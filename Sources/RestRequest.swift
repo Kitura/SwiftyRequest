@@ -22,15 +22,17 @@ public class RestRequest {
     
     public var queryItems: [URLQueryItem]? {
         set {
-            _queryItems = newValue
             // Replace queryitems on request.url with new queryItems
             if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
-                urlComponents.queryItems = _queryItems
+                urlComponents.queryItems = newValue
                 request.url = urlComponents.url
             }
         }
         get {
-            return _queryItems
+            if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
+                return urlComponents.queryItems
+            }
+            return nil
         }
     }
 
@@ -39,9 +41,6 @@ public class RestRequest {
     
     /// URL `String` used to store a url containing replacable template values
     private var urlTemplate: String? = nil
-    
-    /// Query parameters to be appended to the request's url
-    private var _queryItems: [URLQueryItem]? = nil
 
     /// A default `URLSession` instance
     private let session = URLSession(configuration: URLSessionConfiguration.default)
@@ -58,7 +57,6 @@ public class RestRequest {
     ///   - headerParameters: HTTP header parameters for the request
     ///   - acceptType: Specify the type of content to accept
     ///   - contentType: Specify the type of content to send
-    ///   - queryItems: Query parameters to add to url
     ///   - messageBody: Data to be placed in the body of the request
     ///   - productInfo: String containing product name and version for use in creating user agent String
     ///   - circuitParameters: `CircuitBreaker` parameters if any
@@ -69,7 +67,6 @@ public class RestRequest {
         headerParameters: [String: String] = [:],
         acceptType: String? = nil,
         contentType: String? = nil,
-        queryItems: [URLQueryItem]? = nil,
         messageBody: Data? = nil,
         productInfo: String? = nil,
         circuitParameters: CircuitParameters<String>? = nil)
@@ -78,15 +75,10 @@ public class RestRequest {
         // So the following logic discerns between normal URLs and templated URLs
         var urlComponents: URLComponents!
         if let components = URLComponents(string: url) {
-
             urlComponents = components
-            if let queryItems = queryItems, !queryItems.isEmpty {
-                urlComponents.queryItems = queryItems
-            }
         } else {
             urlComponents = URLComponents(string: "")
             self.urlTemplate = url
-            self._queryItems = queryItems
         }
 
         // construct basic mutable request
@@ -144,7 +136,6 @@ public class RestRequest {
                   headerParameters: requestParameters.headerParameters,
                   acceptType: requestParameters.acceptType,
                   contentType: requestParameters.contentType,
-                  queryItems: requestParameters.queryItems,
                   messageBody: requestParameters.messageBody,
                   circuitParameters: circuitParameters)
     }
@@ -200,13 +191,10 @@ public class RestRequest {
             urlString = ur
         }
 
-        guard var urlComponents = urlString.expand(params: params) else {
+        guard let urlComponents = urlString.expand(params: params) else {
             return RestError.invalidSubstitution
         }
 
-        if let queryItems = self.queryItems, !queryItems.isEmpty {
-            urlComponents.queryItems = queryItems
-        }
         self.request.url = urlComponents.url
         return nil
     }
@@ -215,8 +203,11 @@ public class RestRequest {
     ///
     /// - Parameters:
     ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
     ///   - completionHandler: Callback used on completion of operation
-    public func responseData(templateParams: [String: String]? = nil, completionHandler: @escaping (RestResponse<Data>) -> Void) {
+    public func responseData(templateParams: [String: String]? = nil,
+                             queryItems: [URLQueryItem]? = nil,
+                             completionHandler: @escaping (RestResponse<Data>) -> Void) {
 
         // determine if params should be considered and substituted into url
         if let error = performSubstitutions(params: templateParams) {
@@ -225,7 +216,8 @@ public class RestRequest {
             completionHandler(dataResponse)
             return
         }
-
+        self.queryItems = queryItems
+        
         response() { data, response, error in
             guard let data = data else {
                 let result = Result<Data>.failure(RestError.noData)
@@ -263,14 +255,16 @@ public class RestRequest {
     ///   - dataToError: Error callback closure focused on validating data
     ///   - path: Array of Json keys leading to desired Json
     ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
     ///   - completionHandler: Callback used on completion of operation
     public func responseObject<T: JSONDecodable>(
         dataToError: ((Data) -> Error?)? = nil,
         path: [JSONPathType]? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<T>) -> Void)
     {
-        responseObject(responseToError: dataToErrorWrapper(dataToError: dataToError), path: path, templateParams: templateParams, completionHandler: completionHandler)
+        responseObject(responseToError: dataToErrorWrapper(dataToError: dataToError), path: path, templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
 
     /// Request response method with the expected result of the object, `T` specified
@@ -279,11 +273,13 @@ public class RestRequest {
     ///   - responseToError: Error callback closure in case of request failure
     ///   - path: Array of Json keys leading to desired Json
     ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
     ///   - completionHandler: Callback used on completion of operation
     public func responseObject<T: JSONDecodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         path: [JSONPathType]? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<T>) -> Void)
     {
         if let error = performSubstitutions(params: templateParams) {
@@ -292,6 +288,7 @@ public class RestRequest {
             completionHandler(dataResponse)
             return
         }
+        self.queryItems = queryItems
 
         response() { data, response, error in
 
@@ -344,9 +341,10 @@ public class RestRequest {
         dataToError: ((Data) -> Error?)? = nil,
         path: [JSONPathType]? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<[T]>) -> Void)
     {
-        responseArray(responseToError: dataToErrorWrapper(dataToError: dataToError), path: path, templateParams: templateParams, completionHandler: completionHandler)
+        responseArray(responseToError: dataToErrorWrapper(dataToError: dataToError), path: path, templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
 
     /// Request response method with the expected result of an array of type `T` specified
@@ -355,11 +353,13 @@ public class RestRequest {
     ///   - responseToError: Error callback closure in case of request failure
     ///   - path: Array of Json keys leading to desired Json
     ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
     ///   - completionHandler: Callback used on completion of operation
     public func responseArray<T: JSONDecodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         path: [JSONPathType]? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<[T]>) -> Void)
     {
         if let error = performSubstitutions(params: templateParams) {
@@ -368,6 +368,7 @@ public class RestRequest {
             completionHandler(dataResponse)
             return
         }
+        self.queryItems = queryItems
 
         response() { data, response, error in
 
@@ -420,9 +421,10 @@ public class RestRequest {
     public func responseString(
         dataToError: ((Data) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<String>) -> Void)
     {
-        responseString(responseToError: dataToErrorWrapper(dataToError: dataToError), templateParams: templateParams, completionHandler: completionHandler)
+        responseString(responseToError: dataToErrorWrapper(dataToError: dataToError), templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
 
     /// Request response method with the expected result of a `String`
@@ -430,10 +432,12 @@ public class RestRequest {
     /// - Parameters:
     ///   - responseToError: Error callback closure in case of request failure
     ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
     ///   - completionHandler: Callback used on completion of operation
     public func responseString(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<String>) -> Void)
     {
         if let error = performSubstitutions(params: templateParams) {
@@ -442,6 +446,7 @@ public class RestRequest {
             completionHandler(dataResponse)
             return
         }
+        self.queryItems = queryItems
 
         response() { data, response, error in
 
@@ -481,10 +486,12 @@ public class RestRequest {
     /// - Parameters:
     ///   - responseToError: Error callback closure in case of request failure
     ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
     ///   - completionHandler: Callback used on completion of operation
     public func responseVoid(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<Void>) -> Void)
     {
         if let error = performSubstitutions(params: templateParams) {
@@ -493,6 +500,7 @@ public class RestRequest {
             completionHandler(dataResponse)
             return
         }
+        self.queryItems = queryItems
 
         response() { data, response, error in
 
@@ -543,17 +551,15 @@ public struct RequestParameters {
     let headerParameters: [String: String]
     let acceptType: String?
     let contentType: String?
-    let queryItems: [URLQueryItem]?
     let messageBody: Data?
 
-    init(method: HTTPMethod, url: String, credentials: Credentials, headerParameters: [String: String] = [:], acceptType: String? = nil, contentType: String? = nil, queryItems: [URLQueryItem]? = nil, messageBody: Data? = nil) {
+    init(method: HTTPMethod, url: String, credentials: Credentials, headerParameters: [String: String] = [:], acceptType: String? = nil, contentType: String? = nil, messageBody: Data? = nil) {
         self.method = method
         self.url = url
         self.credentials = credentials
         self.headerParameters = headerParameters
         self.acceptType = acceptType
         self.contentType = contentType
-        self.queryItems = queryItems
         self.messageBody = messageBody
     }
 }
