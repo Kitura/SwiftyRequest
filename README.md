@@ -48,8 +48,8 @@ To make outbound HTTP calls using RestKit, you create a `RestRequest` instance. 
 - `headerParameters`
 - `acceptType`
 - `contentType`
-- `queryItems`
 - `messageBody`
+- `productInfo`
 - `circuitParameters`
 
 Example usage of `RestRequest`:
@@ -63,17 +63,45 @@ let request = RestRequest(method: .get,
 ```
 
 ### Invoke Response
-In this example, `dataToError` is simply an error handling function.
+In this example, `responseToError` is simply an error handling function.
 The `response` object we get back is of type `RestResponse<String>` so we can perform a switch on the `response.result` to determine if the network call was successful.
 
 ```swift
-request.responseString(dataToError: dataToError) { response in
+request.responseString(responseToError: responseToError) { response in
     switch response.result {
     case .success(let result):
         print("Success")
     case .failure(let error):
         print("Failure")
     }
+}
+```
+
+### Invoke Response with Template Parameters
+
+In this example, we invoke a response method with some template parameters to be used in replacing the `{state}` and `{city}` values in the `url`. This allows us to create multiple response invocations with the same `RestRequest` object, but possibly using different url values. Additionally, the `RequestParameters` is a helper object to bundle up values used to create a `RestRequest` object.
+
+```swift
+let requestParameters = RequestParameters(method: .get,
+                                          url: "http://api.weather.com/api/123456/conditions/q/{state}/{city}.json",
+                                          credentials: .apiKey)
+let request = RestRequest(requestParameters)
+request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { response in
+	// Handle response
+}
+```
+
+### Invoke Response with Query Parameters
+
+In this example, we invoke a response method with a query parameter to be appeneded onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`.
+
+```swift
+let requestParameters = RequestParameters(method: .get,
+                                          url: "http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json",
+                                          credentials: .apiKey)
+let request = RestRequest(requestParameters)
+request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { response in
+	// Handle response	
 }
 ```
 
