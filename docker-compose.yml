@@ -1,0 +1,5 @@
+test:
+  image: ibmcom/swift-ubuntu:3.1.1
+  volumes:
+      - .:/RestKit
+  command: bash -c "cd /RestKit && swift package clean && swift build && swift test && swift package clean"
