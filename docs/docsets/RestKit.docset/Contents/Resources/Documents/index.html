@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
           RestKit Docs
         </a>
-         (45% documented)
+         (46% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -197,8 +197,8 @@
 <li><code>headerParameters</code></li>
 <li><code>acceptType</code></li>
 <li><code>contentType</code></li>
-<li><code>queryItems</code></li>
 <li><code>messageBody</code></li>
+<li><code>productInfo</code></li>
 <li><code>circuitParameters</code></li>
 </ul>
 
@@ -211,15 +211,37 @@
 </code></pre>
 <h3 id='invoke-response' class='heading'>Invoke Response</h3>
 
-<p>In this example, <code>dataToError</code> is simply an error handling function.
+<p>In this example, <code>responseToError</code> is simply an error handling function.
 The <code>response</code> object we get back is of type <code>RestResponse&lt;String&gt;</code> so we can perform a switch on the <code>response.result</code> to determine if the network call was successful.</p>
-<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="nf">responseString</span><span class="p">(</span><span class="nv">dataToError</span><span class="p">:</span> <span class="n">dataToError</span><span class="p">)</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="nf">responseString</span><span class="p">(</span><span class="nv">responseToError</span><span class="p">:</span> <span class="n">responseToError</span><span class="p">)</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
     <span class="k">switch</span> <span class="n">response</span><span class="o">.</span><span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">result</span><span class="p">):</span>
         <span class="nf">print</span><span class="p">(</span><span class="s">"Success"</span><span class="p">)</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
         <span class="nf">print</span><span class="p">(</span><span class="s">"Failure"</span><span class="p">)</span>
     <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='invoke-response-with-template-parameters' class='heading'>Invoke Response with Template Parameters</h3>
+
+<p>In this example, we invoke a response method with some template parameters to be used in replacing the <code>{state}</code> and <code>{city}</code> values in the <code>url</code>. This allows us to create multiple response invocations with the same <code>RestRequest</code> object, but possibly using different url values. Additionally, the <code>RequestParameters</code> is a helper object to bundle up values used to create a <code>RestRequest</code> object.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">requestParameters</span> <span class="o">=</span> <span class="kt">RequestParameters</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span>
+                                          <span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/{state}/{city}.json"</span><span class="p">,</span>
+                                          <span class="nv">credentials</span><span class="p">:</span> <span class="o">.</span><span class="n">apiKey</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="n">requestParameters</span><span class="p">)</span>
+<span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="s">"state"</span><span class="p">:</span> <span class="s">"TX"</span><span class="p">,</span> <span class="s">"city"</span><span class="p">:</span> <span class="s">"Austin"</span><span class="p">])</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+    <span class="c1">// Handle response</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='invoke-response-with-query-parameters' class='heading'>Invoke Response with Query Parameters</h3>
+
+<p>In this example, we invoke a response method with a query parameter to be appeneded onto the <code>url</code> behind the scenes so that the <code>RestRequest</code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>. If no <code>queryItems</code> parameter is set, then all query parameters will be removed from the url if any exsisted.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">requestParameters</span> <span class="o">=</span> <span class="kt">RequestParameters</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span>
+                                          <span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json"</span><span class="p">,</span>
+                                          <span class="nv">credentials</span><span class="p">:</span> <span class="o">.</span><span class="n">apiKey</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="n">requestParameters</span><span class="p">)</span>
+<span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"hour"</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="s">"9"</span><span class="p">)])</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+    <span class="c1">// Handle response  </span>
 <span class="p">}</span>
 </code></pre>
 <h2 id='circuitbreaker-integration' class='heading'>CircuitBreaker Integration</h2>
@@ -268,7 +290,7 @@ The <code>response</code> object we get back is of type <code>RestResponse&lt;St
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-12)</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-13)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
