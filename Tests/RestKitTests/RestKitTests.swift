@@ -478,6 +478,7 @@ class RestKitTests: XCTestCase {
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
         let request = RestRequest(requestParameters, circuitParameters)
+        let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
         
         // verify query has many parameters
         let completionHandlerFour = { (response: (RestResponse<Data>)) in
@@ -486,7 +487,7 @@ class RestKitTests: XCTestCase {
                 XCTAssertGreaterThan(result.count, 0)
                 XCTAssertNotNil(response.request?.url?.query)
                 if let queryItems = response.request?.url?.query {
-                    XCTAssertEqual(queryItems, "friend=brian&friend=george&friend=melissa&friend=mika")
+                    XCTAssertEqual(queryItems, "friend=brian&friend=george&friend=melissa%2Btempe&friend=mika")
                 }
             case .failure(let error):
                 XCTFail("Failed to get weather response data with error: \(error)")
@@ -500,21 +501,21 @@ class RestKitTests: XCTestCase {
             case .success(let result):
                 XCTAssertGreaterThan(result.count, 0)
                 XCTAssertNil(response.request?.url?.query)
-                let queryItems = [URLQueryItem(name: "friend", value: "brian"), URLQueryItem(name: "friend", value: "george"), URLQueryItem(name: "friend", value: "melissa"), URLQueryItem(name: "friend", value: "mika")]
+                let queryItems = [URLQueryItem(name: "friend", value: "brian"), URLQueryItem(name: "friend", value: "george"), URLQueryItem(name: "friend", value: "melissa+tempe"), URLQueryItem(name: "friend", value: "mika")]
                 request.responseData(queryItems: queryItems, completionHandler: completionHandlerFour)
             case .failure(let error):
                 XCTFail("Failed to get weather response data with error: \(error)")
             }
         }
         
-        // verify query value changed
+        // verify query value changed and was encoded properly
         let completionHandlerTwo = { (response: (RestResponse<Data>)) in
             switch response.result {
             case .success(let result):
                 XCTAssertGreaterThan(result.count, 0)
                 XCTAssertNotNil(response.request?.url?.query)
                 if let queryItems = response.request?.url?.query {
-                    XCTAssertEqual(queryItems, "friend=darren")
+                    XCTAssertEqual(queryItems, "friend=darren%2Bfink")
                 }
                 request.responseData(completionHandler: completionHandlerThree)
             case .failure(let error):
@@ -528,17 +529,19 @@ class RestKitTests: XCTestCase {
             case .success(let retVal):
                 XCTAssertGreaterThan(retVal.count, 0)
                 XCTAssertNotNil(response.request?.url?.query)
-                if let queryItems = response.request?.url?.query {
+                XCTAssertNotNil(request.queryItems)
+                if let queryItems = response.request?.url?.query, let requestQueryItems = request.queryItems {
                     XCTAssertEqual(queryItems, "friend=bill")
+                    XCTAssertEqual(initialQueryItems, requestQueryItems)
                 }
                 
-                request.responseData(queryItems: [URLQueryItem(name: "friend", value: "darren")], completionHandler: completionHandlerTwo)
+                request.responseData(queryItems: [URLQueryItem(name: "friend", value: "darren+fink")], completionHandler: completionHandlerTwo)
             case .failure(let error):
                 XCTFail("Failed to get weather response data with error: \(error)")
             }
         }
         
-        request.responseData(queryItems: [URLQueryItem(name: "friend", value: "bill")], completionHandler: completionHandlerOne)
+        request.responseData(queryItems: initialQueryItems, completionHandler: completionHandlerOne)
         
         waitForExpectations(timeout: 10)
         

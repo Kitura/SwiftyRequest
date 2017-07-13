@@ -20,11 +20,14 @@ import CircuitBreaker
 /// Object containing everything needed to build HTTP requests and execute them
 public class RestRequest {
     
+    /// Property used to set and get query parameters on the `request` property of `RestRequest`
     public var queryItems: [URLQueryItem]? {
         set {
             // Replace queryitems on request.url with new queryItems
             if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
                 urlComponents.queryItems = newValue
+                // Must encode "+" to %2B (URLComponents does not do this)
+                urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
                 request.url = urlComponents.url
             }
         }
