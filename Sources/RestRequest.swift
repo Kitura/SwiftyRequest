@@ -234,42 +234,6 @@ public class RestRequest {
         }
     }
 
-    fileprivate func dataToErrorWrapper(dataToError: ((Data) -> Error?)? = nil) -> ((HTTPURLResponse?, Data?) -> Error?)?
-    {
-        return { response, data in
-            // ensure data is not nil
-            guard let data = data else {
-                return RestError.noData
-            }
-
-            // can the data be parsed as an error?
-            if let dataToError = dataToError,
-                let error = dataToError(data) {
-                return error
-            }
-
-            return nil
-        }
-    }
-
-    /// Request response method with the expected result of the object, `T` specified
-    ///
-    /// - Parameters:
-    ///   - dataToError: Error callback closure focused on validating data
-    ///   - path: Array of Json keys leading to desired Json
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
-    public func responseObject<T: JSONDecodable>(
-        dataToError: ((Data) -> Error?)? = nil,
-        path: [JSONPathType]? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<T>) -> Void)
-    {
-        responseObject(responseToError: dataToErrorWrapper(dataToError: dataToError), path: path, templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
-    }
-
     /// Request response method with the expected result of the object, `T` specified
     ///
     /// - Parameters:
@@ -338,16 +302,6 @@ public class RestRequest {
             let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
-    }
-
-    public func responseArray<T: JSONDecodable>(
-        dataToError: ((Data) -> Error?)? = nil,
-        path: [JSONPathType]? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<[T]>) -> Void)
-    {
-        responseArray(responseToError: dataToErrorWrapper(dataToError: dataToError), path: path, templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
 
     /// Request response method with the expected result of an array of type `T` specified
@@ -419,15 +373,6 @@ public class RestRequest {
             let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
-    }
-
-    public func responseString(
-        dataToError: ((Data) -> Error?)? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<String>) -> Void)
-    {
-        responseString(responseToError: dataToErrorWrapper(dataToError: dataToError), templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
 
     /// Request response method with the expected result of a `String`

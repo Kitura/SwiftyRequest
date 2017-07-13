@@ -88,21 +88,6 @@ class RestKitTests: XCTestCase {
         }
     }
 
-    private func dataToError(data: Data) -> Error? {
-        do {
-            let json = try JSON(data: data)
-            let response = try json.getDictionary(at: "response")
-            let error = response["error"]
-            if let message = try error?.getString(at: "description") {
-                print("Error: \(message)")
-                return RestError.noData
-            }
-            return nil
-        } catch {
-            return nil
-        }
-    }
-
     let failureFallback = { (error: BreakerError, msg: String) in
         // If this fallback is accessed, we consider it a failure
         XCTFail("Test opened the circuit and we are in the failure fallback.")
@@ -190,7 +175,7 @@ class RestKitTests: XCTestCase {
                                   url: apiURL,
                                   credentials: .apiKey)
 
-        request.responseString(dataToError: dataToError) { response in
+        request.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
                 XCTAssertGreaterThan(result.characters.count, 0)
@@ -263,7 +248,7 @@ class RestKitTests: XCTestCase {
                               credentials: .apiKey,
                               productInfo: "restkit-sdk/0.2.0")
 
-        request.responseString(dataToError: dataToError) { response in
+        request.responseString(responseToError: responseToError) { response in
 
             XCTAssertNotNil(response.request?.allHTTPHeaderFields)
             if let headers = response.request?.allHTTPHeaderFields {
@@ -297,7 +282,7 @@ class RestKitTests: XCTestCase {
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
         let request = RestRequest(requestParameters, circuitParameters)
-        request.responseString(dataToError: dataToError) { response in
+        request.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
                 XCTAssertGreaterThan(result.characters.count, 0)
@@ -340,15 +325,15 @@ class RestKitTests: XCTestCase {
         }
 
         // Make multiple requests and ensure the correct callbacks are activated
-        request.responseString(dataToError: dataToError) { [unowned self] (response: RestResponse<String>) in
+        request.responseString(responseToError: responseToError) { [unowned self] (response: RestResponse<String>) in
             completionHandler(response)
 
-            request.responseString(dataToError: self.dataToError, completionHandler: { [unowned self] (response: RestResponse<String>) in
+            request.responseString(responseToError: self.responseToError, completionHandler: { [unowned self] (response: RestResponse<String>) in
                 completionHandler(response)
 
-                request.responseString(dataToError: self.dataToError, completionHandler: completionHandler)
+                request.responseString(responseToError: self.responseToError, completionHandler: completionHandler)
                 sleep(UInt32(resetTimeout/1000) + 1)
-                request.responseString(dataToError: self.dataToError, completionHandler: completionHandler)
+                request.responseString(responseToError: self.responseToError, completionHandler: completionHandler)
             })
         }
 

@@ -57,7 +57,7 @@ public class RestToken {
             credentials: credentials)
         
         // TODO - validate request
-        request.responseString(dataToError: nil) { response in
+        request.responseString(responseToError: nil) { response in
             switch response.result {
             case .success(let token):
                 self.token = token
