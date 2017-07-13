@@ -93,7 +93,7 @@ request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { respon
 
 ### Invoke Response with Query Parameters
 
-In this example, we invoke a response method with a query parameter to be appeneded onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`.
+In this example, we invoke a response method with a query parameter to be appeneded onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`. If no `queryItems` parameter is set, then all query parameters will be removed from the url if any exsisted.
 
 ```swift
 let requestParameters = RequestParameters(method: .get,
