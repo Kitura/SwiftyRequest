@@ -1,8 +1,8 @@
-# RestKit
+# SwiftyRequest
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
 ![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)
 
-RestKit is an HTTP networking library built for Swift.
+SwiftyRequest is an HTTP networking library built for Swift.
 
 ## Contents
 * [Features](#features)
@@ -19,10 +19,10 @@ RestKit is an HTTP networking library built for Swift.
 - Multipart form data.
 
 ## Swift version
-The latest version of RestKit works with the `3.1.1` version of the Swift binaries. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
+The latest version of SwiftyRequest works with the `3.1.1` version of the Swift binaries. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
 
 ## Installation
-To leverage the RestKit package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
+To leverage the SwiftyRequest package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
 
 ```swift
  import PackageDescription
@@ -33,7 +33,7 @@ To leverage the RestKit package in your Swift application, you should specify a 
      ...
 
      dependencies: [
-         .Package(url: "https://github.ibm.com/MIL/RestKit.git", majorVersion: 0),
+         .Package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", majorVersion: 0),
 
          ...
 
@@ -43,7 +43,7 @@ To leverage the RestKit package in your Swift application, you should specify a 
 ## Usage
 
 ### Make Requests
-To make outbound HTTP calls using RestKit, you create a `RestRequest` instance. Required constructor parameters are `method`, `url`, and `credentials`, but there are many more you can use, such as:
+To make outbound HTTP calls using SwiftyRequest, you create a `RestRequest` instance. Required constructor parameters are `method`, `url`, and `credentials`, but there are many more you can use, such as:
 
 - `headerParameters`
 - `acceptType`
@@ -55,7 +55,7 @@ To make outbound HTTP calls using RestKit, you create a `RestRequest` instance. 
 Example usage of `RestRequest`:
 
 ```swift
-import RestKit
+import SwiftyRequest
 
 let request = RestRequest(method: .get,
                           url: "http://myApiCall/hello",
@@ -107,7 +107,7 @@ request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { res
 
 ## CircuitBreaker Integration
 
-RestKit now has additional built-in functionality for leveraging the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library to increase your application's stability. To make use of this functionality, you just need to provide a `CircuitParameters` object to the `RestRequest` initializer. A `CircuitParameters` object will include a reference to a fallback function that will be invoked when the circuit is failing fast.
+SwiftyRequest now has additional built-in functionality for leveraging the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library to increase your application's stability. To make use of this functionality, you just need to provide a `CircuitParameters` object to the `RestRequest` initializer. A `CircuitParameters` object will include a reference to a fallback function that will be invoked when the circuit is failing fast.
 
 ### Fallback
 Here is an example of a fallback closure:
