@@ -17,7 +17,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "RestKit",
+    name: "SwiftyRequest",
     
     dependencies: [
         .Package(url: "https://github.com/IBM-Swift/CircuitBreaker.git", majorVersion: 2)

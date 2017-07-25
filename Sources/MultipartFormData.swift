@@ -41,7 +41,7 @@ public class MultipartFormData {
     }
     
     public init() {
-        self.boundary = "restkit.boundary.bd0b4c6e3b9c2126"
+        self.boundary = "swiftyrequest.boundary.bd0b4c6e3b9c2126"
     }
     
     public func append(_ data: Data, withName: String, mimeType: String? = nil, fileName: String? = nil) {

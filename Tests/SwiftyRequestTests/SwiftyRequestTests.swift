@@ -1,6 +1,6 @@
 import XCTest
 import CircuitBreaker
-@testable import RestKit
+@testable import SwiftyRequest
 
 /// URL for the weather underground that many of the tests use
 let apiKey = "96318a1fc52412b1" // We don't know if API Key for the wunderground API could expire at some point...
@@ -39,7 +39,7 @@ public struct GeoLookupModel: JSONDecodable {
     }
 }
 
-class RestKitTests: XCTestCase {
+class SwiftyRequestTests: XCTestCase {
 
     static var allTests = [
         ("testResponseData", testResponseData),
@@ -75,7 +75,7 @@ class RestKitTests: XCTestCase {
                 print("Data is nil with response code: \(code)")
                 return RestError.noData
             }
-            return nil  // RestKit will generate error for this case
+            return nil  // SwiftyRequest will generate error for this case
         }
 
         do {
@@ -93,13 +93,13 @@ class RestKitTests: XCTestCase {
         XCTFail("Test opened the circuit and we are in the failure fallback.")
     }
 
-    // MARK: RestKit Tests
+    // MARK: SwiftyRequest Tests
 
     // API Key (96318a1fc52412b1) for the wunderground API may expire at some point.
-    // If this happens, use a different endpoint to test RestKit with.
+    // If this happens, use a different endpoint to test SwiftyRequest with.
     func testResponseData() {
 
-        let expectation = self.expectation(description: "responseData RestKit test")
+        let expectation = self.expectation(description: "responseData SwiftyRequest test")
 
         let requestParameters = RequestParameters(method: .get,
                                                   url: apiURL,
@@ -121,7 +121,7 @@ class RestKitTests: XCTestCase {
 
     func testResponseObject() {
 
-        let expectation = self.expectation(description: "responseObject RestKit test")
+        let expectation = self.expectation(description: "responseObject SwiftyRequest test")
 
         let request = RestRequest(method: .get,
                                   url: apiURL,
@@ -145,7 +145,7 @@ class RestKitTests: XCTestCase {
 
     func testResponseArray() {
 
-        let expectation = self.expectation(description: "responseArray RestKit test")
+        let expectation = self.expectation(description: "responseArray SwiftyRequest test")
 
         let requestParameters = RequestParameters(method: .get,
                                                   url: geolookupURL,
@@ -169,7 +169,7 @@ class RestKitTests: XCTestCase {
 
     func testResponseString() {
 
-        let expectation = self.expectation(description: "responseString RestKit test")
+        let expectation = self.expectation(description: "responseString SwiftyRequest test")
 
         let request = RestRequest(method: .get,
                                   url: apiURL,
@@ -191,7 +191,7 @@ class RestKitTests: XCTestCase {
 
     func testResponseVoid() {
 
-        let expectation = self.expectation(description: "responseVoid RestKit test")
+        let expectation = self.expectation(description: "responseVoid SwiftyRequest test")
 
         let request = RestRequest(method: .get,
                                   url: apiURL,
@@ -212,7 +212,7 @@ class RestKitTests: XCTestCase {
 
     func testFileDownload() {
 
-        let expectation = self.expectation(description: "download file RestKit test")
+        let expectation = self.expectation(description: "download file SwiftyRequest test")
 
         let request = RestRequest(method: .get,
                                   url: "https://raw.githubusercontent.com/watson-developer-cloud/swift-sdk/master/Tests/DiscoveryV1Tests/metadata.json",
@@ -241,19 +241,19 @@ class RestKitTests: XCTestCase {
 
     func testRequestUserAgent() {
 
-        let expectation = self.expectation(description: "responseString RestKit test with userAgent string")
+        let expectation = self.expectation(description: "responseString SwiftyRequest test with userAgent string")
 
         let request = RestRequest(method: .get,
                               url: apiURL,
                               credentials: .apiKey,
-                              productInfo: "restkit-sdk/0.2.0")
+                              productInfo: "swiftyrequest-sdk/0.2.0")
 
         request.responseString(responseToError: responseToError) { response in
 
             XCTAssertNotNil(response.request?.allHTTPHeaderFields)
             if let headers = response.request?.allHTTPHeaderFields {
                 XCTAssertNotNil(headers["User-Agent"])
-                XCTAssertEqual(headers["User-Agent"], "restkit-sdk/0.2.0".generateUserAgent())
+                XCTAssertEqual(headers["User-Agent"], "swiftyrequest-sdk/0.2.0".generateUserAgent())
             }
 
             switch response.result {

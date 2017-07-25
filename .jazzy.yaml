@@ -1,6 +1,6 @@
-module: RestKit
+module: SwiftyRequest
 author: IBM
-github_url: https://github.ibm.com/MIL/RestKit
+github_url: https://github.com/IBM-Swift/SwiftyRequest
 
 theme: fullwidth
 clean: true
@@ -11,4 +11,4 @@ readme: README.md
 skip_undocumented: false
 hide_documentation_coverage: false
 
-xcodebuild_arguments: [-project, RestKit.xcodeproj, -target, RestKit, LIBRARY_SEARCH_PATHS=.build/debug]
+xcodebuild_arguments: [-project, SwiftyRequest.xcodeproj, -target, SwiftyRequest, LIBRARY_SEARCH_PATHS=.build/debug]

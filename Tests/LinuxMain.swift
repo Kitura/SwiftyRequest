@@ -1,6 +1,6 @@
 import XCTest
-@testable import RestKitTests
+@testable import SwiftyRequestTests
 
 XCTMain([
-    testCase(RestKitTests.allTests),
+    testCase(SwiftyRequestTests.allTests),
 ])

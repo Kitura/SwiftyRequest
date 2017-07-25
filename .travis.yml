@@ -1,5 +1,5 @@
-# Travis CI build file for RestKit.
-# RestKit runs on macOS and Linux (Ubuntu).
+# Travis CI build file for SwiftyRequest.
+# SwiftyRequest runs on macOS and Linux (Ubuntu).
 
 # whitelist (branches that should be built)
 branches:
