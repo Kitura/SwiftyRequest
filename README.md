@@ -1,4 +1,6 @@
 # SwiftyRequest
+
+[![Build Status - Master](https://travis-ci.org/IBM-Swift/SwiftyRequest.svg?branch=master)](https://travis-ci.org/IBM-Swift/SwiftyRequest)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
 ![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)
 
