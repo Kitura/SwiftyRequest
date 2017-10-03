@@ -21,7 +21,7 @@ SwiftyRequest is an HTTP networking library built for Swift.
 - Multipart form data.
 
 ## Swift version
-The latest version of SwiftyRequest works with the `3.1.1` version of the Swift binaries. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
+The latest version of SwiftyRequest works with the `3.1.1` and newer versions of the Swift binaries. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
 
 ## Installation
 To leverage the SwiftyRequest package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
