@@ -66,7 +66,7 @@ public class RestRequest {
     public init(
         method: HTTPMethod,
         url: String,
-        credentials: Credentials,
+        credentials: Credentials? = nil,
         headerParameters: [String: String] = [:],
         acceptType: String? = nil,
         contentType: String? = nil,
@@ -96,12 +96,14 @@ public class RestRequest {
         }
 
         // set the request's authentication credentials
-        switch credentials {
-        case .apiKey: break
-        case .basicAuthentication(let username, let password):
-            let authData = (username + ":" + password).data(using: .utf8)!
-            let authString = authData.base64EncodedString()
-            request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
+        if let credentials = credentials {
+            switch credentials {
+            case .apiKey: break
+            case .basicAuthentication(let username, let password):
+                let authData = (username + ":" + password).data(using: .utf8)!
+                let authString = authData.base64EncodedString()
+                request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
+            }
         }
 
         // set the request's header parameters
@@ -495,13 +497,13 @@ public class RestRequest {
 public struct RequestParameters {
     let method: HTTPMethod
     let url: String
-    let credentials: Credentials
+    let credentials: Credentials?
     let headerParameters: [String: String]
     let acceptType: String?
     let contentType: String?
     let messageBody: Data?
 
-    init(method: HTTPMethod, url: String, credentials: Credentials, headerParameters: [String: String] = [:], acceptType: String? = nil, contentType: String? = nil, messageBody: Data? = nil) {
+    init(method: HTTPMethod, url: String, credentials: Credentials? = nil, headerParameters: [String: String] = [:], acceptType: String? = nil, contentType: String? = nil, messageBody: Data? = nil) {
         self.method = method
         self.url = url
         self.credentials = credentials
