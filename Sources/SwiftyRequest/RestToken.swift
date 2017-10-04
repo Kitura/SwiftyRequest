@@ -51,11 +51,10 @@ public class RestToken {
         failure: ((Error) -> Void)? = nil,
         success: (() -> Void)? = nil)
     {
-        let request = RestRequest(
-            method: .get,
-            url: tokenURL,
-            credentials: credentials)
+        let request = RestRequest(method: .get, url: tokenURL)
         
+        request.credentials = credentials
+
         // TODO - validate request
         request.responseString(responseToError: nil) { response in
             switch response.result {
