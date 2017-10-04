@@ -505,10 +505,8 @@ class SwiftyRequestTests: XCTestCase {
             case .success(let retVal):
                 XCTAssertGreaterThan(retVal.count, 0)
                 XCTAssertNotNil(response.request?.url?.query)
-                XCTAssertNotNil(request.queryItems)
-                if let queryItems = response.request?.url?.query, let requestQueryItems = request.queryItems {
+                if let queryItems = response.request?.url?.query {
                     XCTAssertEqual(queryItems, "friend=bill")
-                    XCTAssertEqual(initialQueryItems, requestQueryItems)
                 }
                 
                 request.responseData(queryItems: [URLQueryItem(name: "friend", value: "darren+fink")], completionHandler: completionHandlerTwo)

@@ -71,9 +71,6 @@ public class RestRequest {
     /// HTTP User-Agent Header
     public var productInfo: String? = nil
 
-    /// Property used to specify query parameters for a `request`
-    public var queryItems: [URLQueryItem]? = nil
-
     /// Initialize a `RestRequest` instance
     ///
     /// - Parameters:
@@ -113,8 +110,8 @@ public class RestRequest {
     public func responseData(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
                              completionHandler: @escaping (RestResponse<Data>) -> Void) {
-        self.queryItems = queryItems
-        let (request, error) = build(templateParams: templateParams)
+
+        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
 
         // determine if params should be considered and substituted into url
         if  let error = error {
@@ -152,8 +149,7 @@ public class RestRequest {
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<T>) -> Void)
     {
-        self.queryItems = queryItems
-        let (request, error) = build(templateParams: templateParams)
+        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
         
         if  let error = error {
             let result = Result<T>.failure(error)
@@ -225,8 +221,7 @@ public class RestRequest {
         completionHandler: @escaping (RestResponse<[T]>) -> Void)
     {
         
-        self.queryItems = queryItems
-        let (request, error) = build(templateParams: templateParams)
+        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
         
         if  let error = error {
             let result = Result<[T]>.failure(error)
@@ -296,8 +291,7 @@ public class RestRequest {
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<String>) -> Void)
     {
-        self.queryItems = queryItems
-        let (request, error) = build(templateParams: templateParams)
+        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
         
         if  let error = error {
             let result = Result<String>.failure(error)
@@ -352,8 +346,7 @@ public class RestRequest {
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<Void>) -> Void)
     {
-        self.queryItems = queryItems
-        let (request, error) = build(templateParams: templateParams)
+        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
         
         if  let error = error {
             let result = Result<Void>.failure(error)
@@ -444,7 +437,7 @@ public class RestRequest {
     ///
     /// - Parameters: none
     /// - Returns   : returns the given URLRequest Object
-    private func build(templateParams: [String: String]? = nil) -> (URLRequest, RestError?) {
+    private func build(templateParams: [String: String]? = nil, queryItems: [URLQueryItem]? = nil) -> (URLRequest, RestError?) {
         
         let restError: RestError? = performSubstitutions(params: templateParams)
         
