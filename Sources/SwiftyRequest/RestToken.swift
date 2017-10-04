@@ -51,7 +51,7 @@ public class RestToken {
         failure: ((Error) -> Void)? = nil,
         success: (() -> Void)? = nil)
     {
-        let request = RestRequest(method: .get, url: tokenURL)
+        let request = RestRequest(url: tokenURL)
         
         request.credentials = credentials
 

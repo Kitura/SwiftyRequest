@@ -35,8 +35,11 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
      ...
 
      dependencies: [
-         .Package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", majorVersion: 0),
+        // Swift 3.1.1
+        .Package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", majorVersion: 0),
 
+        // Swift 4.0
+        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", upToNextMajor(from: "1.0.0"),
          ...
 
      ])
@@ -45,23 +48,24 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
 ## Usage
 
 ### Make Requests
-To make outbound HTTP calls using SwiftyRequest, you create a `RestRequest` instance. Required constructor parameters are `method`, `url`, and `credentials`, but there are many more you can use, such as:
+To make outbound HTTP calls using SwiftyRequest, you create a `RestRequest` instance. Required constructor parameters are `url`, but there are many more you can use, such as:
 
 - `headerParameters`
 - `acceptType`
-- `contentType`
 - `messageBody`
 - `productInfo`
 - `circuitParameters`
+- `method` : Defaults to `Get`
+- `contentType` : Defaults to `application/json`
 
 Example usage of `RestRequest`:
 
 ```swift
 import SwiftyRequest
 
-let request = RestRequest(method: .get,
-                          url: "http://myApiCall/hello",
-                          credentials: .apiKey)
+let request = RestRequest(url: "http://myApiCall/hello")
+request.method = .get           // Request method defaults to .get
+request.credentials = .apiKey
 ```
 
 ### Invoke Response
@@ -84,10 +88,9 @@ request.responseString(responseToError: responseToError) { response in
 In this example, we invoke a response method with some template parameters to be used in replacing the `{state}` and `{city}` values in the `url`. This allows us to create multiple response invocations with the same `RestRequest` object, but possibly using different url values. Additionally, the `RequestParameters` is a helper object to bundle up values used to create a `RestRequest` object.
 
 ```swift
-let requestParameters = RequestParameters(method: .get,
-                                          url: "http://api.weather.com/api/123456/conditions/q/{state}/{city}.json",
-                                          credentials: .apiKey)
-let request = RestRequest(requestParameters)
+let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/{state}/{city}.json")
+request.credentials = .apiKey
+
 request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { response in
 	// Handle response
 }
@@ -98,10 +101,9 @@ request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { respon
 In this example, we invoke a response method with a query parameter to be appeneded onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`. If no `queryItems` parameter is set, then all query parameters will be removed from the url if any exsisted.
 
 ```swift
-let requestParameters = RequestParameters(method: .get,
-                                          url: "http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json",
-                                          credentials: .apiKey)
-let request = RestRequest(requestParameters)
+let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json")
+request.credentials = .apiKey
+
 request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { response in
 	// Handle response	
 }
@@ -128,10 +130,9 @@ let circuitParameters = CircuitParameters(timeout: 2000,
                                           maxFailures: 2,
                                           fallback: breakFallback)
 
-let request = RestRequest(method: .get,
-                          url: "http://myApiCall/hello",
-                          credentials: .apiKey,
-                          circuitParameters: circuitParameters)
+let request = RestRequest(url: "http://myApiCall/hello")
+request.credentials = .apiKey,
+request.circuitParameters = circuitParameters
 ```
 
 At this point, you can use any of the response methods mentioned in the section below.
