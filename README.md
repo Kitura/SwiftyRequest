@@ -39,7 +39,7 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
         .Package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", majorVersion: 0),
 
         // Swift 4.0
-        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", upToNextMajor(from: "1.0.0"),
+        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "0.0.0"),
          ...
 
      ])
@@ -48,23 +48,23 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
 ## Usage
 
 ### Make Requests
-To make outbound HTTP calls using SwiftyRequest, you create a `RestRequest` instance. Required constructor parameters are `url`, but there are many more you can use, such as:
+To make outbound HTTP calls using SwiftyRequest, You create a `RestRequest` instance. The `method` parameter is optional (defaulting to `.get`) and `url` is required
 
+#### Below is the list of customizeable fields
 - `headerParameters`
 - `acceptType`
 - `messageBody`
 - `productInfo`
 - `circuitParameters`
-- `method` : Defaults to `Get`
 - `contentType` : Defaults to `application/json`
+- `method` : Defaults to `application/json`
 
 Example usage of `RestRequest`:
 
 ```swift
 import SwiftyRequest
 
-let request = RestRequest(url: "http://myApiCall/hello")
-request.method = .get           // Request method defaults to .get
+let request = RestRequest(method: .get, url: "http://myApiCall/hello")
 request.credentials = .apiKey
 ```
 
@@ -130,7 +130,7 @@ let circuitParameters = CircuitParameters(timeout: 2000,
                                           maxFailures: 2,
                                           fallback: breakFallback)
 
-let request = RestRequest(url: "http://myApiCall/hello")
+let request = RestRequest(method: .get, url: "http://myApiCall/hello")
 request.credentials = .apiKey,
 request.circuitParameters = circuitParameters
 ```

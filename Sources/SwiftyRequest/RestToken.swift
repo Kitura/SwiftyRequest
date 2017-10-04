@@ -21,14 +21,14 @@ import Foundation
  retrieved at a particular URL using basic authentication credentials (i.e. username and password).
  */
 public class RestToken {
-    
+
     public var token: String?
     public var isRefreshing = false
     public var retries = 0
-    
+
     private var tokenURL: String
     private var credentials: Credentials
-    
+
     /**
      Create a `RestToken`.
      
@@ -40,7 +40,7 @@ public class RestToken {
         self.tokenURL = tokenURL
         self.credentials = Credentials.basicAuthentication(username: username, password: password)
     }
-    
+
     /**
      Refresh the authentication token.
 
@@ -49,10 +49,9 @@ public class RestToken {
      */
     public func refreshToken(
         failure: ((Error) -> Void)? = nil,
-        success: (() -> Void)? = nil)
-    {
+        success: (() -> Void)? = nil) {
         let request = RestRequest(url: tokenURL)
-        
+
         request.credentials = credentials
 
         // TODO - validate request

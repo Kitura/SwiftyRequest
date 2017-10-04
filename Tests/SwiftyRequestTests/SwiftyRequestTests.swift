@@ -103,7 +103,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let request = RestRequest(url: apiURL)
         request.credentials = .apiKey
-    
+
         request.responseData { response in
             switch response.result {
             case .success(let retval):
@@ -126,8 +126,7 @@ class SwiftyRequestTests: XCTestCase {
         request.credentials = .apiKey
         request.acceptType = "application/json"
 
-        request.responseObject(responseToError:  responseToError)
-                            { (response: RestResponse<WeatherResponse>) in
+        request.responseObject(responseToError:  responseToError) { (response: RestResponse<WeatherResponse>) in
             switch response.result {
             case .success(let retval):
                 XCTAssertGreaterThan(retval.json.count, 0)
@@ -210,10 +209,10 @@ class SwiftyRequestTests: XCTestCase {
         let expectation = self.expectation(description: "download file SwiftyRequest test")
 
         let url = "https://raw.githubusercontent.com/watson-developer-cloud/swift-sdk/master/Tests/DiscoveryV1Tests/metadata.json"
-        
+
         let request = RestRequest(url: url)
         request.credentials = .apiKey
-    
+
         let bundleURL = URL(fileURLWithPath: "/tmp")
         let destinationURL = bundleURL.appendingPathComponent("tempFile.html")
 
@@ -242,7 +241,7 @@ class SwiftyRequestTests: XCTestCase {
         let request = RestRequest(url: apiURL)
         request.credentials = .apiKey
         request.productInfo = "swiftyrequest-sdk/0.2.0"
-    
+
         request.responseString(responseToError: responseToError) { response in
 
             XCTAssertNotNil(response.request?.allHTTPHeaderFields)
@@ -269,7 +268,7 @@ class SwiftyRequestTests: XCTestCase {
     func testCircuitBreakResponseString() {
 
         let expectation = self.expectation(description: "CircuitBreaker success test")
-        
+
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
         let request = RestRequest(url: apiURL)
@@ -307,7 +306,7 @@ class SwiftyRequestTests: XCTestCase {
         let request = RestRequest(url: "http://notreal/blah")
         request.credentials = .apiKey
         request.circuitParameters = circuitParameters
-    
+
         let completionHandler = { (response: (RestResponse<String>)) in
 
             if fallbackCalled {
@@ -342,7 +341,7 @@ class SwiftyRequestTests: XCTestCase {
         let expectation = self.expectation(description: "URL templating and substitution test")
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
-        
+
         let request = RestRequest(url: templetedAPIURL)
         request.credentials = .apiKey
         request.circuitParameters = circuitParameters
@@ -400,7 +399,7 @@ class SwiftyRequestTests: XCTestCase {
         let expectation = self.expectation(description: "URL substitution test with no substitution params")
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
-        
+
         let request = RestRequest(url: templetedAPIURL)
         request.credentials = .apiKey
         request.circuitParameters = circuitParameters
@@ -442,16 +441,16 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
 
     }
-    
+
     // MARK: Query parameter tests
-    
+
     func testQueryParamUpdating() {
-        
+
         let expectation = self.expectation(description: "Test setting, modifying, and removing URL query parameters")
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
         let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
-        
+
         let request = RestRequest(url: apiURL)
         request.credentials = .apiKey
         request.circuitParameters = circuitParameters
@@ -470,7 +469,7 @@ class SwiftyRequestTests: XCTestCase {
             }
             expectation.fulfill()
         }
-        
+
         // verify query was set to nil
         let completionHandlerThree = { (response: (RestResponse<Data>)) in
             switch response.result {
@@ -483,7 +482,7 @@ class SwiftyRequestTests: XCTestCase {
                 XCTFail("Failed to get weather response data with error: \(error)")
             }
         }
-        
+
         // verify query value changed and was encoded properly
         let completionHandlerTwo = { (response: (RestResponse<Data>)) in
             switch response.result {
@@ -498,7 +497,7 @@ class SwiftyRequestTests: XCTestCase {
                 XCTFail("Failed to get weather response data with error: \(error)")
             }
         }
-        
+
         // verfiy query value could be set
         let completionHandlerOne = { (response: (RestResponse<Data>)) in
             switch response.result {
@@ -508,25 +507,25 @@ class SwiftyRequestTests: XCTestCase {
                 if let queryItems = response.request?.url?.query {
                     XCTAssertEqual(queryItems, "friend=bill")
                 }
-                
+
                 request.responseData(queryItems: [URLQueryItem(name: "friend", value: "darren+fink")], completionHandler: completionHandlerTwo)
             case .failure(let error):
                 XCTFail("Failed to get weather response data with error: \(error)")
             }
         }
-        
+
         request.responseData(queryItems: initialQueryItems, completionHandler: completionHandlerOne)
-        
+
         waitForExpectations(timeout: 10)
-        
+
     }
-    
+
     func testQueryTemplateParams() {
-        
+
         let expectation = self.expectation(description: "Testing URL template and query parameters used together")
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
-        
+
         let request = RestRequest(url: templetedAPIURL)
         request.credentials = .apiKey
         request.circuitParameters = circuitParameters
@@ -544,9 +543,9 @@ class SwiftyRequestTests: XCTestCase {
             }
             expectation.fulfill()
         }
-        
+
         waitForExpectations(timeout: 10)
-        
+
     }
 
 }

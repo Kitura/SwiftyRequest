@@ -24,8 +24,8 @@ public class RestRequest {
     private let session = URLSession(configuration: URLSessionConfiguration.default)
 
     /// `CircuitBreaker` instance for this `RestRequest`
-    public var circuitBreaker: CircuitBreaker<(Data?, HTTPURLResponse?, Error?) -> Void, Void, String>? = nil
-    
+    public var circuitBreaker: CircuitBreaker<(Data?, HTTPURLResponse?, Error?) -> Void, Void, String>?
+
     /// Parameters for a `CircuitBreaker` instance.
     /// When set, a new circuitBreaker instance is created
     public var circuitParameters: CircuitParameters<String>? = nil {
@@ -41,45 +41,45 @@ public class RestRequest {
             }
         }
     }
-    
+
     // MARK: HTTP Request Paramters
 
     /// URL `String` used to store a url containing replacable template values
-    private var urlTemplate: String? = nil
+    private var urlTemplate: String?
 
     /// The string representation of HTTP request url
     private var url: String
-    
+
     /// The HTTP request method: defaults to Get
     public var method: HTTPMethod = .get
 
     /// HTTP Credentials
-    public var credentials: Credentials? = nil
+    public var credentials: Credentials?
 
     /// HTTP Header Parameters
     public var headerParameters: [String: String] = [:]
 
     /// HTTP Accept Type Header
-    public var acceptType: String? = nil
+    public var acceptType: String? = "application/json"
 
     /// HTTP Content Type Header: defaults to application/json
     public var contentType: String? = "application/json"
 
     /// HTTP Message Body
-    public var messageBody: Data? = nil
+    public var messageBody: Data?
 
     /// HTTP User-Agent Header
-    public var productInfo: String? = nil
+    public var productInfo: String?
 
     /// Initialize a `RestRequest` instance
     ///
     /// - Parameters:
     ///   - url: URL string to use for network request
-    public init(url: String) {
+    public init(method: HTTPMethod = .get, url: String) {
         self.url = url
-        
+        self.method = method
+
         // We accept URLs with templated values which `URLComponents` does not treat as valid
-        // So the following logic discerns between normal URLs and templated URLs
         if URLComponents(string: url) == nil {
             self.urlTemplate = url
         }
@@ -120,8 +120,8 @@ public class RestRequest {
             completionHandler(dataResponse)
             return
         }
-        
-        response() { data, response, error in
+
+        response { data, response, _ in
             guard let data = data else {
                 let result = Result<Data>.failure(RestError.noData)
                 let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
@@ -147,10 +147,9 @@ public class RestRequest {
         path: [JSONPathType]? = nil,
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<T>) -> Void)
-    {
+        completionHandler: @escaping (RestResponse<T>) -> Void) {
         let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
-        
+
         if  let error = error {
             let result = Result<T>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
@@ -158,7 +157,7 @@ public class RestRequest {
             return
         }
 
-        response() { data, response, error in
+        response { data, response, error in
 
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
@@ -218,11 +217,10 @@ public class RestRequest {
         path: [JSONPathType]? = nil,
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<[T]>) -> Void)
-    {
-        
+        completionHandler: @escaping (RestResponse<[T]>) -> Void) {
+
         let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
-        
+
         if  let error = error {
             let result = Result<[T]>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
@@ -230,7 +228,7 @@ public class RestRequest {
             return
         }
 
-        response() { data, response, error in
+        response { data, response, error in
 
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
@@ -289,10 +287,9 @@ public class RestRequest {
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<String>) -> Void)
-    {
+        completionHandler: @escaping (RestResponse<String>) -> Void) {
         let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
-        
+
         if  let error = error {
             let result = Result<String>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
@@ -300,7 +297,7 @@ public class RestRequest {
             return
         }
 
-        response() { data, response, error in
+        response { data, response, error in
 
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
@@ -344,10 +341,9 @@ public class RestRequest {
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<Void>) -> Void)
-    {
+        completionHandler: @escaping (RestResponse<Void>) -> Void) {
         let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
-        
+
         if  let error = error {
             let result = Result<Void>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
@@ -355,7 +351,7 @@ public class RestRequest {
             return
         }
 
-        response() { data, response, error in
+        response { data, response, error in
 
             if let responseToError = responseToError, let error = responseToError(response, data) {
                 let result = Result<Void>.failure(error)
@@ -408,53 +404,52 @@ public class RestRequest {
             callback(data, response as? HTTPURLResponse, error)
         }
         task.resume()
-        
+
     }
-    
+
     /// Method to perform substitution on `String` URL if it contains templated placeholders
     ///
     /// - Parameter params: dictionary of parameters to substitute in
     /// - Returns: returns either a `RestError` or nil if there were no problems setting new URL on our `URLRequest` object
     private func performSubstitutions(params: [String: String]?) -> RestError? {
-        
+
         guard let params = params else {
             return nil
         }
-        
+
         // Get urlTemplate if available, otherwise just use the request's url
         let urlString = urlTemplate ?? url
-        
+
         guard let urlComponents = urlString.expand(params: params) else {
             return RestError.invalidSubstitution
         }
-        
+
         url = urlComponents.url?.absoluteString ?? url
-        
+
         return nil
     }
-    
+
     /// Builder method to construct a URLRequest
     ///
     /// - Parameters: none
     /// - Returns   : returns the given URLRequest Object
     private func build(templateParams: [String: String]? = nil, queryItems: [URLQueryItem]? = nil) -> (URLRequest, RestError?) {
-        
+
         let restError: RestError? = performSubstitutions(params: templateParams)
-        
-        
+
         // construct basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
-        
+
         let urlObject = urlComponents.url ?? URL(string: "n/a")!
         var request = URLRequest(url: urlObject)
         request.httpMethod = method.rawValue
         request.httpBody = messageBody
-        
+
         // set the request's user agent
         if let productInfo = productInfo {
             request.setValue(productInfo.generateUserAgent(), forHTTPHeaderField: "User-Agent")
         }
-        
+
         // set the request's authentication credentials
         if let credentials = credentials {
             switch credentials {
@@ -465,33 +460,33 @@ public class RestRequest {
                 request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
             }
         }
-        
+
         // modify the url to use the query items
         if  let currentURL = request.url,
             let queryItems = queryItems,
             var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
-            
+
             urlComponents.queryItems = queryItems
             // Must encode "+" to %2B (URLComponents does not do this)
             urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
             request.url = urlComponents.url
         }
-        
+
         // set the request's header parameters
         for (key, value) in headerParameters {
             request.setValue(value, forHTTPHeaderField: key)
         }
-        
+
         // set the request's accept type
         if let acceptType = acceptType {
             request.setValue(acceptType, forHTTPHeaderField: "Accept")
         }
-        
+
         // set the request's content type
         if let contentType = contentType {
             request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         }
-        
+
         return (request, restError)
     }
 }
