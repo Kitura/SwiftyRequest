@@ -17,7 +17,7 @@
 import Foundation
 
 public extension String {
-    
+
     /// A string url expansion method that replaces templated values in a url, with parameters
     /// The template value pattern to be replaced should look like this `{key}`
     /// You can include multiple patterns in a URL as long as you have key and values to replace them
@@ -25,21 +25,20 @@ public extension String {
     /// - Parameter params: parameters to be inserted into the url
     /// - Returns: a `URLComponents` object with expanded url or nil if no substitution was made
     public func expand(params: [String: String]) -> URLComponents? {
-        
+
         var urlString = self
         for (key, value) in params {
             urlString = urlString.replacingOccurrences(of: "{" + key + "}", with: value)
         }
         return URLComponents(string: urlString) ?? nil
     }
-    
-    
+
     /// Creates a user agent string to explain the current platform being used. 
     /// `self` is expected to be product info, typically in the format `<productName>/<productVersion>`
     ///
     /// - Returns: user agent `String`
     public func generateUserAgent() -> String {
-        
+
         let operatingSystem: String = {
             #if os(iOS)
                 return "iOS"
@@ -55,12 +54,12 @@ public extension String {
                 return "Unknown"
             #endif
         }()
-        
+
         let operatingSystemVersion: String = {
             let os = ProcessInfo.processInfo.operatingSystemVersion
             return "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
         }()
-        
+
         return "\(self) \(operatingSystem)/\(operatingSystemVersion)"
     }
 }

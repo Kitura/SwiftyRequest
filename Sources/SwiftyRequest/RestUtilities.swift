@@ -18,7 +18,7 @@ import Foundation
 
 /// Extension of `Dictionary` type values
 public extension Dictionary {
-    
+
     /// Performs a transform on the each value of a dictionary
     ///
     /// - Parameter transform: transform function to execute
