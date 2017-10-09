@@ -96,15 +96,14 @@ public class RestRequest {
         } else {
             let task = session.dataTask(with: build().0) { (data, response, error) in
                 let response = response as? HTTPURLResponse
-                if let error = error {
+                if let code = response?.statusCode,
+                    code >= 200 && code < 300 {
                     completionHandler(data, response, error)
-                }
-                response?.statusCode == 200 ?
-                    completionHandler(data, response, error)
-                    :
+                } else {
                     completionHandler(data,
                                       response,
                                       RestError.erroredResponseStatus("\(String(describing: response?.statusCode))"))
+                }
             }
             task.resume()
         }
