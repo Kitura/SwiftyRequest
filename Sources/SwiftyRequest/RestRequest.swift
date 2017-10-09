@@ -95,7 +95,16 @@ public class RestRequest {
             breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
         } else {
             let task = session.dataTask(with: build().0) { (data, response, error) in
-                completionHandler(data, response as? HTTPURLResponse, error)
+                let response = response as? HTTPURLResponse
+                if let error = error {
+                    completionHandler(data, response, error)
+                }
+                response?.statusCode == 200 ?
+                    completionHandler(data, response, error)
+                    :
+                    completionHandler(data,
+                                      response,
+                                      RestError.erroredResponseStatus("\(String(describing: response?.statusCode))"))
             }
             task.resume()
         }
@@ -121,7 +130,15 @@ public class RestRequest {
             return
         }
 
-        response { data, response, _ in
+        response { data, response, error in
+
+            if let error = error {
+                let result = Result<Data>.failure(error)
+                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+
             guard let data = data else {
                 let result = Result<Data>.failure(RestError.noData)
                 let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
@@ -158,6 +175,13 @@ public class RestRequest {
         }
 
         response { data, response, error in
+
+            if let error = error {
+                let result = Result<T>.failure(error)
+                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
 
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
@@ -230,6 +254,13 @@ public class RestRequest {
 
         response { data, response, error in
 
+            if let error = error {
+                let result = Result<[T]>.failure(error)
+                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+            
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<[T]>.failure(error)
@@ -299,6 +330,13 @@ public class RestRequest {
 
         response { data, response, error in
 
+            if let error = error {
+                let result = Result<String>.failure(error)
+                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+            
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<String>.failure(error)
@@ -353,6 +391,13 @@ public class RestRequest {
 
         response { data, response, error in
 
+            if let error = error {
+                let result = Result<Void>.failure(error)
+                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+            
             if let responseToError = responseToError, let error = responseToError(response, data) {
                 let result = Result<Void>.failure(error)
                 let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
@@ -546,11 +591,24 @@ public enum Credentials {
 /// - fileManagerError: failure in file manipulation
 /// - invalidFile: the file trying to be accessed is invalid
 /// - invalidSubstitution: means a url substitution was attempted that cannot be made
-public enum RestError: Error {
+public enum RestError: Error, CustomStringConvertible {
     case noData
     case serializationError
     case encodingError
     case fileManagerError
     case invalidFile
     case invalidSubstitution
+    case erroredResponseStatus(String)
+    
+    public var description: String {
+        switch self {
+        case .noData                        : return "No Data"
+        case .serializationError            : return "Serialization Error"
+        case .encodingError                 : return "Encoding Error"
+        case .fileManagerError              : return "File Manager Error"
+        case .invalidFile                   : return "Invalid File"
+        case .invalidSubstitution           : return "Invalid Data"
+        case .erroredResponseStatus(let s)  : return "Error HTTP Response: `\(s)`"
+        }
+    }
 }
