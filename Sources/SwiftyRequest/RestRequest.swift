@@ -102,7 +102,7 @@ public class RestRequest {
                 } else {
                     completionHandler(data,
                                       response,
-                                      RestError.erroredResponseStatus("\(String(describing: response?.statusCode))"))
+                                      RestError.erroredResponseStatus(response?.statusCode ?? 400))
                 }
             }
             task.resume()
@@ -418,17 +418,18 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation
     public func download(to destination: URL, completionHandler: @escaping (HTTPURLResponse?, Error?) -> Void) {
         let task = session.downloadTask(with: build().0) { (source, response, error) in
-            guard let source = source else {
-                completionHandler(nil, RestError.invalidFile)
-                return
-            }
-            let fileManager = FileManager.default
             do {
-                try fileManager.moveItem(at: source, to: destination)
+              guard let source = source else {
+                  throw RestError.invalidFile
+              }
+              let fileManager = FileManager.default
+              try fileManager.moveItem(at: source, to: destination)
+
+              completionHandler(response as? HTTPURLResponse, error)
+
             } catch {
                 completionHandler(nil, RestError.fileManagerError)
             }
-            completionHandler(response as? HTTPURLResponse, error)
         }
         task.resume()
     }
@@ -597,7 +598,7 @@ public enum RestError: Error, CustomStringConvertible {
     case fileManagerError
     case invalidFile
     case invalidSubstitution
-    case erroredResponseStatus(String)
+    case erroredResponseStatus(Int)
     
     public var description: String {
         switch self {
