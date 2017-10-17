@@ -95,19 +95,19 @@ public class RestRequest {
             breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
         } else {
             let task = session.dataTask(with: build().0) { (data, response, error) in
-              guard error == nil, let response = response as? HTTPURLResponse else {
-                  completionHandler(nil, nil, error)
-                  return
-              }
+                guard error == nil, let response = response as? HTTPURLResponse else {
+                    completionHandler(nil, nil, error)
+                    return
+                }
               
-              let code = response.statusCode
-              if code >= 200 && code < 300 {
-                  completionHandler(data, response, error)
-              } else {
-                  completionHandler(data,
-                                    response,
-                                    RestError.erroredResponseStatus(code))
-              }
+                let code = response.statusCode
+                if code >= 200 && code < 300 {
+                    completionHandler(data, response, error)
+                } else {
+                    completionHandler(data,
+                                      response,
+                                      RestError.erroredResponseStatus(code))
+                }
             }
             task.resume()
         }
