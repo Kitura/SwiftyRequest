@@ -611,4 +611,11 @@ public enum RestError: Error, CustomStringConvertible {
         case .erroredResponseStatus(let s)  : return "Error HTTP Response: `\(s)`"
         }
     }
+
+    public var code: Int? {
+        switch self {
+        case .erroredResponseStatus(let status): return status
+        default: return nil
+        }
+    }
 }
