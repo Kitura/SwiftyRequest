@@ -95,14 +95,18 @@ public class RestRequest {
             breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
         } else {
             let task = session.dataTask(with: build().0) { (data, response, error) in
-                let response = response as? HTTPURLResponse
-                if let code = response?.statusCode,
-                    code >= 200 && code < 300 {
+                guard error == nil, let response = response as? HTTPURLResponse else {
+                    completionHandler(nil, nil, error)
+                    return
+                }
+              
+                let code = response.statusCode
+                if code >= 200 && code < 300 {
                     completionHandler(data, response, error)
                 } else {
                     completionHandler(data,
                                       response,
-                                      RestError.erroredResponseStatus("\(String(describing: response?.statusCode))"))
+                                      RestError.erroredResponseStatus(code))
                 }
             }
             task.resume()
@@ -418,17 +422,18 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation
     public func download(to destination: URL, completionHandler: @escaping (HTTPURLResponse?, Error?) -> Void) {
         let task = session.downloadTask(with: build().0) { (source, response, error) in
-            guard let source = source else {
-                completionHandler(nil, RestError.invalidFile)
-                return
-            }
-            let fileManager = FileManager.default
             do {
-                try fileManager.moveItem(at: source, to: destination)
+              guard let source = source else {
+                  throw RestError.invalidFile
+              }
+              let fileManager = FileManager.default
+              try fileManager.moveItem(at: source, to: destination)
+
+              completionHandler(response as? HTTPURLResponse, error)
+
             } catch {
                 completionHandler(nil, RestError.fileManagerError)
             }
-            completionHandler(response as? HTTPURLResponse, error)
         }
         task.resume()
     }
@@ -597,7 +602,7 @@ public enum RestError: Error, CustomStringConvertible {
     case fileManagerError
     case invalidFile
     case invalidSubstitution
-    case erroredResponseStatus(String)
+    case erroredResponseStatus(Int)
     
     public var description: String {
         switch self {
@@ -608,6 +613,13 @@ public enum RestError: Error, CustomStringConvertible {
         case .invalidFile                   : return "Invalid File"
         case .invalidSubstitution           : return "Invalid Data"
         case .erroredResponseStatus(let s)  : return "Error HTTP Response: `\(s)`"
+        }
+    }
+
+    public var code: Int? {
+        switch self {
+        case .erroredResponseStatus(let status): return status
+        default: return nil
         }
     }
 }
