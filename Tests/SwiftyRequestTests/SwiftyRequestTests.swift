@@ -409,7 +409,11 @@ class SwiftyRequestTests: XCTestCase {
             case .success(_):
                 XCTFail("Request should have failed with no parameters passed into a templated URL")
             case .failure(let error):
+                #if os(Linux)
                 XCTAssertEqual(error.localizedDescription, "The operation could not be completed")
+                #else
+                XCTAssertEqual(error.localizedDescription, "unsupported URL")
+                #endif
             }
             expectation.fulfill()
         }
