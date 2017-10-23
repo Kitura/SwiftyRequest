@@ -23,6 +23,9 @@ public class RestRequest {
     /// A default `URLSession` instance
     private let session = URLSession(configuration: URLSessionConfiguration.default)
 
+    // The HTTP Request
+    private var request: URLRequest
+
     /// `CircuitBreaker` instance for this `RestRequest`
     public var circuitBreaker: CircuitBreaker<(Data?, HTTPURLResponse?, Error?) -> Void, Void, String>?
 
@@ -51,25 +54,85 @@ public class RestRequest {
     private var url: String
 
     /// The HTTP request method: defaults to Get
-    public var method: HTTPMethod = .get
+    public var method: HTTPMethod = .get {
+        didSet {
+            request.httpMethod = method.rawValue
+        }
+    }
 
     /// HTTP Credentials
-    public var credentials: Credentials?
+    public var credentials: Credentials? {
+        didSet {
+            // set the request's authentication credentials
+            if let credentials = credentials {
+                switch credentials {
+                case .apiKey: break
+                case .basicAuthentication(let username, let password):
+                    let authData = (username + ":" + password).data(using: .utf8)!
+                    let authString = authData.base64EncodedString()
+                    request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
+                }
+            } else {
+                request.setValue(nil, forHTTPHeaderField: "Authorization")
+            }
+        }
+    }
 
     /// HTTP Header Parameters
-    public var headerParameters: [String: String] = [:]
+    public var headerParameters: [String: String] = [:] {
+        didSet {
+            resetHeaders()
+            for (key, value) in headerParameters {
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+        }
+    }
 
-    /// HTTP Accept Type Header
-    public var acceptType: String? = "application/json"
+    /// HTTP Accept Type Header: defaults to application/json
+    public var acceptType: String? {
+        didSet {
+            request.setValue(acceptType, forHTTPHeaderField: "Accept")
+        }
+    }
 
     /// HTTP Content Type Header: defaults to application/json
-    public var contentType: String? = "application/json"
-
-    /// HTTP Message Body
-    public var messageBody: Data?
+    public var contentType: String? {
+        didSet {
+            request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        }
+    }
 
     /// HTTP User-Agent Header
-    public var productInfo: String?
+    public var productInfo: String? {
+        didSet {
+            request.setValue(productInfo?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
+        }
+    }
+
+    /// HTTP Message Body
+    public var messageBody: Data? {
+        didSet {
+            request.httpBody = messageBody
+        }
+    }
+
+    public var queryItems: [URLQueryItem]?  {
+        set {
+            // Replace queryitems on request.url with new queryItems
+            if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
+                urlComponents.queryItems = newValue
+                // Must encode "+" to %2B (URLComponents does not do this)
+                urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+                request.url = urlComponents.url
+            }
+        }
+        get {
+            if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
+                return urlComponents.queryItems
+            }
+            return nil
+        }
+    }
 
     /// Initialize a `RestRequest` instance
     ///
@@ -78,6 +141,14 @@ public class RestRequest {
     public init(method: HTTPMethod = .get, url: String) {
         self.url = url
         self.method = method
+
+        // construct basic mutable request
+        let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
+
+        let urlObject = urlComponents.url ?? URL(string: "n/a")!
+        self.request = URLRequest(url: urlObject)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // We accept URLs with templated values which `URLComponents` does not treat as valid
         if URLComponents(string: url) == nil {
@@ -94,7 +165,7 @@ public class RestRequest {
         if let breaker = circuitBreaker {
             breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
         } else {
-            let task = session.dataTask(with: build().0) { (data, response, error) in
+            let task = session.dataTask(with: request) { (data, response, error) in
                 guard error == nil, let response = response as? HTTPURLResponse else {
                     completionHandler(nil, nil, error)
                     return
@@ -123,33 +194,32 @@ public class RestRequest {
                              queryItems: [URLQueryItem]? = nil,
                              completionHandler: @escaping (RestResponse<Data>) -> Void) {
 
-        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
-
-        // determine if params should be considered and substituted into url
-        if  let error = error {
+        if  let error = performSubstitutions(params: templateParams) {
             let result = Result<Data>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
             completionHandler(dataResponse)
             return
         }
 
+        self.queryItems = queryItems
+
         response { data, response, error in
 
             if let error = error {
                 let result = Result<Data>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
 
             guard let data = data else {
                 let result = Result<Data>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
             let result = Result.success(data)
-            let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
     }
@@ -168,20 +238,21 @@ public class RestRequest {
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<T>) -> Void) {
-        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
 
-        if  let error = error {
+        if  let error = performSubstitutions(params: templateParams) {
             let result = Result<T>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
             completionHandler(dataResponse)
             return
         }
 
+        self.queryItems = queryItems
+
         response { data, response, error in
 
             if let error = error {
                 let result = Result<T>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -189,7 +260,7 @@ public class RestRequest {
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<T>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -197,7 +268,7 @@ public class RestRequest {
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<T>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -226,7 +297,7 @@ public class RestRequest {
             }
 
             // execute callback
-            let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
     }
@@ -246,36 +317,36 @@ public class RestRequest {
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<[T]>) -> Void) {
 
-        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
-
-        if  let error = error {
+        if  let error = performSubstitutions(params: templateParams) {
             let result = Result<[T]>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
             completionHandler(dataResponse)
             return
         }
 
+        self.queryItems = queryItems
+
         response { data, response, error in
 
             if let error = error {
-                let result = Result<[T]>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+               let result = Result<[T]>.failure(error)
+               let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
 
             if let responseToError = responseToError,
-                let error = responseToError(response, data) {
-                let result = Result<[T]>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+               let error = responseToError(response, data) {
+               let result = Result<[T]>.failure(error)
+               let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
 
             // ensure data is not nil
             guard let data = data else {
-                let result = Result<[T]>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                  let result = Result<[T]>.failure(RestError.noData)
+                  let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -305,7 +376,7 @@ public class RestRequest {
             }
 
             // execute callback
-            let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
     }
@@ -322,20 +393,21 @@ public class RestRequest {
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<String>) -> Void) {
-        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
 
-        if  let error = error {
+        if  let error = performSubstitutions(params: templateParams) {
             let result = Result<String>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
             completionHandler(dataResponse)
             return
         }
 
+        self.queryItems = queryItems
+
         response { data, response, error in
 
             if let error = error {
-                let result = Result<String>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+               let result = Result<String>.failure(error)
+               let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -343,7 +415,7 @@ public class RestRequest {
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<String>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -351,7 +423,7 @@ public class RestRequest {
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<String>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -359,14 +431,14 @@ public class RestRequest {
             // parse data as a string
             guard let string = String(data: data, encoding: .utf8) else {
                 let result = Result<String>.failure(RestError.serializationError)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
 
             // execute callback
             let result = Result.success(string)
-            let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
     }
@@ -383,34 +455,35 @@ public class RestRequest {
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<Void>) -> Void) {
-        let (request, error) = build(templateParams: templateParams, queryItems: queryItems)
 
-        if  let error = error {
+        if  let error = performSubstitutions(params: templateParams) {
             let result = Result<Void>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
             completionHandler(dataResponse)
             return
         }
 
+        self.queryItems = queryItems
+
         response { data, response, error in
 
             if let error = error {
-                let result = Result<Void>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: nil, result: result)
+               let result = Result<Void>.failure(error)
+               let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
                 return
             }
 
             if let responseToError = responseToError, let error = responseToError(response, data) {
                 let result = Result<Void>.failure(error)
-                let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
 
             // execute callback
             let result = Result<Void>.success(())
-            let dataResponse = RestResponse(request: request, response: response, data: data, result: result)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
         }
     }
@@ -421,15 +494,15 @@ public class RestRequest {
     ///   - destination: URL destination to save the file to
     ///   - completionHandler: Callback used on completion of operation
     public func download(to destination: URL, completionHandler: @escaping (HTTPURLResponse?, Error?) -> Void) {
-        let task = session.downloadTask(with: build().0) { (source, response, error) in
+        let task = session.downloadTask(with: request) { (source, response, error) in
             do {
-              guard let source = source else {
-                  throw RestError.invalidFile
-              }
-              let fileManager = FileManager.default
-              try fileManager.moveItem(at: source, to: destination)
+                guard let source = source else {
+                    throw RestError.invalidFile
+                }
+                let fileManager = FileManager.default
+                try fileManager.moveItem(at: source, to: destination)
 
-              completionHandler(response as? HTTPURLResponse, error)
+                completionHandler(response as? HTTPURLResponse, error)
 
             } catch {
                 completionHandler(nil, RestError.fileManagerError)
@@ -442,7 +515,6 @@ public class RestRequest {
     ///
     /// - Parameter invocation: `Invocation` contains a command argument, Void return type, and a String fallback arguement
     private func handleInvocation(invocation: Invocation<(Data?, HTTPURLResponse?, Error?) -> Void, Void, String>) {
-        let (request, _ ) = build()
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
                 invocation.notifyFailure()
@@ -473,70 +545,18 @@ public class RestRequest {
             return RestError.invalidSubstitution
         }
 
-        url = urlComponents.url?.absoluteString ?? url
+        self.request.url = urlComponents.url
 
         return nil
     }
 
-    /// Builder method to construct a URLRequest
+    /// Method to reset the request header fields to the base set { Accept, Content-Type, User-Agent } when not nil
     ///
-    /// - Parameters: none
-    /// - Returns   : returns the given URLRequest Object
-    private func build(templateParams: [String: String]? = nil, queryItems: [URLQueryItem]? = nil) -> (URLRequest, RestError?) {
-
-        let restError: RestError? = performSubstitutions(params: templateParams)
-
-        // construct basic mutable request
-        let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
-
-        let urlObject = urlComponents.url ?? URL(string: "n/a")!
-        var request = URLRequest(url: urlObject)
-        request.httpMethod = method.rawValue
-        request.httpBody = messageBody
-
-        // set the request's user agent
-        if let productInfo = productInfo {
-            request.setValue(productInfo.generateUserAgent(), forHTTPHeaderField: "User-Agent")
-        }
-
-        // set the request's authentication credentials
-        if let credentials = credentials {
-            switch credentials {
-            case .apiKey: break
-            case .basicAuthentication(let username, let password):
-                let authData = (username + ":" + password).data(using: .utf8)!
-                let authString = authData.base64EncodedString()
-                request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
-            }
-        }
-
-        // modify the url to use the query items
-        if  let currentURL = request.url,
-            let queryItems = queryItems,
-            var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
-
-            urlComponents.queryItems = queryItems
-            // Must encode "+" to %2B (URLComponents does not do this)
-            urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
-            request.url = urlComponents.url
-        }
-
-        // set the request's header parameters
-        for (key, value) in headerParameters {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
-
-        // set the request's accept type
-        if let acceptType = acceptType {
-            request.setValue(acceptType, forHTTPHeaderField: "Accept")
-        }
-
-        // set the request's content type
-        if let contentType = contentType {
-            request.setValue(contentType, forHTTPHeaderField: "Content-Type")
-        }
-
-        return (request, restError)
+    private func resetHeaders() {
+        request.allHTTPHeaderFields = nil
+        request.setValue(acceptType, forHTTPHeaderField: "Accept")
+        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        request.setValue(productInfo?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
     }
 }
 
