@@ -140,6 +140,37 @@ class SwiftyRequestTests: XCTestCase {
 
     }
 
+    #if swift(>=4.0)
+    func testDecodableResponseObject() {
+        struct Response: Decodable {
+            let response: Body
+        }
+        struct Body: Decodable {
+            let version: String
+            let termsofService: String
+        }
+        
+        let expectation = self.expectation(description: "responseObject SwiftyRequest test")
+        
+        let request = RestRequest(url: "http://api.wunderground.com/api/Your_Key/almanac/q/CA/San_Francisco.json")
+        request.credentials = .apiKey
+        request.acceptType = "application/json"
+        
+        request.responseObject(responseToError:  responseToError) { (response: RestResponse<Response>) in
+            switch response.result {
+            case .success(let response):
+                XCTAssertEqual(response.response.version, "0.1")
+                XCTAssertEqual(response.response.termsofService, "http://www.wunderground.com/weather/api/d/terms.html")
+            case .failure(let error):
+                XCTFail("Failed to get weather response object with error: \(error)")
+            }
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
+    #endif
+
     func testResponseArray() {
 
         let expectation = self.expectation(description: "responseArray SwiftyRequest test")

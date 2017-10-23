@@ -301,6 +301,61 @@ public class RestRequest {
             completionHandler(dataResponse)
         }
     }
+    
+    #if swift(>=4.0)
+    /// Request response method with the expected result of an array of type `T` specified
+    ///
+    /// - Parameters:
+    ///   - responseToError: Error callback closure in case of request failure
+    ///   - path: Array of Json keys leading to desired Json
+    ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - completionHandler: Callback used on completion of operation
+    public func responseObject<T: Decodable>(
+        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
+        templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        completionHandler: @escaping (RestResponse<T>) -> Void) {
+        
+        if  let error = performSubstitutions(params: templateParams) {
+            let result = Result<T>.failure(error)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            completionHandler(dataResponse)
+            return
+        }
+
+        response { data, response, error in
+            
+            if let error = error ?? responseToError?(response,data) {
+                let result = Result<T>.failure(error)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+            
+            // ensure data is not nil
+            guard let data = data else {
+                let result = Result<T>.failure(RestError.noData)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+            
+            // parse json object
+            let result: Result<T>
+            do {
+                let object = try JSONDecoder().decode(T.self, from: data)
+                result = .success(object)
+            } catch {
+                result = .failure(error)
+            }
+            
+            // execute callback
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            completionHandler(dataResponse)
+        }
+    }
+    #endif
 
     /// Request response method with the expected result of an array of type `T` specified
     ///
