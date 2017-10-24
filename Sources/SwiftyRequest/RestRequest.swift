@@ -89,7 +89,7 @@ public class RestRequest {
         set {
             // Remove any header fields external to the RestRequest supported headers
             let s: Set<String> = ["Authorization", "Accept", "Content-Type", "User-Agent"]
-            let headers = request.allHTTPHeaderFields?.map { key, value in if !s.contains(key) { request.setValue(nil, forHTTPHeaderField: key) } }
+            request.allHTTPHeaderFields?.map { key, value in if !s.contains(key) { request.setValue(nil, forHTTPHeaderField: key) } }
             // Add new header parameters
             for (key, value) in newValue {
                 request.setValue(value, forHTTPHeaderField: key)
