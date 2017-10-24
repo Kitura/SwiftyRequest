@@ -54,9 +54,12 @@ public class RestRequest {
     private var url: String
 
     /// The HTTP request method: defaults to Get
-    public var method: HTTPMethod = .get {
-        didSet {
-            request.httpMethod = method.rawValue
+    public var method: HTTPMethod {
+        get {
+            return HTTPMethod(fromRawValue: request.httpMethod ?? "unknown")
+        }
+        set {
+            request.httpMethod = newValue.rawValue
         }
     }
 
@@ -79,10 +82,14 @@ public class RestRequest {
     }
 
     /// HTTP Header Parameters
-    public var headerParameters: [String: String] = [:] {
-        didSet {
-            resetHeaders()
-            for (key, value) in headerParameters {
+    public var headerParameters: [String: String] {
+        get {
+            return request.allHTTPHeaderFields ?? [:]
+        }
+        set {
+            let additionalDefaults = ["Accept": acceptType, "Content-Type": contentType, "User-Agent": productInfo]
+            resetHeaders(defaults: additionalDefaults)
+            for (key, value) in newValue {
                 request.setValue(value, forHTTPHeaderField: key)
             }
         }
@@ -90,28 +97,40 @@ public class RestRequest {
 
     /// HTTP Accept Type Header: defaults to application/json
     public var acceptType: String? {
-        didSet {
-            request.setValue(acceptType, forHTTPHeaderField: "Accept")
+        get {
+            return request.value(forHTTPHeaderField: "Accept")
+        }
+        set {
+            request.setValue(newValue, forHTTPHeaderField: "Accept")
         }
     }
 
     /// HTTP Content Type Header: defaults to application/json
     public var contentType: String? {
-        didSet {
-            request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        get {
+            return request.value(forHTTPHeaderField: "Content-Type")
+        }
+        set {
+            request.setValue(newValue, forHTTPHeaderField: "Content-Type")
         }
     }
 
     /// HTTP User-Agent Header
     public var productInfo: String? {
-        didSet {
-            request.setValue(productInfo?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
+        get {
+            return request.value(forHTTPHeaderField: "User-Agent")
+        }
+        set {
+            request.setValue(newValue?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
         }
     }
 
     /// HTTP Message Body
     public var messageBody: Data? {
-        didSet {
+        get {
+            return request.httpBody
+        }
+        set {
             request.httpBody = messageBody
         }
     }
@@ -139,16 +158,17 @@ public class RestRequest {
     /// - Parameters:
     ///   - url: URL string to use for network request
     public init(method: HTTPMethod = .get, url: String) {
-        self.url = url
-        self.method = method
 
-        // construct basic mutable request
+        // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
-
         let urlObject = urlComponents.url ?? URL(string: "n/a")!
         self.request = URLRequest(url: urlObject)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Set inital fields
+        self.url = url
+        self.method = method
+        self.acceptType = "application/json"
+        self.contentType = "application/json"
 
         // We accept URLs with templated values which `URLComponents` does not treat as valid
         if URLComponents(string: url) == nil {
@@ -552,11 +572,12 @@ public class RestRequest {
 
     /// Method to reset the request header fields to the base set { Accept, Content-Type, User-Agent } when not nil
     ///
-    private func resetHeaders() {
+    private func resetHeaders(defaults: [String: String?]) {
         request.allHTTPHeaderFields = nil
-        request.setValue(acceptType, forHTTPHeaderField: "Accept")
-        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
-        request.setValue(productInfo?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
+        request.setValue(defaults["Accept"] ?? nil, forHTTPHeaderField: "Accept")
+        request.setValue(defaults["Content-Type"] ?? nil, forHTTPHeaderField: "Content-Type")
+        let agent = defaults["User-Agent"] ?? nil
+        request.setValue(agent?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
     }
 }
 
