@@ -87,8 +87,10 @@ public class RestRequest {
             return request.allHTTPHeaderFields ?? [:]
         }
         set {
-            let additionalDefaults = ["Accept": acceptType, "Content-Type": contentType, "User-Agent": productInfo]
-            resetHeaders(defaults: additionalDefaults)
+            // Remove any header fields external to the RestRequest supported headers
+            let s: Set<String> = ["Authorization", "Accept", "Content-Type", "User-Agent"]
+            let headers = request.allHTTPHeaderFields?.map { key, value in if !s.contains(key) { request.setValue(nil, forHTTPHeaderField: key) } }
+            // Add new header parameters
             for (key, value) in newValue {
                 request.setValue(value, forHTTPHeaderField: key)
             }
@@ -568,16 +570,6 @@ public class RestRequest {
         self.request.url = urlComponents.url
 
         return nil
-    }
-
-    /// Method to reset the request header fields to the base set { Accept, Content-Type, User-Agent } when not nil
-    ///
-    private func resetHeaders(defaults: [String: String?]) {
-        request.allHTTPHeaderFields = nil
-        request.setValue(defaults["Accept"] ?? nil, forHTTPHeaderField: "Accept")
-        request.setValue(defaults["Content-Type"] ?? nil, forHTTPHeaderField: "Content-Type")
-        let agent = defaults["User-Agent"] ?? nil
-        request.setValue(agent?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
     }
 }
 
