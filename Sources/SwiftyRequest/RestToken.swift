@@ -22,16 +22,24 @@ import Foundation
  */
 public class RestToken {
 
+    /// String Authentication token
     public var token: String?
+
+    /// Denotes whether the token is refreshing
     public var isRefreshing = false
+
+    // Denotes number of retries
     public var retries = 0
 
+    //  The URL that shall be used to obtain a token.
     private var tokenURL: String
+
+    // Basic Authentication credentials to retrieve tokens
     private var credentials: Credentials
 
     /**
      Create a `RestToken`.
-     
+
      - parameter tokenURL:   The URL that shall be used to obtain a token.
      - parameter username:   The username credential used to obtain a token.
      - parameter password:   The password credential used to obtain a token.

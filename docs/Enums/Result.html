@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Result Enum Reference</title>
+    <title>Result Enumeration Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -16,14 +16,14 @@
 
     <a name="//apple_ref/swift/Enum/Result" class="dashAnchor"></a>
 
-    <a title="Result Enum Reference"></a>
+    <a title="Result Enumeration Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
           SwiftyRequest Docs
         </a>
-         (46% documented)
+         (92% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">SwiftyRequest Reference</a>
       <img class="carat" src="../img/carat.png" />
-      Result Enum Reference
+      Result Enumeration Reference
     </p>
 
     <div class="content-wrapper">
@@ -65,7 +65,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Enums.html">Enums</a>
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/Credentials.html">Credentials</a>
@@ -116,22 +116,19 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Structs.html">Structs</a>
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON.html">JSON</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON/Error.html">– Error</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17RequestParameters">RequestParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/RestResponse.html">RestResponse</a>
@@ -153,11 +150,6 @@
               </div>
             <p>Enum to differentiate a success or failure</p>
 
-<ul>
-<li>success: means a success of generic type <code>T</code></li>
-<li>failure: means a failure with an <code>Error</code> object</li>
-</ul>
-
           </div>
         </section>
 
@@ -168,9 +160,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest6Result7successurFMGS0_x_FxGS0_x_"></a>
+                    <a name="/s:13SwiftyRequest6ResultO7successACyxGxcAEmlF"></a>
                     <a name="//apple_ref/swift/Element/success" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest6Result7successurFMGS0_x_FxGS0_x_">success</a>
+                    <a class="token" href="#/s:13SwiftyRequest6ResultO7successACyxGxcAEmlF">success</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -178,14 +170,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>a success of generic type <code>T</code></p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">success</span><span class="p">(</span><span class="kt">T</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -199,9 +191,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest6Result7failureurFMGS0_x_FPs5Error_GS0_x_"></a>
+                    <a name="/s:13SwiftyRequest6ResultO7failureACyxGs5Error_pcAEmlF"></a>
                     <a name="//apple_ref/swift/Element/failure" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest6Result7failureurFMGS0_x_FPs5Error_GS0_x_">failure</a>
+                    <a class="token" href="#/s:13SwiftyRequest6ResultO7failureACyxGs5Error_pcAEmlF">failure</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -209,14 +201,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>a failure with an <code>Error</code> object</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">failure</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -231,8 +223,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-25)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

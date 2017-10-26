@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           SwiftyRequest Docs
         </a>
-         (46% documented)
+         (92% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -65,7 +65,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Enums.html">Enums</a>
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/Credentials.html">Credentials</a>
@@ -116,22 +116,19 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Structs.html">Structs</a>
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON.html">JSON</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON/Error.html">– Error</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17RequestParameters">RequestParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/RestResponse.html">RestResponse</a>
@@ -163,9 +160,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:vC13SwiftyRequest11RestRequest10queryItemsGSqGSaV10Foundation12URLQueryItem__"></a>
-                    <a name="//apple_ref/swift/Property/queryItems" class="dashAnchor"></a>
-                    <a class="token" href="#/s:vC13SwiftyRequest11RestRequest10queryItemsGSqGSaV10Foundation12URLQueryItem__">queryItems</a>
+                    <a name="/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcytSSGSgv"></a>
+                    <a name="//apple_ref/swift/Property/circuitBreaker" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcytSSGSgv">circuitBreaker</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -173,7 +170,262 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Property used to set and get query parameters on the <code>request</code> property of <code>RestRequest</code></p>
+                        <p><code>CircuitBreaker</code> instance for this <code>RestRequest</code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitBreaker</span><span class="p">:</span> <span class="kt">CircuitBreaker</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">Data</span><span class="p">?,</span> <span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="kt">Void</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgv"></a>
+                    <a name="//apple_ref/swift/Property/circuitParameters" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgv">circuitParameters</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Parameters for a <code>CircuitBreaker</code> instance.
+When set, a new circuitBreaker instance is created</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitParameters</span><span class="p">:</span> <span class="kt"><a href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/HTTP%20Request%20Paramters"></a>
+                <a name="//apple_ref/swift/Section/HTTP Request Paramters" class="dashAnchor"></a>
+                <a href="#/HTTP%20Request%20Paramters">
+                  <h3 class="section-name">HTTP Request Paramters</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C6methodAA10HTTPMethodOv"></a>
+                    <a name="//apple_ref/swift/Property/method" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6methodAA10HTTPMethodOv">method</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The HTTP request method: defaults to Get</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C11credentialsAA11CredentialsOSgv"></a>
+                    <a name="//apple_ref/swift/Property/credentials" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11credentialsAA11CredentialsOSgv">credentials</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP Credentials</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">credentials</span><span class="p">:</span> <span class="kt"><a href="../Enums/Credentials.html">Credentials</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C16headerParameterss10DictionaryVyS2SGv"></a>
+                    <a name="//apple_ref/swift/Property/headerParameters" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C16headerParameterss10DictionaryVyS2SGv">headerParameters</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP Header Parameters</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">headerParameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C10acceptTypeSSSgv"></a>
+                    <a name="//apple_ref/swift/Property/acceptType" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C10acceptTypeSSSgv">acceptType</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP Accept Type Header: defaults to application/json</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">acceptType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C11contentTypeSSSgv"></a>
+                    <a name="//apple_ref/swift/Property/contentType" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11contentTypeSSSgv">contentType</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP Content Type Header: defaults to application/json</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">contentType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C11productInfoSSSgv"></a>
+                    <a name="//apple_ref/swift/Property/productInfo" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11productInfoSSSgv">productInfo</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP User-Agent Header</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">productInfo</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C11messageBody10Foundation4DataVSgv"></a>
+                    <a name="//apple_ref/swift/Property/messageBody" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11messageBody10Foundation4DataVSgv">messageBody</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP Message Body</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">messageBody</span><span class="p">:</span> <span class="kt">Data</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgv"></a>
+                    <a name="//apple_ref/swift/Property/queryItems" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgv">queryItems</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>HTTP Request Query Items</p>
 
                       </div>
                       <div class="declaration">
@@ -190,9 +442,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequestcFT6methodOS_10HTTPMethod3urlSS11credentialsOS_11Credentials16headerParametersGVs10DictionarySSSS_10acceptTypeGSqSS_11contentTypeGSqSS_11messageBodyGSqV10Foundation4Data_11productInfoGSqSS_17circuitParametersGSqGVS_17CircuitParametersSS___S0_"></a>
-                    <a name="//apple_ref/swift/Method/init(method:url:credentials:headerParameters:acceptType:contentType:messageBody:productInfo:circuitParameters:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequestcFT6methodOS_10HTTPMethod3urlSS11credentialsOS_11Credentials16headerParametersGVs10DictionarySSSS_10acceptTypeGSqSS_11contentTypeGSqSS_11messageBodyGSqV10Foundation4Data_11productInfoGSqSS_17circuitParametersGSqGVS_17CircuitParametersSS___S0_">init(method:url:credentials:headerParameters:acceptType:contentType:messageBody:productInfo:circuitParameters:)</a>
+                    <a name="/s:13SwiftyRequest04RestB0CAcA10HTTPMethodO6method_SS3urltcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(method:url:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0CAcA10HTTPMethodO6method_SS3urltcfc">init(method:url:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -207,16 +459,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span>
-        <span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span><span class="p">,</span>
-        <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
-        <span class="nv">credentials</span><span class="p">:</span> <span class="kt"><a href="../Enums/Credentials.html">Credentials</a></span><span class="p">,</span>
-        <span class="nv">headerParameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[:],</span>
-        <span class="nv">acceptType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">contentType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">messageBody</span><span class="p">:</span> <span class="kt">Data</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">productInfo</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">circuitParameters</span><span class="p">:</span> <span class="kt"><a href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -224,18 +467,6 @@
                         <h4>Parameters</h4>
                         <table class="graybox">
                           <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>method</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Specify the HTTP method for network request</p>
-                                </div>
-                              </td>
-                            </tr>
                             <tr>
                               <td>
                                 <code>
@@ -248,160 +479,29 @@
                                 </div>
                               </td>
                             </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>credentials</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Authentication credentials</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>headerParameters</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>HTTP header parameters for the request</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>acceptType</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Specify the type of content to accept</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>contentType</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Specify the type of content to send</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>messageBody</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Data to be placed in the body of the request</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>productInfo</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>String containing product name and version for use in creating user agent String</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>circuitParameters</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p><code>CircuitBreaker</code> parameters if any</p>
-                                </div>
-                              </td>
-                            </tr>
                           </tbody>
                         </table>
                       </div>
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Response%20methods"></a>
+                <a name="//apple_ref/swift/Section/Response methods" class="dashAnchor"></a>
+                <a href="#/Response%20methods">
+                  <h3 class="section-name">Response methods</h3>
+                </a>
+              </div>
+              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequestcFTVS_17RequestParametersGSqGVS_17CircuitParametersSS___S0_"></a>
-                    <a name="//apple_ref/swift/Method/init(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequestcFTVS_17RequestParametersGSqGVS_17CircuitParametersSS___S0_">init(_:_:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Convenience initalizer for <code>RestRequest</code></p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="n">_</span> <span class="nv">requestParameters</span><span class="p">:</span> <span class="kt"><a href="../Structs.html#/s:V13SwiftyRequest17RequestParameters">RequestParameters</a></span><span class="p">,</span> <span class="n">_</span> <span class="nv">circuitParameters</span><span class="p">:</span> <span class="kt"><a href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>requestParameters</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Parameters needed to initialize a <code>RestRequest</code> object</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>circuitParameters</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p><code>CircuitBreaker</code> parameters for configuration</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest8responseFT17completionHandlerFTGSqV10Foundation4Data_GSqCSo15HTTPURLResponse_GSqPs5Error___T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C8responseyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtc17completionHandler_tF"></a>
                     <a name="//apple_ref/swift/Method/response(completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest8responseFT17completionHandlerFTGSqV10Foundation4Data_GSqCSo15HTTPURLResponse_GSqPs5Error___T__T_">response(completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C8responseyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtc17completionHandler_tF">response(completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -442,23 +542,12 @@
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <div class="task-name-container">
-                <a name="/Response%20methods"></a>
-                <a name="//apple_ref/swift/Section/Response methods" class="dashAnchor"></a>
-                <a href="#/Response%20methods">
-                  <h3 class="section-name">Response methods</h3>
-                </a>
-              </div>
-              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest12responseDataFT14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaV10Foundation12URLQueryItem__17completionHandlerFGVS_12RestResponseVS2_4Data_T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C12responseDatays10DictionaryVyS2SGSg14templateParams_Say10Foundation12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyAJ0E0VGc17completionHandlertF"></a>
                     <a name="//apple_ref/swift/Method/responseData(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest12responseDataFT14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaV10Foundation12URLQueryItem__17completionHandlerFGVS_12RestResponseVS2_4Data_T__T_">responseData(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C12responseDatays10DictionaryVyS2SGSg14templateParams_Say10Foundation12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyAJ0E0VGc17completionHandlertF">responseData(templateParams:queryItems:completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -528,9 +617,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest14responseObjectuRxS_13JSONDecodablerFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___4pathGSqGSaPS_12JSONPathType___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS3_12URLQueryItem__17completionHandlerFGVS_12RestResponsex_T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C14responseObjectys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_SayAA12JSONPathType_pGSg4paths10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyxGc17completionHandlertAA13JSONDecodableRzlF"></a>
                     <a name="//apple_ref/swift/Method/responseObject(responseToError:path:templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest14responseObjectuRxS_13JSONDecodablerFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___4pathGSqGSaPS_12JSONPathType___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS3_12URLQueryItem__17completionHandlerFGVS_12RestResponsex_T__T_">responseObject(responseToError:path:templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseObjectys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_SayAA12JSONPathType_pGSg4paths10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyxGc17completionHandlertAA13JSONDecodableRzlF">responseObject(responseToError:path:templateParams:queryItems:completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -627,9 +716,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest13responseArrayuRxS_13JSONDecodablerFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___4pathGSqGSaPS_12JSONPathType___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS3_12URLQueryItem__17completionHandlerFGVS_12RestResponseGSax__T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C13responseArrayys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_SayAA12JSONPathType_pGSg4paths10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVySayxGGc17completionHandlertAA13JSONDecodableRzlF"></a>
                     <a name="//apple_ref/swift/Method/responseArray(responseToError:path:templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest13responseArrayuRxS_13JSONDecodablerFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___4pathGSqGSaPS_12JSONPathType___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS3_12URLQueryItem__17completionHandlerFGVS_12RestResponseGSax__T__T_">responseArray(responseToError:path:templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C13responseArrayys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_SayAA12JSONPathType_pGSg4paths10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVySayxGGc17completionHandlertAA13JSONDecodableRzlF">responseArray(responseToError:path:templateParams:queryItems:completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -726,9 +815,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest14responseStringFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS2_12URLQueryItem__17completionHandlerFGVS_12RestResponseSS_T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C14responseStringys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_s10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVySSGc17completionHandlertF"></a>
                     <a name="//apple_ref/swift/Method/responseString(responseToError:templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest14responseStringFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS2_12URLQueryItem__17completionHandlerFGVS_12RestResponseSS_T__T_">responseString(responseToError:templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseStringys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_s10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVySSGc17completionHandlertF">responseString(responseToError:templateParams:queryItems:completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -812,9 +901,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest12responseVoidFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS2_12URLQueryItem__17completionHandlerFGVS_12RestResponseT__T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C12responseVoidys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_s10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyytGc17completionHandlertF"></a>
                     <a name="//apple_ref/swift/Method/responseVoid(responseToError:templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest12responseVoidFT15responseToErrorGSqFTGSqCSo15HTTPURLResponse_GSqV10Foundation4Data__GSqPs5Error___14templateParamsGSqGVs10DictionarySSSS__10queryItemsGSqGSaVS2_12URLQueryItem__17completionHandlerFGVS_12RestResponseT__T__T_">responseVoid(responseToError:templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C12responseVoidys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_s10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyytGc17completionHandlertF">responseVoid(responseToError:templateParams:queryItems:completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -898,9 +987,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FC13SwiftyRequest11RestRequest8downloadFT2toV10Foundation3URL17completionHandlerFTGSqCSo15HTTPURLResponse_GSqPs5Error___T__T_"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C8downloady10Foundation3URLV2to_ySo15HTTPURLResponseCSg_s5Error_pSgtc17completionHandlertF"></a>
                     <a name="//apple_ref/swift/Method/download(to:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC13SwiftyRequest11RestRequest8downloadFT2toV10Foundation3URL17completionHandlerFTGSqCSo15HTTPURLResponse_GSqPs5Error___T__T_">download(to:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C8downloady10Foundation3URLV2to_ySo15HTTPURLResponseCSg_s5Error_pSgtc17completionHandlertF">download(to:completionHandler:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -961,8 +1050,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-25)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

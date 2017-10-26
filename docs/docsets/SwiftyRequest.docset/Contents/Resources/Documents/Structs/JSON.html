@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>JSON Struct Reference</title>
+    <title>JSON Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -16,14 +16,14 @@
 
     <a name="//apple_ref/swift/Struct/JSON" class="dashAnchor"></a>
 
-    <a title="JSON Struct Reference"></a>
+    <a title="JSON Structure Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
           SwiftyRequest Docs
         </a>
-         (46% documented)
+         (92% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">SwiftyRequest Reference</a>
       <img class="carat" src="../img/carat.png" />
-      JSON Struct Reference
+      JSON Structure Reference
     </p>
 
     <div class="content-wrapper">
@@ -65,7 +65,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Enums.html">Enums</a>
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/Credentials.html">Credentials</a>
@@ -116,22 +116,19 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Structs.html">Structs</a>
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON.html">JSON</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON/Error.html">– Error</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17RequestParameters">RequestParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/RestResponse.html">RestResponse</a>
@@ -145,7 +142,13 @@
         <section class="section">
           <div class="section-content">
             <h1>JSON</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">JSON</span></code></pre>
+
+                </div>
+              </div>
+            <p>Object encapsulating a JSON object</p>
 
           </div>
         </section>
@@ -157,9 +160,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSONcFT4jsonP__S0_"></a>
+                    <a name="/s:13SwiftyRequest4JSONVACyp4json_tcfc"></a>
                     <a name="//apple_ref/swift/Method/init(json:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSONcFT4jsonP__S0_">init(json:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONVACyp4json_tcfc">init(json:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -167,8 +170,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initializes a <code>JSON</code> instance from an Any Object</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">json</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -176,9 +187,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSONcFzT6stringSS_S0_"></a>
+                    <a name="/s:13SwiftyRequest4JSONVACSS6string_tKcfc"></a>
                     <a name="//apple_ref/swift/Method/init(string:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSONcFzT6stringSS_S0_">init(string:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONVACSS6string_tKcfc">init(string:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -186,8 +197,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initializes a <code>JSON</code> instance from a string</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -195,9 +214,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSONcFzT4dataV10Foundation4Data_S0_"></a>
+                    <a name="/s:13SwiftyRequest4JSONVAC10Foundation4DataV4data_tKcfc"></a>
                     <a name="//apple_ref/swift/Method/init(data:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSONcFzT4dataV10Foundation4Data_S0_">init(data:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONVAC10Foundation4DataV4data_tKcfc">init(data:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -205,8 +224,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initialize a <code>JSON</code> instance from a Data Object</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -214,9 +241,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSONcFT10dictionaryGVs10DictionarySSP___S0_"></a>
+                    <a name="/s:13SwiftyRequest4JSONVACs10DictionaryVySSypG10dictionary_tcfc"></a>
                     <a name="//apple_ref/swift/Method/init(dictionary:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSONcFT10dictionaryGVs10DictionarySSP___S0_">init(dictionary:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONVACs10DictionaryVySSypG10dictionary_tcfc">init(dictionary:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -224,8 +251,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initialize a <code>JSON</code> instance from a [String: Any]</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">dictionary</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -233,9 +268,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSONcFT5arrayGSaP___S0_"></a>
+                    <a name="/s:13SwiftyRequest4JSONVACSayypG5array_tcfc"></a>
                     <a name="//apple_ref/swift/Method/init(array:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSONcFT5arrayGSaP___S0_">init(array:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONVACSayypG5array_tcfc">init(array:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -243,8 +278,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initialize a <code>JSON</code> instance from a [Any]</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">array</span><span class="p">:</span> <span class="p">[</span><span class="kt">Any</span><span class="p">])</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -252,9 +295,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON9serializeFzT_V10Foundation4Data"></a>
+                    <a name="/s:13SwiftyRequest4JSONV9serialize10Foundation4DataVyKF"></a>
                     <a name="//apple_ref/swift/Method/serialize()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON9serializeFzT_V10Foundation4Data">serialize()</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV9serialize10Foundation4DataVyKF">serialize()</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -262,8 +305,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Serialize a JSON object</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">serialize</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Data object for a serialized JSON Object</p>
                       </div>
                     </section>
                   </div>
@@ -271,9 +326,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON15serializeStringFzT_SS"></a>
+                    <a name="/s:13SwiftyRequest4JSONV15serializeStringSSyKF"></a>
                     <a name="//apple_ref/swift/Method/serializeString()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON15serializeStringFzT_SS">serializeString()</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV15serializeStringSSyKF">serializeString()</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -281,8 +336,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Serialize a JSON string</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">serializeString</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>String of the serialized JSON Object</p>
                       </div>
                     </section>
                   </div>
@@ -290,9 +357,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON6decodeuRxS_13JSONDecodablerFzT2atGSaPS_12JSONPathType__4typeMx_x"></a>
+                    <a name="/s:13SwiftyRequest4JSONV6decodexSayAA12JSONPathType_pG2atd_xm4typetKAA13JSONDecodableRzlF"></a>
                     <a name="//apple_ref/swift/Method/decode(at:type:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON6decodeuRxS_13JSONDecodablerFzT2atGSaPS_12JSONPathType__4typeMx_x">decode(at:type:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV6decodexSayAA12JSONPathType_pG2atd_xm4typetKAA13JSONDecodableRzlF">decode(at:type:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -300,8 +367,51 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Decodes the designated JSONDecodable object at the given JSONPathType</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">decode</span><span class="o">&lt;</span><span class="kt">Decoded</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="kt">Decoded</span><span class="o">.</span><span class="k">Type</span> <span class="o">=</span> <span class="kt">Decoded</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Decoded</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>path</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>[JSONPathType]</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The type to decode</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The decoded object</p>
                       </div>
                     </section>
                   </div>
@@ -309,9 +419,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON9getDoubleFzt2atGSaPS_12JSONPathType___Sd"></a>
+                    <a name="/s:13SwiftyRequest4JSONV9getDoubleSdSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getDouble(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON9getDoubleFzt2atGSaPS_12JSONPathType___Sd">getDouble(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV9getDoubleSdSayAA12JSONPathType_pG2atd_tKF">getDouble(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -319,8 +429,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve Double</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDouble</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Double</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Double</p>
                       </div>
                     </section>
                   </div>
@@ -328,9 +450,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON6getIntFzt2atGSaPS_12JSONPathType___Si"></a>
+                    <a name="/s:13SwiftyRequest4JSONV6getIntSiSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getInt(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON6getIntFzt2atGSaPS_12JSONPathType___Si">getInt(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV6getIntSiSayAA12JSONPathType_pG2atd_tKF">getInt(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -338,8 +460,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve Double</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getInt</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Double</p>
                       </div>
                     </section>
                   </div>
@@ -347,9 +481,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON9getStringFzt2atGSaPS_12JSONPathType___SS"></a>
+                    <a name="/s:13SwiftyRequest4JSONV9getStringSSSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getString(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON9getStringFzt2atGSaPS_12JSONPathType___SS">getString(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV9getStringSSSayAA12JSONPathType_pG2atd_tKF">getString(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -357,8 +491,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve String</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getString</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Double</p>
                       </div>
                     </section>
                   </div>
@@ -366,9 +512,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON7getBoolFzt2atGSaPS_12JSONPathType___Sb"></a>
+                    <a name="/s:13SwiftyRequest4JSONV7getBoolSbSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getBool(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON7getBoolFzt2atGSaPS_12JSONPathType___Sb">getBool(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV7getBoolSbSayAA12JSONPathType_pG2atd_tKF">getBool(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -376,8 +522,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve Bool</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getBool</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Double</p>
                       </div>
                     </section>
                   </div>
@@ -385,9 +543,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON8getArrayFzt2atGSaPS_12JSONPathType___GSaS0__"></a>
+                    <a name="/s:13SwiftyRequest4JSONV8getArraySayACGSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getArray(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON8getArrayFzt2atGSaPS_12JSONPathType___GSaS0__">getArray(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV8getArraySayACGSayAA12JSONPathType_pG2atd_tKF">getArray(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -395,8 +553,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve JSON Array</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getArray</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">JSON</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Double</p>
                       </div>
                     </section>
                   </div>
@@ -404,9 +574,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON12decodedArrayuRxS_13JSONDecodablerFzT2atGSaPS_12JSONPathType__4typeMx_GSax_"></a>
+                    <a name="/s:13SwiftyRequest4JSONV12decodedArraySayxGSayAA12JSONPathType_pG2atd_xm4typetKAA13JSONDecodableRzlF"></a>
                     <a name="//apple_ref/swift/Method/decodedArray(at:type:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON12decodedArrayuRxS_13JSONDecodablerFzT2atGSaPS_12JSONPathType__4typeMx_GSax_">decodedArray(at:type:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV12decodedArraySayxGSayAA12JSONPathType_pG2atd_xm4typetKAA13JSONDecodableRzlF">decodedArray(at:type:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -414,8 +584,51 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Decodes the designated [JSONDecodable] object at the given JSONPathType</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">decodedArray</span><span class="o">&lt;</span><span class="kt">Decoded</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="kt">Decoded</span><span class="o">.</span><span class="k">Type</span> <span class="o">=</span> <span class="kt">Decoded</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">Decoded</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>path</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>[JSONPathType]</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The type to decode</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The decoded array object</p>
                       </div>
                     </section>
                   </div>
@@ -423,9 +636,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON17decodedDictionaryuRxS_13JSONDecodablerFzT2atGSaPS_12JSONPathType__4typeMx_GVs10DictionarySSx_"></a>
+                    <a name="/s:13SwiftyRequest4JSONV17decodedDictionarys0E0VySSxGSayAA12JSONPathType_pG2atd_xm4typetKAA13JSONDecodableRzlF"></a>
                     <a name="//apple_ref/swift/Method/decodedDictionary(at:type:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON17decodedDictionaryuRxS_13JSONDecodablerFzT2atGSaPS_12JSONPathType__4typeMx_GVs10DictionarySSx_">decodedDictionary(at:type:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV17decodedDictionarys0E0VySSxGSayAA12JSONPathType_pG2atd_xm4typetKAA13JSONDecodableRzlF">decodedDictionary(at:type:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -433,8 +646,51 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Decodes the designated [String: JSONDecodable] object at the given JSONPathType</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">decodedDictionary</span><span class="o">&lt;</span><span class="kt">Decoded</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="kt">Decoded</span><span class="o">.</span><span class="k">Type</span> <span class="o">=</span> <span class="kt">Decoded</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Decoded</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>path</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>[JSONPathType]</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The value type to decode</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The decoded [String: Decoded]</p>
                       </div>
                     </section>
                   </div>
@@ -442,9 +698,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON7getJSONFzt2atGSaPS_12JSONPathType___P_"></a>
+                    <a name="/s:13SwiftyRequest4JSONV03getC0ypSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getJSON(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON7getJSONFzt2atGSaPS_12JSONPathType___P_">getJSON(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV03getC0ypSayAA12JSONPathType_pG2atd_tKF">getJSON(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -452,8 +708,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve JSON from JSONPathType</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getJSON</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Any</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Any</p>
                       </div>
                     </section>
                   </div>
@@ -461,9 +729,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON13getDictionaryFzt2atGSaPS_12JSONPathType___GVs10DictionarySSS0__"></a>
+                    <a name="/s:13SwiftyRequest4JSONV13getDictionarys0E0VySSACGSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getDictionary(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON13getDictionaryFzt2atGSaPS_12JSONPathType___GVs10DictionarySSS0__">getDictionary(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV13getDictionarys0E0VySSACGSayAA12JSONPathType_pG2atd_tKF">getDictionary(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -471,8 +739,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve [String: JSON] from JSONPathType</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDictionary</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">JSON</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>[String: JSON]</p>
                       </div>
                     </section>
                   </div>
@@ -480,9 +760,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FV13SwiftyRequest4JSON19getDictionaryObjectFzt2atGSaPS_12JSONPathType___GVs10DictionarySSP__"></a>
+                    <a name="/s:13SwiftyRequest4JSONV19getDictionaryObjects0E0VySSypGSayAA12JSONPathType_pG2atd_tKF"></a>
                     <a name="//apple_ref/swift/Method/getDictionaryObject(at:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FV13SwiftyRequest4JSON19getDictionaryObjectFzt2atGSaPS_12JSONPathType___GVs10DictionarySSP__">getDictionaryObject(at:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV19getDictionaryObjects0E0VySSypGSayAA12JSONPathType_pG2atd_tKF">getDictionaryObject(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -490,8 +770,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to Retrieve [String: Any] from JSONPathType</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDictionaryObject</span><span class="p">(</span><span class="n">at</span> <span class="nv">path</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>[String: Any]</p>
                       </div>
                     </section>
                   </div>
@@ -503,9 +795,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:OV13SwiftyRequest4JSON5Error"></a>
+                    <a name="/s:13SwiftyRequest4JSONV5ErrorO"></a>
                     <a name="//apple_ref/swift/Enum/Error" class="dashAnchor"></a>
-                    <a class="token" href="#/s:OV13SwiftyRequest4JSON5Error">Error</a>
+                    <a class="token" href="#/s:13SwiftyRequest4JSONV5ErrorO">Error</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -513,9 +805,17 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Enum to describe JSON errors</p>
 
                         <a href="../Structs/JSON/Error.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span><span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -528,8 +828,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-25)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
