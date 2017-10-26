@@ -28,13 +28,13 @@ public class RestToken {
     /// Denotes whether the token is refreshing
     public var isRefreshing = false
 
-    // Denotes number of retries
+    /// Denotes number of retries
     public var retries = 0
 
-    //  The URL that shall be used to obtain a token.
+    ///  The URL that shall be used to obtain a token.
     private var tokenURL: String
 
-    // Basic Authentication credentials to retrieve tokens
+    /// Basic Authentication credentials to retrieve tokens
     private var credentials: Credentials
 
     /**

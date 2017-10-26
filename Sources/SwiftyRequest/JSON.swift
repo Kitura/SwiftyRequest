@@ -20,7 +20,11 @@ import Foundation
 
 /// Designates JSON Path Types
 public protocol JSONPathType {
+
+    /// Method to extract a JSON value from a [String: Any]
     func value(in dictionary: [String: Any]) throws -> JSON
+
+    /// Method to extract a JSON value from a [Any]
     func value(in array: [Any]) throws -> JSON
 }
 
@@ -280,16 +284,26 @@ extension JSON {
 
 // MARK: - JSON Protocols
 
+/// Designates a type capable of being decoded from JSON
 public protocol JSONDecodable {
+
+    /// Initializes a JSONDecodable instance from JSON
     init(json: JSON) throws
 }
 
+/// Designates a type capable of encoding to JSON
 public protocol JSONEncodable {
+
+    /// Method to encode self as JSON
     func toJSON() -> JSON
+
+    /// Method to encode self to Any JSON object
     func toJSONObject() -> Any
 }
 
 extension JSONEncodable {
+
+    /// Default implementation to encode type instances to JSON
     public func toJSON() -> JSON {
         return JSON(json: self.toJSONObject())
     }

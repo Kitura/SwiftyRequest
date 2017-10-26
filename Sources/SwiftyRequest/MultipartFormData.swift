@@ -16,6 +16,7 @@
 
 import Foundation
 
+/// Object encapsulating a Multipart Form
 public class MultipartFormData {
 
     /// String denoting the Content Type

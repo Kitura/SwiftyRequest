@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           SwiftyRequest Docs
         </a>
-         (92% documented)
+         (100% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -142,7 +142,13 @@
         <section class="section">
           <div class="section-content">
             <h1>JSONEncodable</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">JSONEncodable</span></code></pre>
+
+                </div>
+              </div>
+            <p>Designates a type capable of encoding to JSON</p>
 
           </div>
         </section>
@@ -167,13 +173,21 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to encode self as JSON</p>
 
                       </div>
                       <h4>Default Implementation</h4>
                       <div class="default_impl abstract">
-                        <p>Undocumented</p>
+                        <p>Default implementation to encode type instances to JSON</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">toJSON</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/JSON.html">JSON</a></span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -191,8 +205,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to encode self to Any JSON object</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">toJSONObject</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Any</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
