@@ -1,18 +1,7 @@
 {
-  "autoPin": true,
+  "autoPin": false,
   "pins": [
-    {
-      "package": "CircuitBreaker",
-      "reason": null,
-      "repositoryURL": "https://github.com/IBM-Swift/CircuitBreaker.git",
-      "version": "2.0.1"
-    },
-    {
-      "package": "LoggerAPI",
-      "reason": null,
-      "repositoryURL": "https://github.com/IBM-Swift/LoggerAPI.git",
-      "version": "1.7.1"
-    }
+    
   ],
   "version": 1
 }
