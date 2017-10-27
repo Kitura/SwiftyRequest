@@ -137,6 +137,7 @@ public class RestRequest {
         }
     }
 
+    /// HTTP Request Query Items
     public var queryItems: [URLQueryItem]?  {
         set {
             // Replace queryitems on request.url with new queryItems
@@ -576,13 +577,26 @@ public class RestRequest {
 /// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` init.
 /// `A` is the type of the fallback's parameter
 public struct CircuitParameters<A> {
+
+    /// The circuit timeout: defaults to 1000
     let timeout: Int
+
+    /// The circuit timeout: defaults to 60000
     let resetTimeout: Int
+
+    /// Max failures allowed: defaults to 5
     let maxFailures: Int
+
+    /// Rolling Window: defaults to 10000
     let rollingWindow: Int
+
+    /// Bulkhead: defaults to 0
     let bulkhead: Int
+
+    /// The error fallback callback
     let fallback: (BreakerError, A) -> Void
 
+    /// Initialize a `CircuitPrameters` instance
     init(timeout: Int = 1000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.timeout = timeout
         self.resetTimeout = resetTimeout
@@ -596,47 +610,63 @@ public struct CircuitParameters<A> {
 /// Contains data associated with a finished network request.
 /// With `T` being the type of the response expected to be received
 public struct RestResponse<T> {
+
+    /// The rest request
     public let request: URLRequest?
+
+    /// The response to the request
     public let response: HTTPURLResponse?
+
+    /// The Response Data
     public let data: Data?
+
+    /// The Reponse Result
     public let result: Result<T>
 }
 
 /// Enum to differentiate a success or failure
-///
-/// - success: means a success of generic type `T`
-/// - failure: means a failure with an `Error` object
 public enum Result<T> {
+    /// a success of generic type `T`
     case success(T)
+
+    /// a failure with an `Error` object
     case failure(Error)
 }
 
-/// Used to specify the type of authentication being used
-///
-/// - apiKey: means an API key is being used, no additional data needed
-/// - basicAuthentication: means a basic username/password authentication is being used with said value, passed in
+/// Enum used to specify the type of authentication being used
 public enum Credentials {
+    /// an API key is being used, no additional data needed
     case apiKey
+
+    /// a basic username/password authentication is being used with said value, passed in
     case basicAuthentication(username: String, password: String)
 }
 
-/// Error types that can occur during a rest request and response
-///
-/// - noData: means no data was returned from the network
-/// - serializationError: means data couldn't be parsed correctly
-/// - encodingError: failure to encode data into a certain format
-/// - fileManagerError: failure in file manipulation
-/// - invalidFile: the file trying to be accessed is invalid
-/// - invalidSubstitution: means a url substitution was attempted that cannot be made
+/// Enum describing error types that can occur during a rest request and response
 public enum RestError: Error, CustomStringConvertible {
+
+    /// no data was returned from the network
     case noData
+
+    /// data couldn't be parsed correctly
     case serializationError
+
+    /// failure to encode data into a certain format
     case encodingError
+
+    /// failure in file manipulation
     case fileManagerError
+
+    /// the file trying to be accessed is invalid
     case invalidFile
+
+    /// the url substitution attempted could not be made
     case invalidSubstitution
+
+    /// Error response status
     case erroredResponseStatus(Int)
 
+    /// Error Description
     public var description: String {
         switch self {
         case .noData                        : return "No Data"
@@ -649,6 +679,7 @@ public enum RestError: Error, CustomStringConvertible {
         }
     }
 
+    /// Computed Property to extract error code
     public var code: Int? {
         switch self {
         case .erroredResponseStatus(let status): return status

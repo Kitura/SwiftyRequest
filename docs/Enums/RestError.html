@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>RestError Enum Reference</title>
+    <title>RestError Enumeration Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -16,14 +16,14 @@
 
     <a name="//apple_ref/swift/Enum/RestError" class="dashAnchor"></a>
 
-    <a title="RestError Enum Reference"></a>
+    <a title="RestError Enumeration Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
           SwiftyRequest Docs
         </a>
-         (46% documented)
+         (100% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">SwiftyRequest Reference</a>
       <img class="carat" src="../img/carat.png" />
-      RestError Enum Reference
+      RestError Enumeration Reference
     </p>
 
     <div class="content-wrapper">
@@ -65,7 +65,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Enums.html">Enums</a>
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/Credentials.html">Credentials</a>
@@ -116,22 +116,19 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Structs.html">Structs</a>
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON.html">JSON</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON/Error.html">– Error</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17RequestParameters">RequestParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/RestResponse.html">RestResponse</a>
@@ -147,20 +144,11 @@
             <h1>RestError</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
 
                 </div>
               </div>
-            <p>Error types that can occur during a rest request and response</p>
-
-<ul>
-<li>noData: means no data was returned from the network</li>
-<li>serializationError: means data couldn&rsquo;t be parsed correctly</li>
-<li>encodingError: failure to encode data into a certain format</li>
-<li>fileManagerError: failure in file manipulation</li>
-<li>invalidFile: the file trying to be accessed is invalid</li>
-<li>invalidSubstitution: means a url substitution was attempted that cannot be made</li>
-</ul>
+            <p>Enum describing error types that can occur during a rest request and response</p>
 
           </div>
         </section>
@@ -172,9 +160,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest9RestError6noDataFMS0_S0_"></a>
+                    <a name="/s:13SwiftyRequest9RestErrorO6noDataA2CmF"></a>
                     <a name="//apple_ref/swift/Element/noData" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest9RestError6noDataFMS0_S0_">noData</a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO6noDataA2CmF">noData</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -182,14 +170,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>no data was returned from the network</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="n">noData</span></code></pre>
 
                         </div>
                       </div>
@@ -203,9 +191,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest9RestError18serializationErrorFMS0_S0_"></a>
+                    <a name="/s:13SwiftyRequest9RestErrorO013serializationD0A2CmF"></a>
                     <a name="//apple_ref/swift/Element/serializationError" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest9RestError18serializationErrorFMS0_S0_">serializationError</a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO013serializationD0A2CmF">serializationError</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -213,14 +201,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>data couldn&rsquo;t be parsed correctly</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="n">serializationError</span></code></pre>
 
                         </div>
                       </div>
@@ -234,9 +222,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest9RestError13encodingErrorFMS0_S0_"></a>
+                    <a name="/s:13SwiftyRequest9RestErrorO08encodingD0A2CmF"></a>
                     <a name="//apple_ref/swift/Element/encodingError" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest9RestError13encodingErrorFMS0_S0_">encodingError</a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO08encodingD0A2CmF">encodingError</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -244,14 +232,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>failure to encode data into a certain format</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="n">encodingError</span></code></pre>
 
                         </div>
                       </div>
@@ -265,9 +253,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest9RestError16fileManagerErrorFMS0_S0_"></a>
+                    <a name="/s:13SwiftyRequest9RestErrorO011fileManagerD0A2CmF"></a>
                     <a name="//apple_ref/swift/Element/fileManagerError" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest9RestError16fileManagerErrorFMS0_S0_">fileManagerError</a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO011fileManagerD0A2CmF">fileManagerError</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -275,14 +263,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>failure in file manipulation</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="n">fileManagerError</span></code></pre>
 
                         </div>
                       </div>
@@ -296,9 +284,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest9RestError11invalidFileFMS0_S0_"></a>
+                    <a name="/s:13SwiftyRequest9RestErrorO11invalidFileA2CmF"></a>
                     <a name="//apple_ref/swift/Element/invalidFile" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest9RestError11invalidFileFMS0_S0_">invalidFile</a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO11invalidFileA2CmF">invalidFile</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -306,14 +294,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>the file trying to be accessed is invalid</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="n">invalidFile</span></code></pre>
 
                         </div>
                       </div>
@@ -327,9 +315,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FO13SwiftyRequest9RestError19invalidSubstitutionFMS0_S0_"></a>
+                    <a name="/s:13SwiftyRequest9RestErrorO19invalidSubstitutionA2CmF"></a>
                     <a name="//apple_ref/swift/Element/invalidSubstitution" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FO13SwiftyRequest9RestError19invalidSubstitutionFMS0_S0_">invalidSubstitution</a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO19invalidSubstitutionA2CmF">invalidSubstitution</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -337,14 +325,103 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>the url substitution attempted could not be made</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">RestError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="n">invalidSubstitution</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest9RestErrorO21erroredResponseStatusACSicACmF"></a>
+                    <a name="//apple_ref/swift/Element/erroredResponseStatus" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO21erroredResponseStatusACSicACmF">erroredResponseStatus</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Error response status</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">erroredResponseStatus</span><span class="p">(</span><span class="kt">Int</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest9RestErrorO11descriptionSSv"></a>
+                    <a name="//apple_ref/swift/Property/description" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO11descriptionSSv">description</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Error Description</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest9RestErrorO4codeSiSgv"></a>
+                    <a name="//apple_ref/swift/Property/code" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorO4codeSiSgv">code</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Computed Property to extract error code</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">code</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -359,8 +436,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-25)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

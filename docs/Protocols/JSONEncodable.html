@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           SwiftyRequest Docs
         </a>
-         (46% documented)
+         (100% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -65,7 +65,7 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Enums.html">Enums</a>
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/Credentials.html">Credentials</a>
@@ -116,22 +116,19 @@
             </ul>
           </li>
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Structs.html">Structs</a>
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17CircuitParameters">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON.html">JSON</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSON/Error.html">– Error</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:V13SwiftyRequest17RequestParameters">RequestParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/RestResponse.html">RestResponse</a>
@@ -145,7 +142,13 @@
         <section class="section">
           <div class="section-content">
             <h1>JSONEncodable</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">JSONEncodable</span></code></pre>
+
+                </div>
+              </div>
+            <p>Designates a type capable of encoding to JSON</p>
 
           </div>
         </section>
@@ -157,9 +160,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FP13SwiftyRequest13JSONEncodable6toJSONFT_VS_4JSON"></a>
+                    <a name="/s:13SwiftyRequest13JSONEncodableP6toJSONAA0E0VyF"></a>
                     <a name="//apple_ref/swift/Method/toJSON()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FP13SwiftyRequest13JSONEncodable6toJSONFT_VS_4JSON">toJSON()</a>
+                    <a class="token" href="#/s:13SwiftyRequest13JSONEncodableP6toJSONAA0E0VyF">toJSON()</a>
                     </code>
                       <span class="declaration-note">
                         Default implementation
@@ -170,13 +173,21 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to encode self as JSON</p>
 
                       </div>
                       <h4>Default Implementation</h4>
                       <div class="default_impl abstract">
-                        <p>Undocumented</p>
+                        <p>Default implementation to encode type instances to JSON</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">toJSON</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/JSON.html">JSON</a></span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -184,9 +195,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:FP13SwiftyRequest13JSONEncodable12toJSONObjectFT_P_"></a>
+                    <a name="/s:13SwiftyRequest13JSONEncodableP12toJSONObjectypyF"></a>
                     <a name="//apple_ref/swift/Method/toJSONObject()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FP13SwiftyRequest13JSONEncodable12toJSONObjectFT_P_">toJSONObject()</a>
+                    <a class="token" href="#/s:13SwiftyRequest13JSONEncodableP12toJSONObjectypyF">toJSONObject()</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -194,8 +205,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Method to encode self to Any JSON object</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">toJSONObject</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Any</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -208,8 +227,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-07-25)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
