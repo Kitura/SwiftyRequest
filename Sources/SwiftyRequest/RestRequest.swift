@@ -133,7 +133,7 @@ public class RestRequest {
             return request.httpBody
         }
         set {
-            request.httpBody = messageBody
+            request.httpBody = newValue 
         }
     }
 
