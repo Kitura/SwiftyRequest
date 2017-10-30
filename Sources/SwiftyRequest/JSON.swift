@@ -18,12 +18,22 @@ import Foundation
 
 // MARK: JSON Paths
 
+/// Designates JSON Path Types
 public protocol JSONPathType {
+
+    /// Method to extract a JSON value from a [String: Any]
     func value(in dictionary: [String: Any]) throws -> JSON
+
+    /// Method to extract a JSON value from a [Any]
     func value(in array: [Any]) throws -> JSON
 }
 
 extension String: JSONPathType {
+
+    /// Method to instantiate a JSON object
+    ///
+    /// - Parameter dictionary: [String: Any] object to convert to JSON
+    /// - Returns: JSON Object
     public func value(in dictionary: [String: Any]) throws -> JSON {
         guard let json = dictionary[self] else {
             throw JSON.Error.keyNotFound(key: self)
@@ -31,16 +41,29 @@ extension String: JSONPathType {
         return JSON(json: json)
     }
 
+    /// Method to instantiate a JSON object
+    ///
+    /// - Parameter dictionary: [Any] object to convert to JSON
+    /// - Returns: JSON Object
     public func value(in array: [Any]) throws -> JSON {
         throw JSON.Error.unexpectedSubscript(type: String.self)
     }
 }
 
 extension Int: JSONPathType {
+
+    /// Method to instantiate a JSON object
+    ///
+    /// - Parameter dictionary: [String: Any] object to convert to JSON
+    /// - Returns: JSON Object
     public func value(in dictionary: [String: Any]) throws -> JSON {
         throw JSON.Error.unexpectedSubscript(type: Int.self)
     }
 
+    /// Method to instantiate a JSON object
+    ///
+    /// - Parameter dictionary: [Any] object to convert to JSON
+    /// - Returns: JSON Object
     public func value(in array: [Any]) throws -> JSON {
         let json = array[self]
         return JSON(json: json)
@@ -49,13 +72,16 @@ extension Int: JSONPathType {
 
 // MARK: - JSON
 
+/// Object encapsulating a JSON object
 public struct JSON {
     fileprivate let json: Any
 
+    /// Initializes a `JSON` instance from an Any Object
     public init(json: Any) {
         self.json = json
     }
 
+    /// Initializes a `JSON` instance from a string
     public init(string: String) throws {
         guard let data = string.data(using: .utf8) else {
             throw Error.encodingError
@@ -63,22 +89,31 @@ public struct JSON {
         json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
     }
 
+    /// Initialize a `JSON` instance from a Data Object
     public init(data: Data) throws {
         json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
     }
 
+    /// Initialize a `JSON` instance from a [String: Any]
     public init(dictionary: [String: Any]) {
         json = dictionary
     }
 
+    /// Initialize a `JSON` instance from a [Any]
     public init(array: [Any]) {
         json = array
     }
 
+    /// Method to Serialize a JSON object
+    ///
+    /// - Returns: Data object for a serialized JSON Object
     public func serialize() throws -> Data {
         return try JSONSerialization.data(withJSONObject: json, options: [])
     }
 
+    /// Method to Serialize a JSON string
+    ///
+    /// - Returns: String of the serialized JSON Object
     public func serializeString() throws -> String {
         let data = try serialize()
         guard let string = String(data: data, encoding: .utf8) else {
@@ -87,6 +122,10 @@ public struct JSON {
         return string
     }
 
+    /// Method to retrieve a JSON value from a JSONPathType
+    ///
+    /// - Parameter path: JSONPathType
+    /// - Returns: The JSON object at that path
     private func value(at path: JSONPathType) throws -> JSON {
         if let dictionary = json as? [String: Any] {
             return try path.value(in: dictionary)
@@ -97,6 +136,10 @@ public struct JSON {
         throw Error.unexpectedSubscript(type: type(of: path))
     }
 
+    /// Method to retrieve a JSON value from a [JSONPathType]
+    ///
+    /// - Parameter path: [JSONPathType]
+    /// - Returns: The JSON object at that path
     private func value(at path: [JSONPathType]) throws -> JSON {
         var value = self
         for fragment in path {
@@ -105,26 +148,46 @@ public struct JSON {
         return value
     }
 
+    /// Decodes the designated JSONDecodable object at the given JSONPathType
+    ///
+    /// - Parameter path: [JSONPathType]
+    /// - Parameter type: The type to decode
+    /// - Returns: The decoded object
     public func decode<Decoded: JSONDecodable>(at path: JSONPathType..., type: Decoded.Type = Decoded.self) throws -> Decoded {
         return try Decoded(json: value(at: path))
     }
 
+    /// Method to Retrieve Double
+    /// - Parameter: JSONPathType...
+    /// - Returns: Double
     public func getDouble(at path: JSONPathType...) throws -> Double {
         return try Double(json: value(at: path))
     }
 
+    /// Method to Retrieve Double
+    /// - Parameter: JSONPathType...
+    /// - Returns: Double
     public func getInt(at path: JSONPathType...) throws -> Int {
         return try Int(json: value(at: path))
     }
 
+    /// Method to Retrieve String
+    /// - Parameter: JSONPathType...
+    /// - Returns: Double
     public func getString(at path: JSONPathType...) throws -> String {
         return try String(json: value(at: path))
     }
 
+    /// Method to Retrieve Bool
+    /// - Parameter: JSONPathType...
+    /// - Returns: Double
     public func getBool(at path: JSONPathType...) throws -> Bool {
         return try Bool(json: value(at: path))
     }
 
+    /// Method to Retrieve JSON Array
+    /// - Parameter: JSONPathType...
+    /// - Returns: Double
     public func getArray(at path: JSONPathType...) throws -> [JSON] {
         let json = try value(at: path)
         guard let array = json.json as? [Any] else {
@@ -133,6 +196,11 @@ public struct JSON {
         return array.map { JSON(json: $0) }
     }
 
+    /// Decodes the designated [JSONDecodable] object at the given JSONPathType
+    ///
+    /// - Parameter path: [JSONPathType]
+    /// - Parameter type: The type to decode
+    /// - Returns: The decoded array object
     public func decodedArray<Decoded: JSONDecodable>(at path: JSONPathType..., type: Decoded.Type = Decoded.self) throws -> [Decoded] {
         let json = try value(at: path)
         guard let array = json.json as? [Any] else {
@@ -141,6 +209,11 @@ public struct JSON {
         return try array.map { try Decoded(json: JSON(json: $0)) }
     }
 
+    /// Decodes the designated [String: JSONDecodable] object at the given JSONPathType
+    ///
+    /// - Parameter path: [JSONPathType]
+    /// - Parameter type: The value type to decode
+    /// - Returns: The decoded [String: Decoded]
     public func decodedDictionary<Decoded: JSONDecodable>(at path: JSONPathType..., type: Decoded.Type = Decoded.self) throws -> [String: Decoded] {
         let json = try value(at: path)
         guard let dictionary = json.json as? [String: Any] else {
@@ -153,10 +226,16 @@ public struct JSON {
         return decoded
     }
 
+    /// Method to Retrieve JSON from JSONPathType
+    /// - Parameter: JSONPathType...
+    /// - Returns: Any
     public func getJSON(at path: JSONPathType...) throws -> Any {
         return try value(at: path).json
     }
 
+    /// Method to Retrieve [String: JSON] from JSONPathType
+    /// - Parameter: JSONPathType...
+    /// - Returns: [String: JSON]
     public func getDictionary(at path: JSONPathType...) throws -> [String: JSON] {
         let json = try value(at: path)
         guard let dictionary = json.json as? [String: Any] else {
@@ -165,6 +244,9 @@ public struct JSON {
         return dictionary.map { JSON(json: $0) }
     }
 
+    /// Method to Retrieve [String: Any] from JSONPathType
+    /// - Parameter: JSONPathType...
+    /// - Returns: [String: Any]
     public func getDictionaryObject(at path: JSONPathType...) throws -> [String: Any] {
         let json = try value(at: path)
         guard let dictionary = json.json as? [String: Any] else {
@@ -177,34 +259,59 @@ public struct JSON {
 // MARK: - JSON Errors
 
 extension JSON {
+
+    /// Enum to describe JSON errors
     public enum Error: Swift.Error {
+        /// The designated index was out of bounds
         case indexOutOfBounds(index: Int)
+
+        /// The designated key was not found
         case keyNotFound(key: String)
+
+        /// The subscript was unexpected
         case unexpectedSubscript(type: JSONPathType.Type)
+
+        /// JSONPathType was not convertible to Type
         case valueNotConvertible(value: JSON, to: Any.Type)
+
+        /// There was an error while encoding
         case encodingError
+
+        /// The data could not be serialized to a string
         case stringSerializationError
     }
 }
 
 // MARK: - JSON Protocols
 
+/// Designates a type capable of being decoded from JSON
 public protocol JSONDecodable {
+
+    /// Initializes a JSONDecodable instance from JSON
     init(json: JSON) throws
 }
 
+/// Designates a type capable of encoding to JSON
 public protocol JSONEncodable {
+
+    /// Method to encode self as JSON
     func toJSON() -> JSON
+
+    /// Method to encode self to Any JSON object
     func toJSONObject() -> Any
 }
 
 extension JSONEncodable {
+
+    /// Default implementation to encode type instances to JSON
     public func toJSON() -> JSON {
         return JSON(json: self.toJSONObject())
     }
 }
 
 extension Double: JSONDecodable {
+
+    /// Initializes a `Double` from a JSON object
     public init(json: JSON) throws {
         let any = json.json
         if let double = any as? Double {
@@ -220,6 +327,8 @@ extension Double: JSONDecodable {
 }
 
 extension Int: JSONDecodable {
+
+    /// Initializes an `Int` from a JSON object
     public init(json: JSON) throws {
         let any = json.json
         if let int = any as? Int {
@@ -235,6 +344,8 @@ extension Int: JSONDecodable {
 }
 
 extension Bool: JSONDecodable {
+
+    /// Initializes a `Bool` from a JSON object
     public init(json: JSON) throws {
         let any = json.json
         if let bool = any as? Bool {
@@ -246,6 +357,8 @@ extension Bool: JSONDecodable {
 }
 
 extension String: JSONDecodable {
+
+    /// Initializes a `String` from a JSON object
     public init(json: JSON) throws {
         let any = json.json
         if let string = any as? String {

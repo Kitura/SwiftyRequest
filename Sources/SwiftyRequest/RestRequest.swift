@@ -54,9 +54,12 @@ public class RestRequest {
     private var url: String
 
     /// The HTTP request method: defaults to Get
-    public var method: HTTPMethod = .get {
-        didSet {
-            request.httpMethod = method.rawValue
+    public var method: HTTPMethod {
+        get {
+            return HTTPMethod(fromRawValue: request.httpMethod ?? "unknown")
+        }
+        set {
+            request.httpMethod = newValue.rawValue
         }
     }
 
@@ -79,10 +82,16 @@ public class RestRequest {
     }
 
     /// HTTP Header Parameters
-    public var headerParameters: [String: String] = [:] {
-        didSet {
-            resetHeaders()
-            for (key, value) in headerParameters {
+    public var headerParameters: [String: String] {
+        get {
+            return request.allHTTPHeaderFields ?? [:]
+        }
+        set {
+            // Remove any header fields external to the RestRequest supported headers
+            let s: Set<String> = ["Authorization", "Accept", "Content-Type", "User-Agent"]
+            _ = request.allHTTPHeaderFields?.map { key, value in if !s.contains(key) { request.setValue(nil, forHTTPHeaderField: key) } }
+            // Add new header parameters
+            for (key, value) in newValue {
                 request.setValue(value, forHTTPHeaderField: key)
             }
         }
@@ -90,32 +99,45 @@ public class RestRequest {
 
     /// HTTP Accept Type Header: defaults to application/json
     public var acceptType: String? {
-        didSet {
-            request.setValue(acceptType, forHTTPHeaderField: "Accept")
+        get {
+            return request.value(forHTTPHeaderField: "Accept")
+        }
+        set {
+            request.setValue(newValue, forHTTPHeaderField: "Accept")
         }
     }
 
     /// HTTP Content Type Header: defaults to application/json
     public var contentType: String? {
-        didSet {
-            request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        get {
+            return request.value(forHTTPHeaderField: "Content-Type")
+        }
+        set {
+            request.setValue(newValue, forHTTPHeaderField: "Content-Type")
         }
     }
 
     /// HTTP User-Agent Header
     public var productInfo: String? {
-        didSet {
-            request.setValue(productInfo?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
+        get {
+            return request.value(forHTTPHeaderField: "User-Agent")
+        }
+        set {
+            request.setValue(newValue?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
         }
     }
 
     /// HTTP Message Body
     public var messageBody: Data? {
-        didSet {
-            request.httpBody = messageBody
+        get {
+            return request.httpBody
+        }
+        set {
+            request.httpBody = newValue
         }
     }
 
+    /// HTTP Request Query Items
     public var queryItems: [URLQueryItem]?  {
         set {
             // Replace queryitems on request.url with new queryItems
@@ -139,16 +161,17 @@ public class RestRequest {
     /// - Parameters:
     ///   - url: URL string to use for network request
     public init(method: HTTPMethod = .get, url: String) {
-        self.url = url
-        self.method = method
 
-        // construct basic mutable request
+        // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
-
         let urlObject = urlComponents.url ?? URL(string: "n/a")!
         self.request = URLRequest(url: urlObject)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Set inital fields
+        self.url = url
+        self.method = method
+        self.acceptType = "application/json"
+        self.contentType = "application/json"
 
         // We accept URLs with templated values which `URLComponents` does not treat as valid
         if URLComponents(string: url) == nil {
@@ -301,7 +324,7 @@ public class RestRequest {
             completionHandler(dataResponse)
         }
     }
-    
+
     #if swift(>=4.0)
     /// Request response method with the expected result of an array of type `T` specified
     ///
@@ -316,7 +339,7 @@ public class RestRequest {
         templateParams: [String: String]? = nil,
         queryItems: [URLQueryItem]? = nil,
         completionHandler: @escaping (RestResponse<T>) -> Void) {
-        
+
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<T>.failure(error)
             let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
@@ -325,14 +348,14 @@ public class RestRequest {
         }
 
         response { data, response, error in
-            
+
             if let error = error ?? responseToError?(response,data) {
                 let result = Result<T>.failure(error)
                 let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
-            
+
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<T>.failure(RestError.noData)
@@ -340,7 +363,7 @@ public class RestRequest {
                 completionHandler(dataResponse)
                 return
             }
-            
+
             // parse json object
             let result: Result<T>
             do {
@@ -349,7 +372,7 @@ public class RestRequest {
             } catch {
                 result = .failure(error)
             }
-            
+
             // execute callback
             let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
             completionHandler(dataResponse)
@@ -604,27 +627,31 @@ public class RestRequest {
 
         return nil
     }
-
-    /// Method to reset the request header fields to the base set { Accept, Content-Type, User-Agent } when not nil
-    ///
-    private func resetHeaders() {
-        request.allHTTPHeaderFields = nil
-        request.setValue(acceptType, forHTTPHeaderField: "Accept")
-        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
-        request.setValue(productInfo?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
-    }
 }
 
 /// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` init.
 /// `A` is the type of the fallback's parameter
 public struct CircuitParameters<A> {
+
+    /// The circuit timeout: defaults to 1000
     let timeout: Int
+
+    /// The circuit timeout: defaults to 60000
     let resetTimeout: Int
+
+    /// Max failures allowed: defaults to 5
     let maxFailures: Int
+
+    /// Rolling Window: defaults to 10000
     let rollingWindow: Int
+
+    /// Bulkhead: defaults to 0
     let bulkhead: Int
+
+    /// The error fallback callback
     let fallback: (BreakerError, A) -> Void
 
+    /// Initialize a `CircuitPrameters` instance
     init(timeout: Int = 1000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.timeout = timeout
         self.resetTimeout = resetTimeout
@@ -638,47 +665,63 @@ public struct CircuitParameters<A> {
 /// Contains data associated with a finished network request.
 /// With `T` being the type of the response expected to be received
 public struct RestResponse<T> {
+
+    /// The rest request
     public let request: URLRequest?
+
+    /// The response to the request
     public let response: HTTPURLResponse?
+
+    /// The Response Data
     public let data: Data?
+
+    /// The Reponse Result
     public let result: Result<T>
 }
 
 /// Enum to differentiate a success or failure
-///
-/// - success: means a success of generic type `T`
-/// - failure: means a failure with an `Error` object
 public enum Result<T> {
+    /// a success of generic type `T`
     case success(T)
+
+    /// a failure with an `Error` object
     case failure(Error)
 }
 
-/// Used to specify the type of authentication being used
-///
-/// - apiKey: means an API key is being used, no additional data needed
-/// - basicAuthentication: means a basic username/password authentication is being used with said value, passed in
+/// Enum used to specify the type of authentication being used
 public enum Credentials {
+    /// an API key is being used, no additional data needed
     case apiKey
+
+    /// a basic username/password authentication is being used with said value, passed in
     case basicAuthentication(username: String, password: String)
 }
 
-/// Error types that can occur during a rest request and response
-///
-/// - noData: means no data was returned from the network
-/// - serializationError: means data couldn't be parsed correctly
-/// - encodingError: failure to encode data into a certain format
-/// - fileManagerError: failure in file manipulation
-/// - invalidFile: the file trying to be accessed is invalid
-/// - invalidSubstitution: means a url substitution was attempted that cannot be made
+/// Enum describing error types that can occur during a rest request and response
 public enum RestError: Error, CustomStringConvertible {
+
+    /// no data was returned from the network
     case noData
+
+    /// data couldn't be parsed correctly
     case serializationError
+
+    /// failure to encode data into a certain format
     case encodingError
+
+    /// failure in file manipulation
     case fileManagerError
+
+    /// the file trying to be accessed is invalid
     case invalidFile
+
+    /// the url substitution attempted could not be made
     case invalidSubstitution
+
+    /// Error response status
     case erroredResponseStatus(Int)
 
+    /// Error Description
     public var description: String {
         switch self {
         case .noData                        : return "No Data"
@@ -691,6 +734,7 @@ public enum RestError: Error, CustomStringConvertible {
         }
     }
 
+    /// Computed Property to extract error code
     public var code: Int? {
         switch self {
         case .erroredResponseStatus(let status): return status
