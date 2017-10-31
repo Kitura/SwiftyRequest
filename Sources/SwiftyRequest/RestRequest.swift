@@ -299,7 +299,7 @@ public class RestRequest {
             // parse json object
             let result: Result<T>
             do {
-                let json = try JSON(data: data)
+                let json = try JSONWrapper(data: data)
                 let object: T
                 if let path = path {
                     switch path.count {
@@ -309,7 +309,7 @@ public class RestRequest {
                     case 3: object = try json.decode(at: path[0], path[1], path[2])
                     case 4: object = try json.decode(at: path[0], path[1], path[2], path[3])
                     case 5: object = try json.decode(at: path[0], path[1], path[2], path[3], path[4])
-                    default: throw JSON.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
+                    default: throw JSONWrapper.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
                     }
                 } else {
                     object = try json.decode()
@@ -325,7 +325,6 @@ public class RestRequest {
         }
     }
 
-    #if swift(>=4.0)
     /// Request response method with the expected result of an array of type `T` specified
     ///
     /// - Parameters:
@@ -378,7 +377,6 @@ public class RestRequest {
             completionHandler(dataResponse)
         }
     }
-    #endif
 
     /// Request response method with the expected result of an array of type `T` specified
     ///
@@ -432,8 +430,8 @@ public class RestRequest {
             // parse json object
             let result: Result<[T]>
             do {
-                let json = try JSON(data: data)
-                var array: [JSON]
+                let json = try JSONWrapper(data: data)
+                var array: [JSONWrapper]
                 if let path = path {
                     switch path.count {
                     case 0: array = try json.getArray()
@@ -442,7 +440,7 @@ public class RestRequest {
                     case 3: array = try json.getArray(at: path[0], path[1], path[2])
                     case 4: array = try json.getArray(at: path[0], path[1], path[2], path[3])
                     case 5: array = try json.getArray(at: path[0], path[1], path[2], path[3], path[4])
-                    default: throw JSON.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
+                    default: throw JSONWrapper.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
                     }
                 } else {
                     array = try json.getArray()

@@ -21,7 +21,7 @@ SwiftyRequest is an HTTP networking library built for Swift.
 - Multipart form data.
 
 ## Swift version
-The latest version of SwiftyRequest works with Swift binaries `3.1.1` and newer. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
+The latest version of SwiftyRequest works with Swift binaries `4.0` and newer. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
 
 ## Installation
 To leverage the SwiftyRequest package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
@@ -35,11 +35,8 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
      ...
 
      dependencies: [
-        // Swift 3.1.1
-        .Package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", majorVersion: 0),
-
         // Swift 4.0
-        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "0.0.0"),
+        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "1.0.0"),
          ...
 
      ])
@@ -105,7 +102,7 @@ let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/C
 request.credentials = .apiKey
 
 request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { response in
-	// Handle response	
+	// Handle response
 }
 ```
 
