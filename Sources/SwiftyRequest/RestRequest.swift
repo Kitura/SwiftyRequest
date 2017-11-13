@@ -650,7 +650,7 @@ public struct CircuitParameters<A> {
     let fallback: (BreakerError, A) -> Void
 
     /// Initialize a `CircuitPrameters` instance
-    init(timeout: Int = 1000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
+    init(timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.timeout = timeout
         self.resetTimeout = resetTimeout
         self.maxFailures = maxFailures

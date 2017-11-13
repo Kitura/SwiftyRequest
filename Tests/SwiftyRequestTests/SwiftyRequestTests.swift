@@ -213,7 +213,7 @@ class SwiftyRequestTests: XCTestCase {
             switch response.result {
             case .success(let retval):
                 XCTAssertGreaterThan(retval.count, 0)
-                XCTAssertGreaterThan(retval[0].city.characters.count, 0)
+                XCTAssertGreaterThan(retval[0].city.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response array with error: \(error)")
             }
@@ -234,7 +234,7 @@ class SwiftyRequestTests: XCTestCase {
         request.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
-                XCTAssertGreaterThan(result.characters.count, 0)
+                XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
@@ -313,7 +313,7 @@ class SwiftyRequestTests: XCTestCase {
 
             switch response.result {
             case .success(let result):
-                XCTAssertGreaterThan(result.characters.count, 0)
+                XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
@@ -339,7 +339,7 @@ class SwiftyRequestTests: XCTestCase {
         request.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
-                XCTAssertGreaterThan(result.characters.count, 0)
+                XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
@@ -426,7 +426,7 @@ class SwiftyRequestTests: XCTestCase {
                 XCTAssertGreaterThan(result.count, 0)
                 let str = String(data: result, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(str)
-                XCTAssertGreaterThan(str!.characters.count, 0)
+                XCTAssertGreaterThan(str!.count, 0)
                 // Excluding state from templateParams should cause error
                 request.responseData(templateParams: ["city": "Dallas"], completionHandler: completionHandlerThree)
             case .failure(let error):
@@ -440,7 +440,7 @@ class SwiftyRequestTests: XCTestCase {
                 XCTAssertGreaterThan(result.count, 0)
                 let str = String(data: result, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(str)
-                XCTAssertGreaterThan(str!.characters.count, 0)
+                XCTAssertGreaterThan(str!.count, 0)
 
                 request.responseData(templateParams: ["state": "TX", "city": "Austin"], completionHandler: completionHandlerTwo)
             case .failure(let error):
@@ -510,7 +510,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let expectation = self.expectation(description: "Test setting, modifying, and removing URL query parameters")
 
-        let circuitParameters = CircuitParameters(fallback: failureFallback)
+        let circuitParameters = CircuitParameters(timeout: 3000, fallback: failureFallback)
         let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
 
         let request = RestRequest(url: apiURL)

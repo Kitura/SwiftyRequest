@@ -21,7 +21,10 @@ SwiftyRequest is an HTTP networking library built for Swift.
 - Multipart form data.
 
 ## Swift version
-The latest version of SwiftyRequest works with Swift binaries `4.0` and newer. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
+The 0.0.x releases were tested on macOS and Linux using the Swift 3.1 and 3.1.1 binaries.
+The 1.0.x releases were tested on macOS and Linux using the Swift 4.0.2
+
+You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
 
 ## Installation
 To leverage the SwiftyRequest package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
@@ -138,6 +141,7 @@ At this point, you can use any of the response methods mentioned in the section 
 There are various response methods you can use based on what result type you want, here they are:
 
 - `responseData` returns a `Data` object.
+- `responseObject<T: Codable>` returns a Codable object of type `T`.
 - `responseObject<T: JSONDecodable>` returns an object of type `T`.
 - `responseArray<T: JSONDecodable>` returns an array of type `T`.
 - `responseString` returns a `String`.
