@@ -2,4 +2,4 @@ test:
   image: ibmcom/swift-ubuntu:4.0.2
   volumes:
       - .:/SwiftyRequest
-  command: bash -c "swift -version && cd /SwiftyRequest && swift package --build-path .build-ubuntu clean && swift build --build-path .build-ubuntu && swift test --build-path .build-ubuntu"
+  command: bash -c "cd /SwiftyRequest && swift package --build-path .build-ubuntu clean && swift build --build-path .build-ubuntu && swift test --build-path .build-ubuntu"

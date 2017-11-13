@@ -187,7 +187,7 @@ The 1.0.x releases were tested on macOS and Linux using the Swift 4.0.2</p>
 
      <span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
         <span class="c1">// Swift 4.0</span>
-        <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/SwiftyRequest.git"</span><span class="p">,</span> <span class="o">.</span><span class="nf">upToNextMajor</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="s">"1.0.0"</span><span class="p">),</span>
+        <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/SwiftyRequest.git"</span><span class="p">,</span> <span class="o">.</span><span class="nf">upToNextMajor</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="s">"1.0.0"</span><span class="p">)),</span>
          <span class="o">...</span>
 
      <span class="p">])</span>
@@ -239,7 +239,7 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
 </code></pre>
 <h3 id='invoke-response-with-query-parameters' class='heading'>Invoke Response with Query Parameters</h3>
 
-<p>In this example, we invoke a response method with a query parameter to be appeneded onto the <code>url</code> behind the scenes so that the <code><a href="Classes/RestRequest.html">RestRequest</a></code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>. If no <code>queryItems</code> parameter is set, then all query parameters will be removed from the url if any exsisted.</p>
+<p>In this example, we invoke a response method with a query parameter to be appended onto the <code>url</code> behind the scenes so that the <code><a href="Classes/RestRequest.html">RestRequest</a></code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>. If no <code>queryItems</code> parameter is set, then all query parameters will be removed from the url if any existed.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json"</span><span class="p">)</span>
 <span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span>
 

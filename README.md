@@ -39,7 +39,7 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
 
      dependencies: [
         // Swift 4.0
-        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "1.0.0"),
+        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "1.0.0")),
          ...
 
      ])
@@ -98,7 +98,7 @@ request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { respon
 
 ### Invoke Response with Query Parameters
 
-In this example, we invoke a response method with a query parameter to be appeneded onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`. If no `queryItems` parameter is set, then all query parameters will be removed from the url if any exsisted.
+In this example, we invoke a response method with a query parameter to be appended onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`. If no `queryItems` parameter is set, then all query parameters will be removed from the url if any existed.
 
 ```swift
 let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json")
