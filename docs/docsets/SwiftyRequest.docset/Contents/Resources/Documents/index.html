@@ -73,6 +73,9 @@
                 <a class="nav-group-task-link" href="Enums/HTTPMethod.html">HTTPMethod</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/JSON.html">JSON</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Enums/RestError.html">RestError</a>
               </li>
               <li class="nav-group-task">
@@ -124,10 +127,10 @@
                 <a class="nav-group-task-link" href="Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/JSON.html">JSON</a>
+                <a class="nav-group-task-link" href="Structs/JSONWrapper.html">JSONWrapper</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/JSON/Error.html">– Error</a>
+                <a class="nav-group-task-link" href="Structs/JSONWrapper/Error.html">– Error</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/RestResponse.html">RestResponse</a>
@@ -168,7 +171,10 @@
 </ul>
 <h2 id='swift-version' class='heading'>Swift version</h2>
 
-<p>The latest version of SwiftyRequest works with the <code>3.1.1</code> and newer versions of the Swift binaries. You can download this version of the Swift binaries by following this <a href="https://swift.org/download/#releases">link</a>.</p>
+<p>The 0.0.x releases were tested on macOS and Linux using the Swift 3.1 and 3.1.1 binaries.
+The 1.0.x releases were tested on macOS and Linux using the Swift 4.0.2</p>
+
+<p>You can download this version of the Swift binaries by following this <a href="https://swift.org/download/#releases">link</a>.</p>
 <h2 id='installation' class='heading'>Installation</h2>
 
 <p>To leverage the SwiftyRequest package in your Swift application, you should specify a dependency for it in your <code>Package.swift</code> file:</p>
@@ -180,11 +186,8 @@
      <span class="o">...</span>
 
      <span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
-        <span class="c1">// Swift 3.1.1</span>
-        <span class="o">.</span><span class="kt">Package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/SwiftyRequest.git"</span><span class="p">,</span> <span class="nv">majorVersion</span><span class="p">:</span> <span class="mi">0</span><span class="p">),</span>
-
         <span class="c1">// Swift 4.0</span>
-        <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/SwiftyRequest.git"</span><span class="p">,</span> <span class="o">.</span><span class="nf">upToNextMajor</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="s">"0.0.0"</span><span class="p">),</span>
+        <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/SwiftyRequest.git"</span><span class="p">,</span> <span class="o">.</span><span class="nf">upToNextMajor</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="s">"1.0.0"</span><span class="p">)),</span>
          <span class="o">...</span>
 
      <span class="p">])</span>
@@ -236,12 +239,12 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
 </code></pre>
 <h3 id='invoke-response-with-query-parameters' class='heading'>Invoke Response with Query Parameters</h3>
 
-<p>In this example, we invoke a response method with a query parameter to be appeneded onto the <code>url</code> behind the scenes so that the <code><a href="Classes/RestRequest.html">RestRequest</a></code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>. If no <code>queryItems</code> parameter is set, then all query parameters will be removed from the url if any exsisted.</p>
+<p>In this example, we invoke a response method with a query parameter to be appended onto the <code>url</code> behind the scenes so that the <code><a href="Classes/RestRequest.html">RestRequest</a></code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>. If no <code>queryItems</code> parameter is set, then all query parameters will be removed from the url if any existed.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json"</span><span class="p">)</span>
 <span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span>
 
 <span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"hour"</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="s">"9"</span><span class="p">)])</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
-    <span class="c1">// Handle response  </span>
+    <span class="c1">// Handle response</span>
 <span class="p">}</span>
 </code></pre>
 <h2 id='circuitbreaker-integration' class='heading'>CircuitBreaker Integration</h2>
@@ -273,6 +276,7 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
 
 <ul>
 <li><code>responseData</code> returns a <code>Data</code> object.</li>
+<li><code>responseObject&lt;T: Codable&gt;</code> returns a Codable object of type <code>T</code>.</li>
 <li><code>responseObject&lt;T: JSONDecodable&gt;</code> returns an object of type <code>T</code>.</li>
 <li><code>responseArray&lt;T: JSONDecodable&gt;</code> returns an array of type <code>T</code>.</li>
 <li><code>responseString</code> returns a <code>String</code>.</li>
@@ -289,7 +293,7 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-11-13)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

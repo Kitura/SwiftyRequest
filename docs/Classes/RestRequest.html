@@ -74,6 +74,9 @@
                 <a class="nav-group-task-link" href="../Enums/HTTPMethod.html">HTTPMethod</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/JSON.html">JSON</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/RestError.html">RestError</a>
               </li>
               <li class="nav-group-task">
@@ -125,10 +128,10 @@
                 <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/JSON.html">JSON</a>
+                <a class="nav-group-task-link" href="../Structs/JSONWrapper.html">JSONWrapper</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/JSON/Error.html">– Error</a>
+                <a class="nav-group-task-link" href="../Structs/JSONWrapper/Error.html">– Error</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/RestResponse.html">RestResponse</a>
@@ -716,6 +719,104 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/s:13SwiftyRequest04RestB0C14responseObjectys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_s10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyxGc17completionHandlerts9DecodableRzlF"></a>
+                    <a name="//apple_ref/swift/Method/responseObject(responseToError:templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseObjectys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_s10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVyxGc17completionHandlerts9DecodableRzlF">responseObject(responseToError:templateParams:queryItems:completionHandler:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Request response method with the expected result of an array of type <code>T</code> specified</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseObject</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt">Decodable</span><span class="o">&gt;</span><span class="p">(</span>
+        <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+        <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+        <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+        <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>responseToError</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Error callback closure in case of request failure</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>path</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Array of Json keys leading to desired Json</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>templateParams</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>URL templating parameters used for substituion if possible</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>queryItems</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>completionHandler</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Callback used on completion of operation</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/s:13SwiftyRequest04RestB0C13responseArrayys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_SayAA12JSONPathType_pGSg4paths10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVySayxGGc17completionHandlertAA13JSONDecodableRzlF"></a>
                     <a name="//apple_ref/swift/Method/responseArray(responseToError:path:templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
                     <a class="token" href="#/s:13SwiftyRequest04RestB0C13responseArrayys5Error_pSgSo15HTTPURLResponseCSg_10Foundation4DataVSgtcSg0d2ToF0_SayAA12JSONPathType_pGSg4paths10DictionaryVyS2SGSg14templateParamsSayAJ12URLQueryItemVGSg10queryItemsyAA0C8ResponseVySayxGGc17completionHandlertAA13JSONDecodableRzlF">responseArray(responseToError:path:templateParams:queryItems:completionHandler:)</a>
@@ -1050,7 +1151,7 @@ When set, a new circuitBreaker instance is created</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-10-26)</p>
+      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-11-13)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

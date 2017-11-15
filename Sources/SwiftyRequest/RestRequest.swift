@@ -299,7 +299,7 @@ public class RestRequest {
             // parse json object
             let result: Result<T>
             do {
-                let json = try JSON(data: data)
+                let json = try JSONWrapper(data: data)
                 let object: T
                 if let path = path {
                     switch path.count {
@@ -309,11 +309,64 @@ public class RestRequest {
                     case 3: object = try json.decode(at: path[0], path[1], path[2])
                     case 4: object = try json.decode(at: path[0], path[1], path[2], path[3])
                     case 5: object = try json.decode(at: path[0], path[1], path[2], path[3], path[4])
-                    default: throw JSON.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
+                    default: throw JSONWrapper.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
                     }
                 } else {
                     object = try json.decode()
                 }
+                result = .success(object)
+            } catch {
+                result = .failure(error)
+            }
+
+            // execute callback
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            completionHandler(dataResponse)
+        }
+    }
+
+    /// Request response method with the expected result of an array of type `T` specified
+    ///
+    /// - Parameters:
+    ///   - responseToError: Error callback closure in case of request failure
+    ///   - path: Array of Json keys leading to desired Json
+    ///   - templateParams: URL templating parameters used for substituion if possible
+    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - completionHandler: Callback used on completion of operation
+    public func responseObject<T: Decodable>(
+        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
+        templateParams: [String: String]? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        completionHandler: @escaping (RestResponse<T>) -> Void) {
+
+        if  let error = performSubstitutions(params: templateParams) {
+            let result = Result<T>.failure(error)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            completionHandler(dataResponse)
+            return
+        }
+
+        response { data, response, error in
+
+            if let error = error ?? responseToError?(response,data) {
+                let result = Result<T>.failure(error)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+
+            // ensure data is not nil
+            guard let data = data else {
+                let result = Result<T>.failure(RestError.noData)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                completionHandler(dataResponse)
+                return
+            }
+
+            // parse json object
+            let result: Result<T>
+            do {
+                let object = try JSONDecoder().decode(T.self, from: data)
                 result = .success(object)
             } catch {
                 result = .failure(error)
@@ -377,8 +430,8 @@ public class RestRequest {
             // parse json object
             let result: Result<[T]>
             do {
-                let json = try JSON(data: data)
-                var array: [JSON]
+                let json = try JSONWrapper(data: data)
+                var array: [JSONWrapper]
                 if let path = path {
                     switch path.count {
                     case 0: array = try json.getArray()
@@ -387,7 +440,7 @@ public class RestRequest {
                     case 3: array = try json.getArray(at: path[0], path[1], path[2])
                     case 4: array = try json.getArray(at: path[0], path[1], path[2], path[3])
                     case 5: array = try json.getArray(at: path[0], path[1], path[2], path[3], path[4])
-                    default: throw JSON.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
+                    default: throw JSONWrapper.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
                     }
                 } else {
                     array = try json.getArray()
@@ -597,7 +650,7 @@ public struct CircuitParameters<A> {
     let fallback: (BreakerError, A) -> Void
 
     /// Initialize a `CircuitPrameters` instance
-    init(timeout: Int = 1000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
+    init(timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.timeout = timeout
         self.resetTimeout = resetTimeout
         self.maxFailures = maxFailures

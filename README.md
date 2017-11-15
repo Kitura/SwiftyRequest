@@ -21,7 +21,12 @@ SwiftyRequest is an HTTP networking library built for Swift.
 - Multipart form data.
 
 ## Swift version
-The latest version of SwiftyRequest works with Swift binaries `3.1.1` and newer. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
+The 0.0.x releases were tested on macOS and Linux using the Swift 3.1 and 3.1.1 binaries.
+The 1.0.x releases were tested on macOS and Linux using the Swift 4.0.2
+
+*NOTE:* Because of issues with URLSession/URLRequest in Swift 4.0, Swift 4.0 projects should use the 0.0.x release of SwiftyRequest.
+
+You can download this version of the Swift binaries by following this [link](https://swift.org/download/#releases).
 
 ## Installation
 To leverage the SwiftyRequest package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
@@ -35,11 +40,10 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
      ...
 
      dependencies: [
-        // Swift 3.1.1
-        .Package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", majorVersion: 0),
-
         // Swift 4.0
-        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "0.0.0"),
+        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "0.0.0")),
+        // Swift 4.0.2
+        .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "1.0.0")),
          ...
 
      ])
@@ -98,14 +102,14 @@ request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { respon
 
 ### Invoke Response with Query Parameters
 
-In this example, we invoke a response method with a query parameter to be appeneded onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`. If no `queryItems` parameter is set, then all query parameters will be removed from the url if any exsisted.
+In this example, we invoke a response method with a query parameter to be appended onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`. If no `queryItems` parameter is set, then all query parameters will be removed from the url if any existed.
 
 ```swift
 let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json")
 request.credentials = .apiKey
 
 request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { response in
-	// Handle response	
+	// Handle response
 }
 ```
 
@@ -141,6 +145,7 @@ At this point, you can use any of the response methods mentioned in the section 
 There are various response methods you can use based on what result type you want, here they are:
 
 - `responseData` returns a `Data` object.
+- `responseObject<T: Codable>` returns a Codable object of type `T`.
 - `responseObject<T: JSONDecodable>` returns an object of type `T`.
 - `responseArray<T: JSONDecodable>` returns an array of type `T`.
 - `responseString` returns a `String`.

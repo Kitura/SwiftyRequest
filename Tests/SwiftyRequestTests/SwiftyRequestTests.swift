@@ -17,7 +17,7 @@ public struct WeatherResponse: JSONDecodable {
 
     public let json: [String: Any]
 
-    public init(json: JSON) throws {
+    public init(json: JSONWrapper) throws {
         self.json = try json.getDictionaryObject()
     }
 }
@@ -30,7 +30,7 @@ public struct GeoLookupModel: JSONDecodable {
     public let lat: String
     public let lon: String
 
-    public init(json: JSON) throws {
+    public init(json: JSONWrapper) throws {
         city = try json.getString(at: "city")
         state = try json.getString(at: "state")
         country = try json.getString(at: "country")
@@ -81,7 +81,7 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         do {
-            let json = try JSON(data: data)
+            let json = try JSONWrapper(data: data)
             let message = try json.getString(at: "error")
             print("Failed with error: \(message)")
             return RestError.serializationError
@@ -125,7 +125,7 @@ class SwiftyRequestTests: XCTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 20)
     }
     // API Key (96318a1fc52412b1) for the wunderground API may expire at some point.
     // If this happens, use a different endpoint to test SwiftyRequest with.
@@ -172,6 +172,35 @@ class SwiftyRequestTests: XCTestCase {
 
     }
 
+    func testDecodableResponseObject() {
+        struct Response: Decodable {
+            let response: Body
+        }
+        struct Body: Decodable {
+            let version: String
+            let termsofService: String
+        }
+
+        let expectation = self.expectation(description: "responseObject SwiftyRequest test")
+
+        let request = RestRequest(url: "http://api.wunderground.com/api/Your_Key/almanac/q/CA/San_Francisco.json")
+        request.credentials = .apiKey
+        request.acceptType = "application/json"
+
+        request.responseObject(responseToError:  responseToError) { (response: RestResponse<Response>) in
+            switch response.result {
+            case .success(let response):
+                XCTAssertEqual(response.response.version, "0.1")
+                XCTAssertEqual(response.response.termsofService, "http://www.wunderground.com/weather/api/d/terms.html")
+            case .failure(let error):
+                XCTFail("Failed to get weather response object with error: \(error)")
+            }
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 10)
+    }
+
     func testResponseArray() {
 
         let expectation = self.expectation(description: "responseArray SwiftyRequest test")
@@ -184,7 +213,7 @@ class SwiftyRequestTests: XCTestCase {
             switch response.result {
             case .success(let retval):
                 XCTAssertGreaterThan(retval.count, 0)
-                XCTAssertGreaterThan(retval[0].city.characters.count, 0)
+                XCTAssertGreaterThan(retval[0].city.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response array with error: \(error)")
             }
@@ -205,7 +234,7 @@ class SwiftyRequestTests: XCTestCase {
         request.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
-                XCTAssertGreaterThan(result.characters.count, 0)
+                XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
@@ -284,7 +313,7 @@ class SwiftyRequestTests: XCTestCase {
 
             switch response.result {
             case .success(let result):
-                XCTAssertGreaterThan(result.characters.count, 0)
+                XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
@@ -310,7 +339,7 @@ class SwiftyRequestTests: XCTestCase {
         request.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
-                XCTAssertGreaterThan(result.characters.count, 0)
+                XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
@@ -324,6 +353,7 @@ class SwiftyRequestTests: XCTestCase {
     func testCircuitBreakFailure() {
 
         let expectation = self.expectation(description: "CircuitBreaker max failure test")
+        let timeout = 5000
         let resetTimeout = 3000
         let maxFailures = 2
         var count = 0
@@ -333,7 +363,7 @@ class SwiftyRequestTests: XCTestCase {
             XCTAssertEqual(count, maxFailures)
             fallbackCalled = true
         }
-        let circuitParameters = CircuitParameters(resetTimeout: resetTimeout, maxFailures: maxFailures, fallback: breakFallback)
+        let circuitParameters = CircuitParameters(timeout: timeout, resetTimeout: resetTimeout, maxFailures: maxFailures, fallback: breakFallback)
 
         let request = RestRequest(url: "http://notreal/blah")
         request.credentials = .apiKey
@@ -396,7 +426,7 @@ class SwiftyRequestTests: XCTestCase {
                 XCTAssertGreaterThan(result.count, 0)
                 let str = String(data: result, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(str)
-                XCTAssertGreaterThan(str!.characters.count, 0)
+                XCTAssertGreaterThan(str!.count, 0)
                 // Excluding state from templateParams should cause error
                 request.responseData(templateParams: ["city": "Dallas"], completionHandler: completionHandlerThree)
             case .failure(let error):
@@ -410,7 +440,7 @@ class SwiftyRequestTests: XCTestCase {
                 XCTAssertGreaterThan(result.count, 0)
                 let str = String(data: result, encoding: String.Encoding.utf8)
                 XCTAssertNotNil(str)
-                XCTAssertGreaterThan(str!.characters.count, 0)
+                XCTAssertGreaterThan(str!.count, 0)
 
                 request.responseData(templateParams: ["state": "TX", "city": "Austin"], completionHandler: completionHandlerTwo)
             case .failure(let error):
@@ -441,11 +471,7 @@ class SwiftyRequestTests: XCTestCase {
             case .success(_):
                 XCTFail("Request should have failed with no parameters passed into a templated URL")
             case .failure(let error):
-                #if os(Linux)
-                XCTAssertEqual(error.localizedDescription, "The operation could not be completed")
-                #else
                 XCTAssertEqual(error.localizedDescription, "unsupported URL")
-                #endif
             }
             expectation.fulfill()
         }
@@ -484,7 +510,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let expectation = self.expectation(description: "Test setting, modifying, and removing URL query parameters")
 
-        let circuitParameters = CircuitParameters(fallback: failureFallback)
+        let circuitParameters = CircuitParameters(timeout: 3000, fallback: failureFallback)
         let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
 
         let request = RestRequest(url: apiURL)
