@@ -19,13 +19,20 @@ import Foundation
 /// Object containing everything needed to build HTTP requests and execute them
 public class RestRequest: NSObject, URLSessionDelegate {
     
+    // Flag to determine if the passed in URL is secure
+    private var isSecure: Bool = false
+    
     /// A default `URLSession` instance
     private var session: URLSession {
-        let config = URLSessionConfiguration.default
-        config.requestCachePolicy = .reloadIgnoringLocalCacheData
-        let session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
+        var session = URLSession(configuration: URLSessionConfiguration.default)
+        if isSecure == true {
+            let config = URLSessionConfiguration.default
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
+        }
         return session
     }
+    
     // The HTTP Request
     private var request: URLRequest
     
@@ -48,6 +55,7 @@ public class RestRequest: NSObject, URLSessionDelegate {
         }
     }
     
+    /// URL session function to allow trusting certain URLs
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
@@ -178,12 +186,17 @@ public class RestRequest: NSObject, URLSessionDelegate {
     ///   - url: URL string to use for network request
     public init(method: HTTPMethod = .get, url: String) {
         
+        if url.contains("https") {
+            print(url)
+            self.isSecure = true
+        } else {
+            self.isSecure = false
+        }
         
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
         let urlObject = urlComponents.url ?? URL(string: "n/a")!
         self.request = URLRequest(url: urlObject)
-        
         
         // Set inital fields
         self.url = url
