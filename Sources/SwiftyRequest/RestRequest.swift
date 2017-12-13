@@ -20,12 +20,14 @@ import CircuitBreaker
 /// Object containing everything needed to build HTTP requests and execute them
 public class RestRequest: NSObject, URLSessionDelegate  {
     
+    // Check if there exists a self-signed certificate and whether it's a secure connection
     private var isSecure: Bool = false
+    private var isSelfSigned: Bool = false
     
     /// A default `URLSession` instance
     private var session: URLSession {
         var session = URLSession(configuration: URLSessionConfiguration.default)
-        if isSecure == true {
+        if isSecure == true && isSelfSigned == true {
             let config = URLSessionConfiguration.default
             config.requestCachePolicy = .reloadIgnoringLocalCacheData
             session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
@@ -55,6 +57,7 @@ public class RestRequest: NSObject, URLSessionDelegate  {
         }
     }
     
+    /// URLSession delegate for secure loads
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
@@ -182,13 +185,16 @@ public class RestRequest: NSObject, URLSessionDelegate  {
     ///
     /// - Parameters:
     ///   - url: URL string to use for network request
-    public init(method: HTTPMethod = .get, url: String) {
+    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false) {
         
         if url.contains("https") {
-            print(url)
             self.isSecure = true
         } else {
             self.isSecure = false
+        }
+        
+        if containsSelfSignedCert == true {
+            self.isSelfSigned = true
         }
         
         // Instantiate basic mutable request

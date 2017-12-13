@@ -140,7 +140,7 @@ class SwiftyRequestTests: XCTestCase {
             return
         }
         
-        let request = RestRequest(method: .post, url: echoURLSecure)
+        let request = RestRequest(method: .post, url: echoURLSecure, containsSelfSignedCert: true)
         request.messageBody = data
         
         request.responseData { response in
@@ -160,6 +160,7 @@ class SwiftyRequestTests: XCTestCase {
         
         waitForExpectations(timeout: 20)
     }
+    
     // API Key (96318a1fc52412b1) for the wunderground API may expire at some point.
     // If this happens, use a different endpoint to test SwiftyRequest with.
     func testResponseData() {
