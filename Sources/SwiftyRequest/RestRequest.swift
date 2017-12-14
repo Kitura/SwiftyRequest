@@ -18,7 +18,7 @@ import Foundation
 import CircuitBreaker
 
 /// Object containing everything needed to build HTTP requests and execute them
-public class RestRequest: NSObject, URLSessionDelegate  {
+public class RestRequest: NSObject  {
     
     // Check if there exists a self-signed certificate and whether it's a secure connection
     private var isSecure: Bool = false
@@ -62,7 +62,7 @@ public class RestRequest: NSObject, URLSessionDelegate  {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
         switch (method, host) {
-        case (NSURLAuthenticationMethodServerTrust, "https://localhost:8080"):
+        case (NSURLAuthenticationMethodServerTrust, self.url):
             let trust = challenge.protectionSpace.serverTrust!
             let credential = URLCredential(trust: trust)
             completionHandler(.useCredential, credential)
@@ -187,15 +187,8 @@ public class RestRequest: NSObject, URLSessionDelegate  {
     ///   - url: URL string to use for network request
     public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false) {
         
-        if url.contains("https") {
-            self.isSecure = true
-        } else {
-            self.isSecure = false
-        }
-        
-        if containsSelfSignedCert == true {
-            self.isSelfSigned = true
-        }
+        self.isSecure = url.contains("https")
+        self.isSelfSigned = containsSelfSignedCert
         
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
@@ -776,4 +769,23 @@ public enum RestError: Error, CustomStringConvertible {
         default: return nil
         }
     }
+}
+
+// URL Session extension
+extension RestRequest: URLSessionDelegate {
+    
+    /// URL session function to allow trusting certain URLs
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        let method = challenge.protectionSpace.authenticationMethod
+        let host = challenge.protectionSpace.host
+        switch (method, host) {
+        case (NSURLAuthenticationMethodServerTrust, self.url):
+            let trust = challenge.protectionSpace.serverTrust!
+            let credential = URLCredential(trust: trust)
+            completionHandler(.useCredential, credential)
+        default:
+            completionHandler(.performDefaultHandling, nil)
+        }
+    }
+    
 }
