@@ -57,20 +57,6 @@ public class RestRequest: NSObject  {
         }
     }
     
-    /// URLSession delegate for secure loads
-    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        let method = challenge.protectionSpace.authenticationMethod
-        let host = challenge.protectionSpace.host
-        switch (method, host) {
-        case (NSURLAuthenticationMethodServerTrust, self.url):
-            let trust = challenge.protectionSpace.serverTrust!
-            let credential = URLCredential(trust: trust)
-            completionHandler(.useCredential, credential)
-        default:
-            completionHandler(.performDefaultHandling, nil)
-        }
-    }
-    
     // MARK: HTTP Request Paramters
     /// URL `String` used to store a url containing replacable template values
     private var urlTemplate: String?
@@ -188,7 +174,7 @@ public class RestRequest: NSObject  {
     public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false) {
         
         self.isSecure = url.contains("https")
-        self.isSelfSigned = containsSelfSignedCert
+        self.isSelfSigned = containsSelfSignedCert ?? false
         
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
