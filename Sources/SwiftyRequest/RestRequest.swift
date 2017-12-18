@@ -766,8 +766,8 @@ extension RestRequest: URLSessionDelegate {
         let host = challenge.protectionSpace.host
         switch (method, host) {
         case (NSURLAuthenticationMethodServerTrust, self.url):
-            let trust = challenge.protectionSpace.serverTrust!
-            let credential = URLCredential(trust: trust)
+            let trust = challenge.protectionSpace.serverTrust
+            let credential = URLCredential(trust: trust!)
             completionHandler(.useCredential, credential)
         default:
             completionHandler(.performDefaultHandling, nil)
