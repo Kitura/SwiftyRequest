@@ -42,7 +42,7 @@ To leverage the SwiftyRequest package in your Swift application, you should spec
      dependencies: [
         // Swift 4.0
         .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "0.0.0")),
-        // Swift 4.0.2
+        // Swift 4.0.2 or newer
         .package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", .upToNextMajor(from: "1.0.0")),
          ...
 
