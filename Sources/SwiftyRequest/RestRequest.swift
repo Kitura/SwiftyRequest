@@ -768,7 +768,7 @@ extension RestRequest: URLSessionDelegate {
         case (NSURLAuthenticationMethodServerTrust, self.url):
             #if MAC_OS_X_VERSION_10_6
                 let trust = challenge.protectionSpace.serverTrust
-                let credential = URLCredential(trust: trust)
+                let credential = URLCredential(trust: trust!)
                 completionHandler(.useCredential, credential)
             #else
                 print("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
