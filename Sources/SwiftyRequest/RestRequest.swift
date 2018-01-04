@@ -771,14 +771,8 @@ extension RestRequest: URLSessionDelegate {
                 let credential = URLCredential(trust: trust)
                 completionHandler(.useCredential, credential)
             #else
-                var optionalTrust: SecTrust? = nil
-                let certArray = challenge.proposedCredential?.certificates
-                let policy = SecPolicyCreateBasicX509()
-                let trust = SecTrustCreateWithCertificates(certArray as AnyObject,
-                                                           policy,
-                                                           &optionalTrust)
-                let credential = URLCredential(trust: trust as! SecTrust)
-                completionHandler(.useCredential, credential)
+                print("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
+                completionHandler(.performDefaultHandling, nil)
             #endif
         default:
             completionHandler(.performDefaultHandling, nil)
