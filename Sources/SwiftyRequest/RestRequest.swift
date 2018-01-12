@@ -505,7 +505,7 @@ public class RestRequest {
             }
 
             // parse data as a string
-            guard let string = String(data: data, encoding: .utf8) else {
+            guard let string = String(data: data, encoding: .isoLatin1) else {
                 let result = Result<String>.failure(RestError.serializationError)
                 let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
