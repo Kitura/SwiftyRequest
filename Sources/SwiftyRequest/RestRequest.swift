@@ -40,19 +40,20 @@ public class RestRequest: NSObject  {
     private var request: URLRequest
     
     /// `CircuitBreaker` instance for this `RestRequest`
-    public var circuitBreaker: CircuitBreaker<(Data?, HTTPURLResponse?, Error?) -> Void, Void, String>?
+    public var circuitBreaker: CircuitBreaker<(String), String>?
     
     /// Parameters for a `CircuitBreaker` instance.
     /// When set, a new circuitBreaker instance is created
     public var circuitParameters: CircuitParameters<String>? = nil {
         didSet {
             if let params = circuitParameters {
-                circuitBreaker = CircuitBreaker(timeout: params.timeout,
+                circuitBreaker = CircuitBreaker(name: params.name,
+                                                timeout: params.timeout,
                                                 resetTimeout: params.resetTimeout,
                                                 maxFailures: params.maxFailures,
                                                 rollingWindow: params.rollingWindow,
                                                 bulkhead: params.bulkhead,
-                                                contextCommand: handleInvocation,
+                                                command: handleInvocation,
                                                 fallback: params.fallback)
             }
         }
@@ -203,7 +204,7 @@ public class RestRequest: NSObject  {
     /// - Parameter completionHandler: Callback used on completion of operation
     public func response(completionHandler: @escaping (Data?, HTTPURLResponse?, Error?) -> Void) {
         if let breaker = circuitBreaker {
-            breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
+            breaker.run(commandArgs: "test", fallbackArgs: "Circuit is open")
         } else {
             let task = session.dataTask(with: request) { (data, response, error) in
                 guard error == nil, let response = response as? HTTPURLResponse else {
@@ -607,15 +608,13 @@ public class RestRequest: NSObject  {
     /// Method used by `CircuitBreaker` as the contextCommand
     ///
     /// - Parameter invocation: `Invocation` contains a command argument, Void return type, and a String fallback arguement
-    private func handleInvocation(invocation: Invocation<(Data?, HTTPURLResponse?, Error?) -> Void, Void, String>) {
+    private func handleInvocation(invocation: Invocation<(String), String>) {
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
-                invocation.notifyFailure()
+                invocation.notifyFailure(error: BreakerError.fastFail)
             } else {
                 invocation.notifySuccess()
             }
-            let callback = invocation.commandArgs
-            callback(data, response as? HTTPURLResponse, error)
         }
         task.resume()
         
@@ -648,6 +647,9 @@ public class RestRequest: NSObject  {
 /// `A` is the type of the fallback's parameter
 public struct CircuitParameters<A> {
     
+    /// The circuit name: defaults to 'circuit'
+    let name: String
+    
     /// The circuit timeout: defaults to 1000
     let timeout: Int
     
@@ -667,7 +669,8 @@ public struct CircuitParameters<A> {
     let fallback: (BreakerError, A) -> Void
     
     /// Initialize a `CircuitPrameters` instance
-    init(timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
+    init(name: String = "circuit", timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
+        self.name = name
         self.timeout = timeout
         self.resetTimeout = resetTimeout
         self.maxFailures = maxFailures
@@ -772,11 +775,11 @@ extension RestRequest: URLSessionDelegate {
                     let credential = URLCredential(trust: trust)
                     completionHandler(.useCredential, credential)
                 } else {
-                    Log.debug("Attempting to establish a secure connection; no server trust established. Resorting to default handling.")
+                    Log.warning("Attempting to establish a secure connection; no server trust established. Resorting to default handling.")
                     completionHandler(.performDefaultHandling, nil)
                 }
             #else
-                Log.debug("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
+                Log.warning("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
                 completionHandler(.performDefaultHandling, nil)
             #endif
         default:
