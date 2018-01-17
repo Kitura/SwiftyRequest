@@ -234,7 +234,9 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         let str = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces))
-        assert(String(str).lowercased() == "iso-8859-1")
+        if String(str).lowercased() != "iso-8859-1" {
+          XCTFail("Test no longer valid using URL: \(response?.url?.absoluteString ?? ""). The charset field was not provided.")
+        }
     }
 
     func testResponseString() {
