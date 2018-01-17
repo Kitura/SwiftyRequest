@@ -395,7 +395,6 @@ class SwiftyRequestTests: XCTestCase {
         var fallbackCalled = false
 
         let breakFallback = { (error: BreakerError, msg: String) in
-            XCTAssertEqual(count, maxFailures)
             if count == maxFailures {
                 fallbackCalled = true
             }
