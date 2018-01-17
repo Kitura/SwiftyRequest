@@ -224,6 +224,19 @@ class SwiftyRequestTests: XCTestCase {
 
     }
 
+    func assertCharsetISO8859(response: HTTPURLResponse?) {
+        guard let text = response?.allHeaderFields["Content-Type"] as? String,
+            let regex = try? NSRegularExpression(pattern: "(?<=charset=).*(?=$|\\s)"),
+            let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+            let range = Range(match.range, in: text) else {
+                assertionFailure("Test no longer valid using URL: \(response?.url?.absoluteString ?? ""). The charset field was not provided.")
+                return
+        }
+
+        let str = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\" \t"))
+        assert(String(str).lowercased() == "iso-8859-1")
+    }
+
     func testResponseString() {
 
         let expectation = self.expectation(description: "responseString SwiftyRequest test")
@@ -243,6 +256,7 @@ class SwiftyRequestTests: XCTestCase {
             /// Known example of charset=ISO-8859-1
             let request2 = RestRequest(url: "http://google.com/")
             request2.responseString(responseToError: self.responseToError) { response in
+                self.assertCharsetISO8859(response: response.response)
                 switch response.result {
                 case .success(let result):
                     XCTAssertGreaterThan(result.count, 0)
