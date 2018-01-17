@@ -226,10 +226,10 @@ class SwiftyRequestTests: XCTestCase {
 
     func assertCharsetISO8859(response: HTTPURLResponse?) {
         guard let text = response?.allHeaderFields["Content-Type"] as? String,
-            let regex = try? NSRegularExpression(pattern: "(?<=charset=).*(?=$|\\s)"),
-            let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+            let regex = try? NSRegularExpression(pattern: "(?<=charset=).*?(?=$|;|\\s)", options: [.caseInsensitive]),
+            let match = regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).last,
             let range = Range(match.range, in: text) else {
-                assertionFailure("Test no longer valid using URL: \(response?.url?.absoluteString ?? ""). The charset field was not provided.")
+                XCTFail("Test no longer valid using URL: \(response?.url?.absoluteString ?? ""). The charset field was not provided.")
                 return
         }
 

@@ -635,8 +635,8 @@ public class RestRequest {
     /// - Returns: returns the defined or default String.Encoding.Type
     private func getCharacterEncoding(from contentType: String? = nil) -> String.Encoding {
         guard let text = contentType,
-              let regex = try? NSRegularExpression(pattern: "(?<=charset=).*(?=$|\\s)"),
-              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+              let regex = try? NSRegularExpression(pattern: "(?<=charset=).*?(?=$|;|\\s)", options: [.caseInsensitive]),
+              let match = regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).last,
               let range = Range(match.range, in: text) else {
             return .utf8
         }
@@ -648,7 +648,6 @@ public class RestRequest {
         case "iso-8859-1": return .isoLatin1
         default: return .utf8
         }
-
     }
 }
 
