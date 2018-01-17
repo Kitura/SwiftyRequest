@@ -387,6 +387,7 @@ class SwiftyRequestTests: XCTestCase {
     func testCircuitBreakFailure() {
 
         let expectation = self.expectation(description: "CircuitBreaker max failure test")
+        let name = "circuitName"
         let timeout = 5000
         let resetTimeout = 3000
         let maxFailures = 2
@@ -395,9 +396,11 @@ class SwiftyRequestTests: XCTestCase {
 
         let breakFallback = { (error: BreakerError, msg: String) in
             XCTAssertEqual(count, maxFailures)
-            fallbackCalled = true
+            if count == maxFailures {
+                fallbackCalled = true
+            }
         }
-        let circuitParameters = CircuitParameters(timeout: timeout, resetTimeout: resetTimeout, maxFailures: maxFailures, fallback: breakFallback)
+        let circuitParameters = CircuitParameters(name: name, timeout: timeout, resetTimeout: resetTimeout, maxFailures: maxFailures, fallback: breakFallback)
 
         let request = RestRequest(url: "http://notreal/blah")
         request.credentials = .apiKey
