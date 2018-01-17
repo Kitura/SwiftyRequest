@@ -630,6 +630,10 @@ public class RestRequest {
         return nil
     }
 
+    /// Method to identify the charset encoding defined by the Content-Type header
+    /// - Defaults set to .utf8
+    /// - Parameter contentType: The content-type header string
+    /// - Returns: returns the defined or default String.Encoding.Type
     private func getCharacterEncoding(from contentType: String? = nil) -> String.Encoding {
         guard let text = contentType,
               let regex = try? NSRegularExpression(pattern: "(?<=charset=).*(?=$|;)"),
