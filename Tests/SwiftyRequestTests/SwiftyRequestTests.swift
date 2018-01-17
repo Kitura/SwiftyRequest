@@ -228,17 +228,30 @@ class SwiftyRequestTests: XCTestCase {
 
         let expectation = self.expectation(description: "responseString SwiftyRequest test")
 
-        let request = RestRequest(url: apiURL)
-        request.credentials = .apiKey
+        /// Standard
+        let request1 = RestRequest(url: apiURL)
+        request1.credentials = .apiKey
 
-        request.responseString(responseToError: responseToError) { response in
+        request1.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
                 XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
-            expectation.fulfill()
+
+            /// Known example of charset=ISO-8859-1
+            let request2 = RestRequest(url: "http://google.com/")
+            request2.responseString(responseToError: self.responseToError) { response in
+                switch response.result {
+                case .success(let result):
+                    XCTAssertGreaterThan(result.count, 0)
+                case .failure(let error):
+                    XCTFail("Failed to get weather response String with error: \(error)")
+                }
+                expectation.fulfill()
+            }
+
         }
 
         waitForExpectations(timeout: 10)
