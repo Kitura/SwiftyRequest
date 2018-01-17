@@ -642,7 +642,7 @@ public class RestRequest {
         }
 
         /// Strip whitespace and quotes
-        let charset = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\" \t"))
+        let charset = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces))
 
         switch String(charset).lowercased() {
         case "iso-8859-1": return .isoLatin1

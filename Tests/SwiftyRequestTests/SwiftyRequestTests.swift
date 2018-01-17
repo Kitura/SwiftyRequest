@@ -233,7 +233,7 @@ class SwiftyRequestTests: XCTestCase {
                 return
         }
 
-        let str = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\" \t"))
+        let str = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces))
         assert(String(str).lowercased() == "iso-8859-1")
     }
 
