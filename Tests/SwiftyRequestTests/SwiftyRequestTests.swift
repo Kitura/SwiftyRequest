@@ -94,7 +94,10 @@ class SwiftyRequestTests: XCTestCase {
 
     let failureFallback = { (error: BreakerError, msg: String) in
         // If this fallback is accessed, we consider it a failure
-        XCTFail("Test opened the circuit and we are in the failure fallback.")
+        if error.description == "BreakerError : An error occurred in an open state. Failing fast." {} else {
+            XCTFail("Test opened the circuit and we are in the failure fallback.")
+            return
+        }
     }
 
     // MARK: SwiftyRequest Tests
