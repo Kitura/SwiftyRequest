@@ -504,8 +504,11 @@ public class RestRequest {
                 return
             }
 
+            // Retrieve string encoding type
+            let encoding = self.getCharacterEncoding(from: response?.allHeaderFields["Content-Type"] as? String)
+
             // parse data as a string
-            guard let string = String(data: data, encoding: .utf8) else {
+            guard let string = String(data: data, encoding: encoding) else {
                 let result = Result<String>.failure(RestError.serializationError)
                 let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
@@ -624,6 +627,27 @@ public class RestRequest {
         self.request.url = urlComponents.url
 
         return nil
+    }
+
+    /// Method to identify the charset encoding defined by the Content-Type header
+    /// - Defaults set to .utf8
+    /// - Parameter contentType: The content-type header string
+    /// - Returns: returns the defined or default String.Encoding.Type
+    private func getCharacterEncoding(from contentType: String? = nil) -> String.Encoding {
+        guard let text = contentType,
+              let regex = try? NSRegularExpression(pattern: "(?<=charset=).*?(?=$|;|\\s)", options: [.caseInsensitive]),
+              let match = regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).last,
+              let range = Range(match.range, in: text) else {
+            return .utf8
+        }
+
+        /// Strip whitespace and quotes
+        let charset = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces))
+
+        switch String(charset).lowercased() {
+        case "iso-8859-1": return .isoLatin1
+        default: return .utf8
+        }
     }
 }
 

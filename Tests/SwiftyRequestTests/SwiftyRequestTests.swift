@@ -224,21 +224,50 @@ class SwiftyRequestTests: XCTestCase {
 
     }
 
+    func assertCharsetISO8859(response: HTTPURLResponse?) {
+        guard let text = response?.allHeaderFields["Content-Type"] as? String,
+            let regex = try? NSRegularExpression(pattern: "(?<=charset=).*?(?=$|;|\\s)", options: [.caseInsensitive]),
+            let match = regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).last,
+            let range = Range(match.range, in: text) else {
+                XCTFail("Test no longer valid using URL: \(response?.url?.absoluteString ?? ""). The charset field was not provided.")
+                return
+        }
+
+        let str = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces))
+        if String(str).lowercased() != "iso-8859-1" {
+          XCTFail("Test no longer valid using URL: \(response?.url?.absoluteString ?? ""). The charset field was not provided.")
+        }
+    }
+
     func testResponseString() {
 
         let expectation = self.expectation(description: "responseString SwiftyRequest test")
 
-        let request = RestRequest(url: apiURL)
-        request.credentials = .apiKey
+        /// Standard
+        let request1 = RestRequest(url: apiURL)
+        request1.credentials = .apiKey
 
-        request.responseString(responseToError: responseToError) { response in
+        request1.responseString(responseToError: responseToError) { response in
             switch response.result {
             case .success(let result):
                 XCTAssertGreaterThan(result.count, 0)
             case .failure(let error):
                 XCTFail("Failed to get weather response String with error: \(error)")
             }
-            expectation.fulfill()
+
+            /// Known example of charset=ISO-8859-1
+            let request2 = RestRequest(url: "http://google.com/")
+            request2.responseString(responseToError: self.responseToError) { response in
+                self.assertCharsetISO8859(response: response.response)
+                switch response.result {
+                case .success(let result):
+                    XCTAssertGreaterThan(result.count, 0)
+                case .failure(let error):
+                    XCTFail("Failed to get weather response String with error: \(error)")
+                }
+                expectation.fulfill()
+            }
+
         }
 
         waitForExpectations(timeout: 10)
