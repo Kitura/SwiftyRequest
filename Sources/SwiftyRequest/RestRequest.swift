@@ -611,7 +611,7 @@ public class RestRequest: NSObject  {
     private func handleInvocation(invocation: Invocation<(Data?, HTTPURLResponse?, Error?) -> Void, String>) {
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
-                invocation.notifyFailure(error: BreakerError.fastFail)
+                invocation.notifyFailure(error: BreakerError(reason: error.debugDescription.description))
             } else {
                 invocation.notifySuccess()
             }
@@ -777,11 +777,11 @@ extension RestRequest: URLSessionDelegate {
                     let credential = URLCredential(trust: trust)
                     completionHandler(.useCredential, credential)
                 } else {
-                    Log.debug("Attempting to establish a secure connection; no server trust established. Resorting to default handling.")
+                    Log.warning("Attempting to establish a secure connection; no server trust established. Resorting to default handling.")
                     completionHandler(.performDefaultHandling, nil)
                 }
             #else
-                Log.debug("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
+                Log.warning("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
                 completionHandler(.performDefaultHandling, nil)
             #endif
         default:
