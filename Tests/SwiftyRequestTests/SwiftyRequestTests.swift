@@ -132,20 +132,20 @@ class SwiftyRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 20)
     }
-    
+
     func testEchoDataSecure() {
         let expectation = self.expectation(description: "Data Echoed Back")
-        
+
         let origJson: [String: Any] = ["Data": "string"]
-        
+
         guard let data = try? JSONSerialization.data(withJSONObject: origJson, options: []) else {
             XCTFail("Could not encode json")
             return
         }
-        
+
         let request = RestRequest(method: .post, url: echoURLSecure, containsSelfSignedCert: true)
         request.messageBody = data
-        
+
         request.responseData { response in
             switch response.result {
             case .success(let retval):
@@ -160,10 +160,10 @@ class SwiftyRequestTests: XCTestCase {
             }
             expectation.fulfill()
         }
-        
+
         waitForExpectations(timeout: 20)
     }
-    
+
     // API Key (96318a1fc52412b1) for the wunderground API may expire at some point.
     // If this happens, use a different endpoint to test SwiftyRequest with.
     func testResponseData() {
@@ -397,14 +397,18 @@ class SwiftyRequestTests: XCTestCase {
         var count = 0
         var fallbackCalled = false
 
+        let request = RestRequest(url: "http://notreal/blah")
+
         let breakFallback = { (error: BreakerError, msg: String) in
+            /// After maxFailures, the circuit should be open
             if count == maxFailures {
                 fallbackCalled = true
+                assert(request.circuitBreaker?.breakerState == .open)
             }
         }
+
         let circuitParameters = CircuitParameters(name: name, timeout: timeout, resetTimeout: resetTimeout, maxFailures: maxFailures, fallback: breakFallback)
 
-        let request = RestRequest(url: "http://notreal/blah")
         request.credentials = .apiKey
         request.circuitParameters = circuitParameters
 
@@ -498,6 +502,11 @@ class SwiftyRequestTests: XCTestCase {
     func testURLTemplateNoParams() {
 
         let expectation = self.expectation(description: "URL substitution test with no substitution params")
+
+        /// With updated CircuitBreaker. This fallback will be called even though the circuit is still closed
+        let failureFallback = { (error: BreakerError, msg: String) in
+          XCTAssertEqual(error.reason, "unsupported URL")
+        }
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
