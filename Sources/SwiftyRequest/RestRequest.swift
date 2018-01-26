@@ -366,7 +366,7 @@ public class RestRequest: NSObject  {
 
         response { data, response, error in
 
-            if let error = error ?? responseToError?(response,data) {
+            if let error = error ?? responseToError?(response, data) {
                 let result = Result<T>.failure(error)
                 let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
@@ -522,8 +522,11 @@ public class RestRequest: NSObject  {
                 return
             }
 
+            // Retrieve string encoding type
+            let encoding = self.getCharacterEncoding(from: response?.allHeaderFields["Content-Type"] as? String)
+
             // parse data as a string
-            guard let string = String(data: data, encoding: .utf8) else {
+            guard let string = String(data: data, encoding: encoding) else {
                 let result = Result<String>.failure(RestError.serializationError)
                 let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
                 completionHandler(dataResponse)
@@ -643,6 +646,27 @@ public class RestRequest: NSObject  {
 
         return nil
     }
+
+    /// Method to identify the charset encoding defined by the Content-Type header
+    /// - Defaults set to .utf8
+    /// - Parameter contentType: The content-type header string
+    /// - Returns: returns the defined or default String.Encoding.Type
+    private func getCharacterEncoding(from contentType: String? = nil) -> String.Encoding {
+        guard let text = contentType,
+              let regex = try? NSRegularExpression(pattern: "(?<=charset=).*?(?=$|;|\\s)", options: [.caseInsensitive]),
+              let match = regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).last,
+              let range = Range(match.range, in: text) else {
+            return .utf8
+        }
+
+        /// Strip whitespace and quotes
+        let charset = String(text[range]).trimmingCharacters(in: CharacterSet(charactersIn: "\"").union(.whitespaces))
+
+        switch String(charset).lowercased() {
+        case "iso-8859-1": return .isoLatin1
+        default: return .utf8
+        }
+    }
 }
 
 /// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` init.
@@ -653,25 +677,25 @@ public struct CircuitParameters<A> {
     let name: String
 
     /// The circuit timeout: defaults to 1000
-    let timeout: Int
+    public let timeout: Int
 
     /// The circuit timeout: defaults to 60000
-    let resetTimeout: Int
+    public let resetTimeout: Int
 
     /// Max failures allowed: defaults to 5
-    let maxFailures: Int
+    public let maxFailures: Int
 
     /// Rolling Window: defaults to 10000
-    let rollingWindow: Int
+    public let rollingWindow: Int
 
     /// Bulkhead: defaults to 0
-    let bulkhead: Int
+    public let bulkhead: Int
 
     /// The error fallback callback
-    let fallback: (BreakerError, A) -> Void
+    public let fallback: (BreakerError, A) -> Void
 
     /// Initialize a `CircuitPrameters` instance
-    init(name: String = "circuitName", timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
+    public init(name: String = "circuitName", timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.name = name
         self.timeout = timeout
         self.resetTimeout = resetTimeout
