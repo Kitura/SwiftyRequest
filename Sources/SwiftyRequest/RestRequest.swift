@@ -348,7 +348,7 @@ public class RestRequest {
 
         response { data, response, error in
 
-            if let error = error ?? responseToError?(response,data) {
+            if let error = error ?? responseToError?(response, data) {
                 let result = Result<T>.failure(error)
                 let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
@@ -656,25 +656,25 @@ public class RestRequest {
 public struct CircuitParameters<A> {
 
     /// The circuit timeout: defaults to 1000
-    let timeout: Int
+    public let timeout: Int
 
     /// The circuit timeout: defaults to 60000
-    let resetTimeout: Int
+    public let resetTimeout: Int
 
     /// Max failures allowed: defaults to 5
-    let maxFailures: Int
+    public let maxFailures: Int
 
     /// Rolling Window: defaults to 10000
-    let rollingWindow: Int
+    public let rollingWindow: Int
 
     /// Bulkhead: defaults to 0
-    let bulkhead: Int
+    public let bulkhead: Int
 
     /// The error fallback callback
-    let fallback: (BreakerError, A) -> Void
+    public let fallback: (BreakerError, A) -> Void
 
     /// Initialize a `CircuitPrameters` instance
-    init(timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
+    public init(timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.timeout = timeout
         self.resetTimeout = resetTimeout
         self.maxFailures = maxFailures
