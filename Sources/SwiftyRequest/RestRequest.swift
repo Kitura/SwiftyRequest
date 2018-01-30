@@ -794,19 +794,30 @@ extension RestRequest: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
+        
+        guard let url = URLComponents(string: self.url), let baseHost = url.host else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        let warning = "Attempting to establish a secure connection; This is only supported by macOS 10.6 or higher. Resorting to default handling."
+
         switch (method, host) {
-        case (NSURLAuthenticationMethodServerTrust, self.url):
-            #if MAC_OS_X_VERSION_10_6
-                if let trust = challenge.protectionSpace.serverTrust {
-                    let credential = URLCredential(trust: trust)
-                    completionHandler(.useCredential, credential)
-                } else {
-                    Log.warning("Attempting to establish a secure connection; no server trust established. Resorting to default handling.")
-                    completionHandler(.performDefaultHandling, nil)
+        case (NSURLAuthenticationMethodServerTrust, baseHost):
+            #if !os(Linux)
+            guard #available(macOS 10.6, *),
+                let trust = challenge.protectionSpace.serverTrust else {
+                    
+                    Log.warning(warning)
+                    fallthrough
                 }
+
+            let credential = URLCredential(trust: trust)
+            completionHandler(.useCredential, credential)
+
             #else
-                Log.warning("Attempting to establish a secure connection; macOS 10.6 or higher must be used to achieve this. Resorting to default handling.")
-                completionHandler(.performDefaultHandling, nil)
+            Log.warning(warning)
+            fallthrough
             #endif
         default:
             completionHandler(.performDefaultHandling, nil)
