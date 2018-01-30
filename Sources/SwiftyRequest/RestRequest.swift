@@ -794,23 +794,21 @@ extension RestRequest: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
-        
+
         guard let url = URLComponents(string: self.url), let baseHost = url.host else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        
+
         let warning = "Attempting to establish a secure connection; This is only supported by macOS 10.6 or higher. Resorting to default handling."
 
         switch (method, host) {
         case (NSURLAuthenticationMethodServerTrust, baseHost):
             #if !os(Linux)
-            guard #available(macOS 10.6, *),
-                let trust = challenge.protectionSpace.serverTrust else {
-                    
-                    Log.warning(warning)
-                    fallthrough
-                }
+            guard #available(macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
+                Log.warning(warning)
+                fallthrough
+            }
 
             let credential = URLCredential(trust: trust)
             completionHandler(.useCredential, credential)
