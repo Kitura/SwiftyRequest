@@ -805,7 +805,7 @@ extension RestRequest: URLSessionDelegate {
         switch (method, host) {
         case (NSURLAuthenticationMethodServerTrust, baseHost):
             #if !os(Linux)
-            guard #available(macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
+            guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
                 Log.warning(warning)
                 fallthrough
             }
