@@ -5,7 +5,7 @@ import CircuitBreaker
 /// URL for the weather underground that many of the tests use
 let apiKey = "96318a1fc52412b1" // We don't know if API Key for the wunderground API could expire at some point...
 let echoURL = "http://httpbin.org/post"
-let echoURLSecure = "https://httpbin.org/post"
+let echoURLSecure = "https://self-signed.badssl.com/"
 let apiURL = "http://api.wunderground.com/api/\(apiKey)/conditions/q/CA/San_Francisco.json"
 let geolookupURL = "http://api.wunderground.com/api/\(apiKey)/geolookup/q/CA/San_Francisco.json"
 let templetedAPIURL = "http://api.wunderground.com/api/\(apiKey)/conditions/q/{state}/{city}.json"
@@ -45,7 +45,6 @@ class SwiftyRequestTests: XCTestCase {
 
     static var allTests = [
         ("testEchoData", testEchoData),
-        ("testEchoDataSecure", testEchoDataSecure),
         ("testResponseData", testResponseData),
         ("testResponseObject", testResponseObject),
         ("testResponseArray", testResponseArray),
@@ -60,6 +59,7 @@ class SwiftyRequestTests: XCTestCase {
         ("testURLTemplateNoTemplateValues", testURLTemplateNoTemplateValues),
         ("testQueryParamUpdating", testQueryParamUpdating),
         ("testQueryTemplateParams", testQueryTemplateParams)
+        
     ]
 
     // MARK: Helper methods
@@ -133,28 +133,16 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEchoDataSecure() {
+    func testGetSelfSignedCert() {
+        #if !os(Linux)
         let expectation = self.expectation(description: "Data Echoed Back")
 
-        let origJson: [String: Any] = ["Data": "string"]
-
-        guard let data = try? JSONSerialization.data(withJSONObject: origJson, options: []) else {
-            XCTFail("Could not encode json")
-            return
-        }
-
-        let request = RestRequest(method: .post, url: echoURLSecure, containsSelfSignedCert: true)
-        request.messageBody = data
+        let request = RestRequest(method: .get, url: echoURLSecure, containsSelfSignedCert: true)
 
         request.responseData { response in
             switch response.result {
             case .success(let retval):
-                guard let decoded = try? JSONSerialization.jsonObject(with: retval, options: []),
-                    let json = decoded as? [String: Any] else {
-                        XCTFail("Could not decode json")
-                        return
-                }
-                XCTAssertEqual("{\"Data\":\"string\"}", json["data"] as? String)
+                XCTAssert(retval.count != 0)
             case .failure(let error):
                 XCTFail("Failed to get data response: \(error)")
             }
@@ -162,6 +150,7 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 20)
+        #endif
     }
 
     // API Key (96318a1fc52412b1) for the wunderground API may expire at some point.
