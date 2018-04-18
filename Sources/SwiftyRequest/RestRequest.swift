@@ -15,7 +15,7 @@
  **/
 
 import Foundation
-import CircuitBreaker
+import CircuitBreakerSwift
 import LoggerAPI
 
 /// Object containing everything needed to build HTTP requests and execute them
