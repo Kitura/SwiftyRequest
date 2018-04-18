@@ -1,5 +1,5 @@
 import XCTest
-import CircuitBreaker
+import CircuitBreakerSwift
 @testable import SwiftyRequest
 
 /// URL for the weather underground that many of the tests use
