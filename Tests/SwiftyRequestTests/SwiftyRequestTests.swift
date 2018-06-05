@@ -57,6 +57,7 @@ class SwiftyRequestTests: XCTestCase {
         ("testURLTemplateDataCall", testURLTemplateDataCall),
         ("testURLTemplateNoParams", testURLTemplateNoParams),
         ("testURLTemplateNoTemplateValues", testURLTemplateNoTemplateValues),
+        ("testQueryObject", testQueryObject),
         ("testQueryParamUpdating", testQueryParamUpdating),
         ("testQueryTemplateParams", testQueryTemplateParams)
         
@@ -571,6 +572,32 @@ class SwiftyRequestTests: XCTestCase {
     }
 
     // MARK: Query parameter tests
+    
+    func testQueryObject() {
+        
+        let expectation = self.expectation(description: "Test setting URL query parameters")
+        
+        let circuitParameters = CircuitParameters(timeout: 3000, fallback: failureFallback)
+        
+        let request = RestRequest(url: apiURL)
+        request.credentials = .apiKey
+        request.circuitParameters = circuitParameters
+        
+        let queryItems = [URLQueryItem(name: "friend", value: "brian"), URLQueryItem(name: "friend", value: "george"), URLQueryItem(name: "friend", value: "melissa+tempe"), URLQueryItem(name: "friend", value: "mika")]
+        
+        let completionHandler = { (response: (RestResponse<Data>)) in
+            switch response.result {
+            case .success:
+                expectation.fulfill()
+            case .failure(let error):
+                XCTFail("Failed to get weather response data with error: \(error)")
+            }
+        }
+        request.responseData(queryItems: queryItems, completionHandler: completionHandler)
+        
+        waitForExpectations(timeout: 10)
+        
+    }
 
     func testQueryParamUpdating() {
 
