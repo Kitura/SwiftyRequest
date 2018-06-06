@@ -17,7 +17,7 @@
 import Foundation
 
 // A Result extension to make it Equatable
-extension Result: Equatable where T: Equatable {
+public extension Result: Equatable where T: Equatable {
     
     public static func ==(lhs: Result, rhs: Result) -> Bool {
         switch (lhs, rhs) {
