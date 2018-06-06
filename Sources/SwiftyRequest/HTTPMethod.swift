@@ -106,7 +106,7 @@ public enum HTTPMethod: String {
 
     /// Convert a string to a `HTTPMethod` instance.
     ///
-    /// Parameter fromRawValue: The string form of an HTTP method to convert to an `HTTPMethod` enum.
+    /// - Parameter fromRawValue: The string form of an HTTP method to convert to an `HTTPMethod` enum.
     init(fromRawValue: String) {
         self = HTTPMethod(rawValue: fromRawValue) ?? .unknown
     }
