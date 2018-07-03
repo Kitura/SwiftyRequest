@@ -59,7 +59,9 @@ class SwiftyRequestTests: XCTestCase {
         ("testURLTemplateNoParams", testURLTemplateNoParams),
         ("testURLTemplateNoTemplateValues", testURLTemplateNoTemplateValues),
         ("testQueryParamUpdating", testQueryParamUpdating),
-        ("testQueryTemplateParams", testQueryTemplateParams)
+        ("testQueryParamUpdatingObject", testQueryParamUpdatingObject),
+        ("testQueryTemplateParams", testQueryTemplateParams),
+        ("testQueryTemplateParamsObject", testQueryTemplateParamsObject)
         
     ]
 
@@ -674,6 +676,82 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
 
     }
+    
+    func testQueryParamUpdatingObject() {
+        
+        let expectation = self.expectation(description: "Test setting, modifying, and removing URL query parameters")
+        
+        let circuitParameters = CircuitParameters(timeout: 3000, fallback: failureFallback)
+        let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
+        
+        let request = RestRequest(url: apiURL)
+        request.credentials = .apiKey
+        request.circuitParameters = circuitParameters
+        
+        // verify query has many parameters
+        let completionHandlerFour = { (response: (RestResponse<WeatherResponse>)) in
+            switch response.result {
+            case .success(let result):
+                XCTAssertGreaterThan(result.json.count, 0)
+                XCTAssertNotNil(response.request?.url?.query)
+                if let queryItems = response.request?.url?.query {
+                    XCTAssertEqual(queryItems, "friend=brian&friend=george&friend=melissa%2Btempe&friend=mika")
+                }
+            case .failure(let error):
+                XCTFail("Failed to get weather response data with error: \(error)")
+            }
+            expectation.fulfill()
+        }
+        
+        // verify query was set to nil
+        let completionHandlerThree = { (response: (RestResponse<WeatherResponse>)) in
+            switch response.result {
+            case .success(let result):
+                XCTAssertGreaterThan(result.json.count, 0)
+                XCTAssertNil(response.request?.url?.query)
+                let queryItems = [URLQueryItem(name: "friend", value: "brian"), URLQueryItem(name: "friend", value: "george"), URLQueryItem(name: "friend", value: "melissa+tempe"), URLQueryItem(name: "friend", value: "mika")]
+                request.responseObject(queryItems: queryItems, completionHandler: completionHandlerFour)
+            case .failure(let error):
+                XCTFail("Failed to get weather response data with error: \(error)")
+            }
+        }
+        
+        // verify query value changed and was encoded properly
+        let completionHandlerTwo = { (response: (RestResponse<WeatherResponse>)) in
+            switch response.result {
+            case .success(let result):
+                XCTAssertGreaterThan(result.json.count, 0)
+                XCTAssertNotNil(response.request?.url?.query)
+                if let queryItems = response.request?.url?.query {
+                    XCTAssertEqual(queryItems, "friend=darren%2Bfink")
+                }
+                request.responseObject(completionHandler: completionHandlerThree)
+            case .failure(let error):
+                XCTFail("Failed to get weather response data with error: \(error)")
+            }
+        }
+        
+        // verfiy query value could be set
+        let completionHandlerOne = { (response: (RestResponse<WeatherResponse>)) in
+            switch response.result {
+            case .success(let retVal):
+                XCTAssertGreaterThan(retVal.json.count, 0)
+                XCTAssertNotNil(response.request?.url?.query)
+                if let queryItems = response.request?.url?.query {
+                    XCTAssertEqual(queryItems, "friend=bill")
+                }
+                
+                request.responseObject(queryItems: [URLQueryItem(name: "friend", value: "darren+fink")], completionHandler: completionHandlerTwo)
+            case .failure(let error):
+                XCTFail("Failed to get weather response data with error: \(error)")
+            }
+        }
+        
+        request.responseObject(queryItems: initialQueryItems, completionHandler: completionHandlerOne)
+        
+        waitForExpectations(timeout: 10)
+        
+    }
 
     func testQueryTemplateParams() {
 
@@ -701,6 +779,40 @@ class SwiftyRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
 
+    }
+    
+    func testQueryTemplateParamsObject() {
+        
+        let expectation = self.expectation(description: "Testing URL template and query parameters used together")
+        
+        let circuitParameters = CircuitParameters(fallback: failureFallback)
+        
+        let request = RestRequest(url: templetedAPIURL)
+        request.credentials = .apiKey
+        request.circuitParameters = circuitParameters
+        
+        let templateParams: [String: String] = ["state": "TX", "city": "Austin"]
+        
+        let queryItems = [URLQueryItem(name: "friend", value: "bill")]
+        
+        let completionHandler = { (response: (RestResponse<WeatherResponse>)) in
+            switch response.result {
+            case .success(let retVal):
+                XCTAssertGreaterThan(retVal.json.count, 0)
+                XCTAssertNotNil(response.request?.url?.query)
+                if let queryItems = response.request?.url?.query {
+                    XCTAssertEqual(queryItems, "friend=bill")
+                }
+            case .failure(let error):
+                XCTFail("Failed to get weather response data with error: \(error)")
+            }
+            expectation.fulfill()
+        }
+        
+        request.responseObject(templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
+ 
+        waitForExpectations(timeout: 10)
+        
     }
 
 }
