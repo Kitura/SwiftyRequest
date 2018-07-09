@@ -53,24 +53,24 @@ extension JSONTests {
 
 extension SwiftyRequestTests {
     static let __allTests = [
-        ("testCircuitBreakFailure", testCircuitBreakFailure),
-        ("testCircuitBreakResponseString", testCircuitBreakResponseString),
-        ("testDecodableResponseObject", testDecodableResponseObject),
         ("testEchoData", testEchoData),
-        ("testFileDownload", testFileDownload),
-        ("testGetSelfSignedCert", testGetSelfSignedCert),
-        ("testLinuxResponseString", testLinuxResponseString),
-        ("testQueryParamUpdating", testQueryParamUpdating),
-        ("testQueryTemplateParams", testQueryTemplateParams),
-        ("testRequestUserAgent", testRequestUserAgent),
-        ("testResponseArray", testResponseArray),
         ("testResponseData", testResponseData),
         ("testResponseObject", testResponseObject),
+        ("testQueryObject", testQueryObject),
+        ("testResponseArray", testResponseArray),
         ("testResponseString", testResponseString),
         ("testResponseVoid", testResponseVoid),
+        ("testFileDownload", testFileDownload),
+        ("testRequestUserAgent", testRequestUserAgent),
+        ("testCircuitBreakResponseString", testCircuitBreakResponseString),
+        ("testCircuitBreakFailure", testCircuitBreakFailure),
         ("testURLTemplateDataCall", testURLTemplateDataCall),
         ("testURLTemplateNoParams", testURLTemplateNoParams),
         ("testURLTemplateNoTemplateValues", testURLTemplateNoTemplateValues),
+        ("testQueryParamUpdating", testQueryParamUpdating),
+        ("testQueryParamUpdatingObject", testQueryParamUpdatingObject),
+        ("testQueryTemplateParams", testQueryTemplateParams),
+        ("testQueryTemplateParamsObject", testQueryTemplateParamsObject),
     ]
 }
 
