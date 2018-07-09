@@ -62,7 +62,6 @@ class SwiftyRequestTests: XCTestCase {
         ("testQueryParamUpdatingObject", testQueryParamUpdatingObject),
         ("testQueryTemplateParams", testQueryTemplateParams),
         ("testQueryTemplateParamsObject", testQueryTemplateParamsObject)
-        
     ]
 
     // MARK: Helper methods
