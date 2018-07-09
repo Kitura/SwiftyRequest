@@ -809,11 +809,11 @@ extension RestRequest: URLSessionDelegate {
         switch (method, host) {
         case (NSURLAuthenticationMethodServerTrust, baseHost):
             #if !os(Linux)
-                guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
+                guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust, let pinned = self.pinnedCertificateName else {
                     Log.warning(warning)
                     fallthrough
                 }
-                if let certificateData = NSData(contentsOfFile: Bundle.main.path(forResource: self.pinnedCertificateName, ofType: "der") ?? "") {
+                if let certificateData = NSData(contentsOfFile: Bundle.main.path(forResource: pinned, ofType: "der") ?? "") {
                     if let serverCertificate = SecTrustGetCertificateAtIndex(trust, 0) {
                         let serverCertificateData = SecCertificateCopyData(serverCertificate) as NSData
                         if certificateData == serverCertificateData {
@@ -822,6 +822,7 @@ extension RestRequest: URLSessionDelegate {
                             return
                         } else {
                             completionHandler(.performDefaultHandling, nil)
+                            return
                         }
                     }
                 }
