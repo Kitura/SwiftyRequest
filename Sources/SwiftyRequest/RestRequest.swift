@@ -252,7 +252,7 @@ public class RestRequest: NSObject  {
             
             if let error = error {
                 let result = Result<Data>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -297,7 +297,7 @@ public class RestRequest: NSObject  {
             
             if let error = error {
                 let result = Result<T>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -428,7 +428,7 @@ public class RestRequest: NSObject  {
             
             if let error = error {
                 let result = Result<[T]>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -505,7 +505,7 @@ public class RestRequest: NSObject  {
             
             if let error = error {
                 let result = Result<String>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
@@ -570,7 +570,7 @@ public class RestRequest: NSObject  {
             
             if let error = error {
                 let result = Result<Void>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
                 completionHandler(dataResponse)
                 return
             }
