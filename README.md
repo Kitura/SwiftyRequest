@@ -23,7 +23,7 @@ SwiftyRequest is an HTTP networking library built for Swift.
 ## Swift version
 The 0.0.x releases were tested on macOS and Linux using the Swift 3.1 and 3.1.1 binaries.
 
-The 1.x.x releases were tested on macOS using the Swift 4.0.3, 4.1.2 and Linux using the Swift 4.0.3, 4.2
+The 1.x.x releases were tested on macOS and Linux using the Swift 4.0.3 and later.
 
 *NOTE:* Because of issues with URLSession/URLRequest in Swift 4.0, Swift 4.0 projects should use the 0.0.x release of SwiftyRequest.
 
