@@ -368,6 +368,8 @@ public class RestRequest: NSObject  {
             return
         }
         
+        self.queryItems = queryItems
+        
         response { data, response, error in
             
             if let error = error ?? responseToError?(response, data) {
