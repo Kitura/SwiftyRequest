@@ -140,6 +140,7 @@ class SwiftyRequestTests: XCTestCase {
         let expectation = self.expectation(description: "Data Echoed Back")
 
         let request = RestRequest(method: .get, url: echoURLSecure, containsSelfSignedCert: true)
+        request.pinnedCertificateName = ""
 
         request.responseData { response in
             switch response.result {
