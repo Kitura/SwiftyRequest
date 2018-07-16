@@ -24,6 +24,7 @@ public class RestRequest: NSObject  {
     // Check if there exists a self-signed certificate and whether it's a secure connection
     private let isSecure: Bool
     private let isSelfSigned: Bool
+    private let certificateName: String
 
     /// A default `URLSession` instance
     private var session: URLSession {
@@ -173,10 +174,11 @@ public class RestRequest: NSObject  {
     ///
     /// - Parameters:
     ///   - url: URL string to use for network request
-    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false) {
+    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, certificateName: String? = nil) {
 
         self.isSecure = url.contains("https")
         self.isSelfSigned = containsSelfSignedCert ?? false
+        self.certificateName = certificateName ?? ""
 
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
@@ -805,6 +807,29 @@ extension RestRequest: URLSessionDelegate {
         let warning = "Attempting to establish a secure connection; This is only supported by macOS 10.6 or higher. Resorting to default handling."
 
         switch (method, host) {
+        case (NSURLAuthenticationMethodClientCertificate, baseHost):
+            #if !os(Linux)
+            guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
+                Log.warning(warning)
+                fallthrough
+            }
+            if let _ = NSData(contentsOfFile: Bundle.main.path(forResource: self.certificateName, ofType: "der") ?? "") {
+                if let serverCertificate = SecTrustGetCertificateAtIndex(trust, 0) {
+                    let certificate: SecCertificate = serverCertificate
+                    var identity: SecIdentity? = nil
+                    let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
+                    guard let id = identity else {
+                        Log.warning(warning)
+                        fallthrough
+                    }
+                    completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
+                }
+            }
+            
+            #else
+            Log.warning(warning)
+            fallthrough
+            #endif
         case (NSURLAuthenticationMethodServerTrust, baseHost):
             #if !os(Linux)
             guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
