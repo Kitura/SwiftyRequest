@@ -812,20 +812,21 @@ extension RestRequest: URLSessionDelegate {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
             #if !os(Linux)
             // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
-            let bundle = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: "/Certificates")
+            if let bundle = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: "/Certificates") {
             // Convert the bundle path to NSData
-            let key: NSData = NSData(base64Encoded: bundle!, options: .ignoreUnknownCharacters)!
-            // Create a secure certificate from the NSData
-            let certificate: SecCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, key)!
-            // Create a secure identity from the certificate
-            var identity: SecIdentity? = nil
-            let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
-            guard let id = identity else {
-                Log.warning(warning)
-                fallthrough
+                let key: NSData = NSData(base64Encoded: bundle, options: .ignoreUnknownCharacters)!
+                // Create a secure certificate from the NSData
+                if let certificate: SecCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
+                    // Create a secure identity from the certificate
+                    var identity: SecIdentity? = nil
+                    let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
+                    guard let id = identity else {
+                        Log.warning(warning)
+                        fallthrough
+                    }
+                    completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
+                }
             }
-            completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
-            
             #else
             Log.warning(warning)
             fallthrough
