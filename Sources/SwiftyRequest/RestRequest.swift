@@ -805,7 +805,7 @@ extension RestRequest: URLSessionDelegate {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
 
-        guard let url = URLComponents(string: self.url), let baseHost = url.host, let certificatePath = self.certificatePath else {
+        guard let url = URLComponents(string: self.url), let baseHost = url.host else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
@@ -815,6 +815,10 @@ extension RestRequest: URLSessionDelegate {
         switch (method, host) {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
             #if !os(Linux)
+            guard let certificatePath = self.certificatePath else {
+                Log.warning(warning)
+                fallthrough
+            }
             // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
             if let path = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: certificatePath) {
                 // Convert the bundle path to NSData
