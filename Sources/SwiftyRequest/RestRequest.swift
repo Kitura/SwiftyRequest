@@ -821,8 +821,8 @@ extension RestRequest: URLSessionDelegate {
             }
             // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
             if let path = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: certificatePath) {
-                // Convert the bundle path to NSData
-                if let key: NSData = NSData(base64Encoded: path, options: .ignoreUnknownCharacters) {
+                // Read the certificate data from disk
+                if let key = NSData(base64Encoded: path) {
                     // Create a secure certificate from the NSData
                     if let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
                         // Create a secure identity from the certificate
