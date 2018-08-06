@@ -805,32 +805,30 @@ extension RestRequest: URLSessionDelegate {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
 
-        guard let url = URLComponents(string: self.url), let baseHost = url.host else {
+        guard let url = URLComponents(string: self.url), let baseHost = url.host, let certificatePath = self.certificatePath else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-
+        
         let warning = "Attempting to establish a secure connection; This is only supported by macOS 10.6 or higher. Resorting to default handling."
 
         switch (method, host) {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
             #if !os(Linux)
-            if let certificatePath = self.certificatePath {
-                // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
-                if let bundle = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: certificatePath) {
-                    // Convert the bundle path to NSData
-                    if let key: NSData = NSData(base64Encoded: bundle, options: .ignoreUnknownCharacters) {
-                        // Create a secure certificate from the NSData
-                        if let certificate: SecCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
-                            // Create a secure identity from the certificate
-                            var identity: SecIdentity? = nil
-                            let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
-                            guard let id = identity else {
-                                Log.warning(warning)
-                                fallthrough
-                            }
-                            completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
+            // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
+            if let path = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: certificatePath) {
+                // Convert the bundle path to NSData
+                if let key: NSData = NSData(base64Encoded: path, options: .ignoreUnknownCharacters) {
+                    // Create a secure certificate from the NSData
+                    if let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
+                        // Create a secure identity from the certificate
+                        var identity: SecIdentity? = nil
+                        let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
+                        guard let id = identity else {
+                            Log.warning(warning)
+                            fallthrough
                         }
+                        completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
                     }
                 }
             }
