@@ -162,7 +162,7 @@ class SwiftyRequestTests: XCTestCase {
         let expectation = self.expectation(description: "Data Echoed Back")
         let certName = "server.csr"
         
-        let request = RestRequest(method: .get, url: echoURLSecure, containsSelfSignedCert: true, certificateName: "Tests/SwiftyRequestTests/Certificates/\(certName)")
+        let request = RestRequest(method: .get, url: echoURLSecure, containsSelfSignedCert: true, certificateName: certName, certificatePath: "Tests/SwiftyRequestTests/Certificates")
         
         request.responseData { response in
             switch response.result {
