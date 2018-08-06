@@ -27,6 +27,9 @@ public class RestRequest: NSObject  {
     
     // The name for the client certificate for 2-way SSL
     private let clientCertificateName: String?
+    
+    // The path to the certificate for 2-way SSL
+    private let certificatePath: String?
 
     /// A default `URLSession` instance
     private var session: URLSession {
@@ -176,11 +179,12 @@ public class RestRequest: NSObject  {
     ///
     /// - Parameters:
     ///   - url: URL string to use for network request
-    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, certificateName: String? = nil) {
+    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, certificateName: String? = nil, certificatePath: String? = nil) {
 
         self.isSecure = url.contains("https")
         self.isSelfSigned = containsSelfSignedCert ?? false
-        self.clientCertificateName = certificateName ?? ""
+        self.clientCertificateName = certificateName
+        self.certificatePath = certificatePath
 
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
@@ -811,20 +815,23 @@ extension RestRequest: URLSessionDelegate {
         switch (method, host) {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
             #if !os(Linux)
-            // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
-            if let bundle = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: "/Certificates") {
-            // Convert the bundle path to NSData
-                let key: NSData = NSData(base64Encoded: bundle, options: .ignoreUnknownCharacters)!
-                // Create a secure certificate from the NSData
-                if let certificate: SecCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
-                    // Create a secure identity from the certificate
-                    var identity: SecIdentity? = nil
-                    let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
-                    guard let id = identity else {
-                        Log.warning(warning)
-                        fallthrough
+            if let certificatePath = self.certificatePath {
+                // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
+                if let bundle = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: certificatePath) {
+                    // Convert the bundle path to NSData
+                    if let key: NSData = NSData(base64Encoded: bundle, options: .ignoreUnknownCharacters) {
+                        // Create a secure certificate from the NSData
+                        if let certificate: SecCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
+                            // Create a secure identity from the certificate
+                            var identity: SecIdentity? = nil
+                            let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
+                            guard let id = identity else {
+                                Log.warning(warning)
+                                fallthrough
+                            }
+                            completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
+                        }
                     }
-                    completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
                 }
             }
             #else
