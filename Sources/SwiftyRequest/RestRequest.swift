@@ -363,6 +363,8 @@ public class RestRequest: NSObject  {
             completionHandler(dataResponse)
             return
         }
+        
+        self.queryItems = queryItems
 
         response { data, response, error in
 
