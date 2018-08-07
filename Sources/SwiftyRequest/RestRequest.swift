@@ -741,7 +741,7 @@ public enum Credentials {
     /// an API key is being used, no additional data needed
     case apiKey
 
-    /// a bearer authentication (token)
+    /// Note: The bearer token should be base64 encoded
     case bearerAuthentication(bearer: String)
 
     /// a basic username/password authentication is being used with said value, passed in
