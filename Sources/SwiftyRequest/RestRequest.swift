@@ -179,12 +179,14 @@ public class RestRequest: NSObject  {
     ///
     /// - Parameters:
     ///   - url: URL string to use for network request
-    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, certificateName: String? = nil, certificatePath: String? = nil) {
+    ///   - containsSelfSignedCert: Pass `True` to use self signed certificates
+    ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL
+    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
 
         self.isSecure = url.contains("https")
         self.isSelfSigned = containsSelfSignedCert ?? false
-        self.clientCertificateName = certificateName
-        self.certificatePath = certificatePath
+        self.clientCertificateName = clientCertificate?.name
+        self.certificatePath = clientCertificate?.path
 
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
@@ -859,4 +861,9 @@ extension RestRequest: URLSessionDelegate {
         }
     }
 
+}
+
+public struct ClientCertificate {
+    let name: String
+    let path: String
 }
