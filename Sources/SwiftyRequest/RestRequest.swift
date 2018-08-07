@@ -815,12 +815,12 @@ extension RestRequest: URLSessionDelegate {
         switch (method, host) {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
             #if !os(Linux)
-            guard let certificatePath = self.certificatePath else {
+            guard let certificateName = self.clientCertificateName, let certificatePath = self.certificatePath else {
                 Log.warning(warning)
                 fallthrough
             }
             // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
-            if let path = Bundle.path(forResource: self.clientCertificateName, ofType: "der", inDirectory: certificatePath) {
+            if let path = Bundle.path(forResource: certificateName, ofType: "der", inDirectory: certificatePath) {
                 // Read the certificate data from disk
                 if let key = NSData(base64Encoded: path) {
                     // Create a secure certificate from the NSData
