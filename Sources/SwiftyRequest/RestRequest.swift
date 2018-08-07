@@ -83,8 +83,8 @@ public class RestRequest: NSObject  {
             if let credentials = credentials {
                 switch credentials {
                 case .apiKey: break
-                case .bearerAuthentication(let token):
-                    request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+                case .tokenAuthentication(let token):
+                    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 case .basicAuthentication(let username, let password):
                     let authData = (username + ":" + password).data(using: .utf8)!
                     let authString = authData.base64EncodedString()
@@ -742,7 +742,7 @@ public enum Credentials {
     case apiKey
 
     /// Note: The bearer token should be base64 encoded
-    case bearerAuthentication(bearer: String)
+    case tokenAuthentication(token: String)
 
     /// a basic username/password authentication is being used with said value, passed in
     case basicAuthentication(username: String, password: String)
