@@ -19,7 +19,7 @@ import Foundation
 // A Result extension to make it Equatable
 // Conditional conformance is only available from Swift 4.1 and up
 #if swift(>=4.1)
-public extension Result: Equatable where T: Equatable {
+extension Result: Equatable where T: Equatable {
     
     public static func ==(lhs: Result, rhs: Result) -> Bool {
         switch (lhs, rhs) {
