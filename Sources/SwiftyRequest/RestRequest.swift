@@ -25,11 +25,8 @@ public class RestRequest: NSObject  {
     private let isSecure: Bool
     private let isSelfSigned: Bool
     
-    // The name for the client certificate for 2-way SSL
-    private let clientCertificateName: String?
-    
-    // The path to the certificate for 2-way SSL
-    private let certificatePath: String?
+    // The client certificate for 2-way SSL
+    private let clientCertificate: ClientCertificate?
 
     /// A default `URLSession` instance
     private var session: URLSession {
@@ -185,8 +182,7 @@ public class RestRequest: NSObject  {
 
         self.isSecure = url.contains("https")
         self.isSelfSigned = containsSelfSignedCert ?? false
-        self.clientCertificateName = clientCertificate?.name
-        self.certificatePath = clientCertificate?.path
+        self.clientCertificate = clientCertificate
 
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
@@ -817,7 +813,7 @@ extension RestRequest: URLSessionDelegate {
         switch (method, host) {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
             #if !os(Linux)
-            guard let certificateName = self.clientCertificateName, let certificatePath = self.certificatePath else {
+            guard let certificateName = self.clientCertificate?.name, let certificatePath = self.clientCertificate?.path else {
                 Log.warning(warning)
                 fallthrough
             }
@@ -863,7 +859,10 @@ extension RestRequest: URLSessionDelegate {
 
 }
 
+/// Struct to store client certificate name and path
 public struct ClientCertificate {
+    /// The name for the client certificate
     let name: String
+    /// The path to the client certificate
     let path: String
 }
