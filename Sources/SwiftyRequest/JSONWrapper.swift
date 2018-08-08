@@ -124,7 +124,7 @@ public struct JSONWrapper {
 
     /// Method to retrieve a JSON value from a JSONPathType
     ///
-    /// - Parameter path: JSONPathType
+    /// - Parameter at: JSONPathType
     /// - Returns: The JSON object at that path
     private func value(at path: JSONPathType) throws -> JSONWrapper {
         if let dictionary = json as? [String: Any] {
@@ -138,7 +138,7 @@ public struct JSONWrapper {
 
     /// Method to retrieve a JSON value from a [JSONPathType]
     ///
-    /// - Parameter path: [JSONPathType]
+    /// - Parameter at: [JSONPathType]
     /// - Returns: The JSON object at that path
     private func value(at path: [JSONPathType]) throws -> JSONWrapper {
         var value = self
@@ -150,7 +150,7 @@ public struct JSONWrapper {
 
     /// Decodes the designated JSONDecodable object at the given JSONPathType
     ///
-    /// - Parameter path: [JSONPathType]
+    /// - Parameter at: [JSONPathType]
     /// - Parameter type: The type to decode
     /// - Returns: The decoded object
     public func decode<Decoded: JSONDecodable>(at path: JSONPathType..., type: Decoded.Type = Decoded.self) throws -> Decoded {
@@ -158,35 +158,35 @@ public struct JSONWrapper {
     }
 
     /// Method to Retrieve Double
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: Double
     public func getDouble(at path: JSONPathType...) throws -> Double {
         return try Double(json: value(at: path))
     }
 
     /// Method to Retrieve Double
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: Double
     public func getInt(at path: JSONPathType...) throws -> Int {
         return try Int(json: value(at: path))
     }
 
     /// Method to Retrieve String
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: Double
     public func getString(at path: JSONPathType...) throws -> String {
         return try String(json: value(at: path))
     }
 
     /// Method to Retrieve Bool
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: Double
     public func getBool(at path: JSONPathType...) throws -> Bool {
         return try Bool(json: value(at: path))
     }
 
     /// Method to Retrieve JSON Array
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: Double
     public func getArray(at path: JSONPathType...) throws -> [JSONWrapper] {
         let json = try value(at: path)
@@ -198,7 +198,7 @@ public struct JSONWrapper {
 
     /// Decodes the designated [JSONDecodable] object at the given JSONPathType
     ///
-    /// - Parameter path: [JSONPathType]
+    /// - Parameter at: [JSONPathType]
     /// - Parameter type: The type to decode
     /// - Returns: The decoded array object
     public func decodedArray<Decoded: JSONDecodable>(at path: JSONPathType..., type: Decoded.Type = Decoded.self) throws -> [Decoded] {
@@ -211,7 +211,7 @@ public struct JSONWrapper {
 
     /// Decodes the designated [String: JSONDecodable] object at the given JSONPathType
     ///
-    /// - Parameter path: [JSONPathType]
+    /// - Parameter at: [JSONPathType]
     /// - Parameter type: The value type to decode
     /// - Returns: The decoded [String: Decoded]
     public func decodedDictionary<Decoded: JSONDecodable>(at path: JSONPathType..., type: Decoded.Type = Decoded.self) throws -> [String: Decoded] {
@@ -227,14 +227,14 @@ public struct JSONWrapper {
     }
 
     /// Method to Retrieve JSON from JSONPathType
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: Any
     public func getJSON(at path: JSONPathType...) throws -> Any {
         return try value(at: path).json
     }
 
     /// Method to Retrieve [String: JSON] from JSONPathType
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: [String: JSON]
     public func getDictionary(at path: JSONPathType...) throws -> [String: JSONWrapper] {
         let json = try value(at: path)
@@ -245,7 +245,7 @@ public struct JSONWrapper {
     }
 
     /// Method to Retrieve [String: Any] from JSONPathType
-    /// - Parameter path: JSONPathType...
+    /// - Parameter at: JSONPathType...
     /// - Returns: [String: Any]
     public func getDictionaryObject(at path: JSONPathType...) throws -> [String: Any] {
         let json = try value(at: path)
