@@ -45,6 +45,8 @@ class SwiftyRequestTests: XCTestCase {
 
     static var allTests = [
         ("testEchoData", testEchoData),
+        ("testGetSelfSignedCert", testGetSelfSignedCert),
+        ("testGetClientCert", testGetClientCert),
         ("testResponseData", testResponseData),
         ("testResponseObject", testResponseObject),
         ("testQueryObject", testQueryObject),
@@ -151,6 +153,27 @@ class SwiftyRequestTests: XCTestCase {
             expectation.fulfill()
         }
 
+        waitForExpectations(timeout: 20)
+        #endif
+    }
+    
+    func testGetClientCert() {
+        #if !os(Linux)
+        let expectation = self.expectation(description: "Data Echoed Back")
+        let testClientCertificate = ClientCertificate(name: "server.csr", path: "Tests/SwiftyRequestTests/Certificates")
+        
+        let request = RestRequest(method: .get, url: echoURLSecure, containsSelfSignedCert: true, clientCertificate: testClientCertificate)
+        
+        request.responseData { response in
+            switch response.result {
+            case .success(let retval):
+                XCTAssert(retval.count != 0)
+            case .failure(let error):
+                XCTFail("Failed to get data response: \(error)")
+            }
+            expectation.fulfill()
+        }
+        
         waitForExpectations(timeout: 20)
         #endif
     }

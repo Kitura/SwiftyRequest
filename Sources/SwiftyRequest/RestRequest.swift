@@ -24,6 +24,9 @@ public class RestRequest: NSObject  {
     // Check if there exists a self-signed certificate and whether it's a secure connection
     private let isSecure: Bool
     private let isSelfSigned: Bool
+    
+    // The client certificate for 2-way SSL
+    private let clientCertificate: ClientCertificate?
 
     /// A default `URLSession` instance
     private var session: URLSession {
@@ -175,10 +178,13 @@ public class RestRequest: NSObject  {
     ///
     /// - Parameters:
     ///   - url: URL string to use for network request
-    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false) {
+    ///   - containsSelfSignedCert: Pass `True` to use self signed certificates
+    ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL
+    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
 
         self.isSecure = url.contains("https")
         self.isSelfSigned = containsSelfSignedCert ?? false
+        self.clientCertificate = clientCertificate
 
         // Instantiate basic mutable request
         let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
@@ -806,10 +812,37 @@ extension RestRequest: URLSessionDelegate {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-
+        
         let warning = "Attempting to establish a secure connection; This is only supported by macOS 10.6 or higher. Resorting to default handling."
 
         switch (method, host) {
+        case (NSURLAuthenticationMethodClientCertificate, baseHost):
+            #if !os(Linux)
+            guard let certificateName = self.clientCertificate?.name, let certificatePath = self.clientCertificate?.path else {
+                Log.warning(warning)
+                fallthrough
+            }
+            // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
+            if let path = Bundle.path(forResource: certificateName, ofType: "der", inDirectory: certificatePath) {
+                // Read the certificate data from disk
+                if let key = NSData(base64Encoded: path) {
+                    // Create a secure certificate from the NSData
+                    if let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
+                        // Create a secure identity from the certificate
+                        var identity: SecIdentity? = nil
+                        let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
+                        guard let id = identity else {
+                            Log.warning(warning)
+                            fallthrough
+                        }
+                        completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
+                    }
+                }
+            }
+            #else
+            Log.warning(warning)
+            fallthrough
+            #endif
         case (NSURLAuthenticationMethodServerTrust, baseHost):
             #if !os(Linux)
             guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
@@ -829,4 +862,12 @@ extension RestRequest: URLSessionDelegate {
         }
     }
 
+}
+
+/// Struct to store client certificate name and path
+public struct ClientCertificate {
+    /// The name for the client certificate
+    public let name: String
+    /// The path to the client certificate
+    public let path: String
 }
