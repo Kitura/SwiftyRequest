@@ -862,7 +862,7 @@ extension RestRequest: URLSessionDelegate {
 /// Struct to store client certificate name and path
 public struct ClientCertificate {
     /// The name for the client certificate
-    let name: String
+    public let name: String
     /// The path to the client certificate
-    let path: String
+    public let path: String
 }
