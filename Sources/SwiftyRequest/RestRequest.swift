@@ -817,7 +817,7 @@ extension RestRequest: URLSessionDelegate {
 
         switch (method, host) {
         case (NSURLAuthenticationMethodClientCertificate, baseHost):
-            #if !os(Linux)
+            #if os(macOS)
             guard let certificateName = self.clientCertificate?.name, let certificatePath = self.clientCertificate?.path else {
                 Log.warning(warning)
                 fallthrough
