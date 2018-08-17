@@ -158,7 +158,7 @@ class SwiftyRequestTests: XCTestCase {
     }
     
     func testGetClientCert() {
-        #if !os(Linux)
+        #if os(macOS)
         let expectation = self.expectation(description: "Data Echoed Back")
         let testClientCertificate = ClientCertificate(name: "server.csr", path: "Tests/SwiftyRequestTests/Certificates")
         
