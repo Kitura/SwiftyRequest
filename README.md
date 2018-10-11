@@ -6,6 +6,8 @@
 
 SwiftyRequest is an HTTP networking library built for Swift.
 
+SwiftyRequest uses `URLSession` for the underlying transport. `URLSession` on Linux is not yet completely implemented so you may find that this library is less reliable on Linux than Darwin.
+
 ## Contents
 * [Features](#features)
 * [Installation](#installation)
