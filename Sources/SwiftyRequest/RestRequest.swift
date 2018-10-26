@@ -870,4 +870,10 @@ public struct ClientCertificate {
     public let name: String
     /// The path to the client certificate
     public let path: String
+
+    /// Initialize a `ClientCertificate` instance
+    public init(name: String, path: String) {
+      self.name = name
+      self.path = path
+    }
 }
