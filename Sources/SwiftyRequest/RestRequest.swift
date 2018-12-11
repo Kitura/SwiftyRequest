@@ -182,7 +182,7 @@ public class RestRequest: NSObject  {
     ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL
     public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
 
-        self.isSecure = url.contains("https")
+        self.isSecure = url.hasPrefix("https")
         self.isSelfSigned = containsSelfSignedCert ?? false
         self.clientCertificate = clientCertificate
 
