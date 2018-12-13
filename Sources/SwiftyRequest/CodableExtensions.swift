@@ -19,7 +19,7 @@ import Foundation
 //===----------------------------------------------------------------------===//
 // Extensions: JSONEncoder
 //===----------------------------------------------------------------------===//
-internal extension JSONEncoder {
+extension JSONEncoder {
 
     /// Encode an optional object.
     internal func encodeIfPresent<T: Encodable>(_ value: T?) throws -> Data {
@@ -32,7 +32,7 @@ internal extension JSONEncoder {
 //===----------------------------------------------------------------------===//
 // Extensions: KeyedEncodingContainer<DynamicKeys>
 //===----------------------------------------------------------------------===//
-internal extension KeyedEncodingContainer where Key == DynamicKeys {
+extension KeyedEncodingContainer where Key == DynamicKeys {
 
     /// Encode additional properties.
     internal mutating func encode(_ additionalProperties: [String: JSON]) throws {
@@ -57,7 +57,7 @@ internal extension KeyedEncodingContainer where Key == DynamicKeys {
 //===----------------------------------------------------------------------===//
 // Extensions: KeyedDecodingContainer<DynamicKeys>
 //===----------------------------------------------------------------------===//
-internal extension KeyedDecodingContainer where Key == DynamicKeys {
+extension KeyedDecodingContainer where Key == DynamicKeys {
 
     /// Decode additional properties.
     internal func decode(_ type: [String: JSON].Type, excluding keys: [CodingKey]) throws -> [String: JSON] {

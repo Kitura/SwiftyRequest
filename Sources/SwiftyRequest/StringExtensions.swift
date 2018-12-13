@@ -16,7 +16,7 @@
 
 import Foundation
 
-public extension String {
+extension String {
 
     /// A string url expansion method that replaces templated values in a url, with parameters
     /// The template value pattern to be replaced should look like this `{key}`
