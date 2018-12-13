@@ -9,6 +9,7 @@ let echoURLSecure = "https://self-signed.badssl.com/"
 let apiURL = "http://api.wunderground.com/api/\(apiKey)/conditions/q/CA/San_Francisco.json"
 let geolookupURL = "http://api.wunderground.com/api/\(apiKey)/geolookup/q/CA/San_Francisco.json"
 let templetedAPIURL = "http://api.wunderground.com/api/\(apiKey)/conditions/q/{state}/{city}.json"
+let insecureUrl = "http://www.stealmylogin.com"
 
 // MARK: Helper structs
 
@@ -110,7 +111,7 @@ class SwiftyRequestTests: XCTestCase {
     func testInsecureConnection() {
         let expectation = self.expectation(description: "Insecure Connection test")
         
-        let request = RestRequest(method: .get, url: echoURL)
+        let request = RestRequest(method: .get, url: insecureUrl)
         
         request.response { (data, response, error) in
             if error != nil {
