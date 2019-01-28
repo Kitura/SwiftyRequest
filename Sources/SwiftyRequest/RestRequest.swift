@@ -237,7 +237,7 @@ public class RestRequest: NSObject  {
     ///
     /// - Parameters:
     ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation
     public func responseData(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
@@ -283,7 +283,7 @@ public class RestRequest: NSObject  {
     ///   - responseToError: Error callback closure in case of request failure
     ///   - path: Array of Json keys leading to desired Json
     ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation
     public func responseObject<T: JSONDecodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
@@ -365,7 +365,7 @@ public class RestRequest: NSObject  {
     ///   - responseToError: Error callback closure in case of request failure
     ///   - path: Array of Json keys leading to desired Json
     ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation
     public func responseObject<T: Decodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
@@ -424,7 +424,7 @@ public class RestRequest: NSObject  {
     ///   - responseToError: Error callback closure in case of request failure
     ///   - path: Array of Json keys leading to desired Json
     ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation
     public func responseArray<T: JSONDecodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
@@ -506,7 +506,7 @@ public class RestRequest: NSObject  {
     /// - Parameters:
     ///   - responseToError: Error callback closure in case of request failure
     ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation
     public func responseString(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
@@ -575,7 +575,7 @@ public class RestRequest: NSObject  {
     /// - Parameters:
     ///   - responseToError: Error callback closure in case of request failure
     ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation
     public func responseVoid(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
