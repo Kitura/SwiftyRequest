@@ -239,7 +239,12 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
 
     }
-    
+
+    // TODO: This test does not appear to really test query parameters...
+    // This needs to test that a request made to an API that _requires_ a query
+    // parameter is successful, or that the response somehow indicates that one
+    // was successfully provided. Both methods of setting query items should be
+    // tested (setter on RestRequest, and via param to request.responseObject).
     func testQueryObject() {
         
         let expectation = self.expectation(description: "responseObject SwiftyRequest test")

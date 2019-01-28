@@ -250,7 +250,11 @@ public class RestRequest: NSObject  {
             return
         }
 
-        self.queryItems = queryItems
+        // Replace any existing query items with those provided in the queryItems
+        // parameter, if any were given.
+        if let queryItems = queryItems {
+            self.queryItems = queryItems
+        }
 
         response { data, response, error in
 
@@ -295,7 +299,11 @@ public class RestRequest: NSObject  {
             return
         }
 
-        self.queryItems = queryItems
+        // Replace any existing query items with those provided in the queryItems
+        // parameter, if any were given.
+        if let queryItems = queryItems {
+            self.queryItems = queryItems
+        }
 
         response { data, response, error in
 
@@ -372,7 +380,11 @@ public class RestRequest: NSObject  {
             return
         }
 
-        self.queryItems = queryItems
+        // Replace any existing query items with those provided in the queryItems
+        // parameter, if any were given.
+        if let queryItems = queryItems {
+            self.queryItems = queryItems
+        }
 
         response { data, response, error in
 
@@ -428,7 +440,11 @@ public class RestRequest: NSObject  {
             return
         }
 
-        self.queryItems = queryItems
+        // Replace any existing query items with those provided in the queryItems
+        // parameter, if any were given.
+        if let queryItems = queryItems {
+            self.queryItems = queryItems
+        }
 
         response { data, response, error in
 
@@ -505,7 +521,11 @@ public class RestRequest: NSObject  {
             return
         }
 
-        self.queryItems = queryItems
+        // Replace any existing query items with those provided in the queryItems
+        // parameter, if any were given.
+        if let queryItems = queryItems {
+            self.queryItems = queryItems
+        }
 
         response { data, response, error in
 
@@ -570,7 +590,11 @@ public class RestRequest: NSObject  {
             return
         }
 
-        self.queryItems = queryItems
+        // Replace any existing query items with those provided in the queryItems
+        // parameter, if any were given.
+        if let queryItems = queryItems {
+            self.queryItems = queryItems
+        }
 
         response { data, response, error in
 
