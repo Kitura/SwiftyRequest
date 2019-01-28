@@ -693,6 +693,8 @@ class SwiftyRequestTests: XCTestCase {
                 if let queryItems = response.request?.url?.query {
                     XCTAssertEqual(queryItems, "friend=darren%2Bfink")
                 }
+                // Explicitly remove query items before next request
+                request.queryItems = nil
                 request.responseData(completionHandler: completionHandlerThree)
             case .failure(let error):
                 XCTFail("Failed to get weather response data with error: \(error)")
@@ -715,7 +717,11 @@ class SwiftyRequestTests: XCTestCase {
             }
         }
 
-        request.responseData(queryItems: initialQueryItems, completionHandler: completionHandlerOne)
+        // Set the query items for subsequent requests
+        request.queryItems = initialQueryItems
+
+        // Do not explicitly pass `queryItems` - current configuration should be picked up
+        request.responseData(completionHandler: completionHandlerOne)
 
         waitForExpectations(timeout: 10)
 
@@ -769,6 +775,8 @@ class SwiftyRequestTests: XCTestCase {
                 if let queryItems = response.request?.url?.query {
                     XCTAssertEqual(queryItems, "friend=darren%2Bfink")
                 }
+                // Explicitly remove query items before next request
+                request.queryItems = nil
                 request.responseObject(completionHandler: completionHandlerThree)
             case .failure(let error):
                 XCTFail("Failed to get weather response data with error: \(error)")
@@ -791,7 +799,11 @@ class SwiftyRequestTests: XCTestCase {
             }
         }
         
-        request.responseObject(queryItems: initialQueryItems, completionHandler: completionHandlerOne)
+        // Set the query items for subsequent requests
+        request.queryItems = initialQueryItems
+
+        // Do not explicitly pass `queryItems` - current configuration should be picked up
+        request.responseObject(completionHandler: completionHandlerOne)
         
         waitForExpectations(timeout: 10)
         
