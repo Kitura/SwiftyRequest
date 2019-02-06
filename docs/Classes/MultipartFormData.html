@@ -125,7 +125,10 @@
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs/CircuitParameters.html">CircuitParameters</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ClientCertificate.html">ClientCertificate</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSONWrapper.html">JSONWrapper</a>
@@ -147,11 +150,11 @@
             <h1>MultipartFormData</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MultipartFormData</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MultipartFormData</span></code></pre>
 
                 </div>
               </div>
-            <p>Object encapsulating a Multipart Form</p>
+            <p>Object encapsulating a multipart form.</p>
 
           </div>
         </section>
@@ -163,9 +166,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest17MultipartFormDataC11contentTypeSSv"></a>
+                    <a name="/s:13SwiftyRequest17MultipartFormDataC11contentTypeSSvp"></a>
                     <a name="//apple_ref/swift/Property/contentType" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest17MultipartFormDataC11contentTypeSSv">contentType</a>
+                    <a class="token" href="#/s:13SwiftyRequest17MultipartFormDataC11contentTypeSSvp">contentType</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -173,14 +176,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>String denoting the Content Type</p>
+                        <p>String denoting the <code>Content-Type</code> of the request header.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">contentType</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">contentType</span><span class="p">:</span> <span class="kt">String</span></code></pre>
 
                         </div>
                       </div>
@@ -200,14 +203,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Initialize a <code>MultipartFormData</code> instance</p>
+                        <p>Initialize a <code>MultipartFormData</code> instance.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">()</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">()</span></code></pre>
 
                         </div>
                       </div>
@@ -227,14 +230,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Method to create append a new body part to the multipart form.</p>
+                        <p>Append a new body part to the multipart form, where the original data is in a file described by the <code>fileName</code> string.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">append</span><span class="p">(</span><span class="n">_</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">withName</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mimeType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">fileName</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">append</span><span class="p">(</span><span class="n">_</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">withName</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mimeType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">fileName</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -250,7 +253,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the data of the body part</p>
+                                  <p>The data of the body part.</p>
                                 </div>
                               </td>
                             </tr>
@@ -262,7 +265,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the name/key of the body part</p>
+                                  <p>The name/key of the body part.</p>
                                 </div>
                               </td>
                             </tr>
@@ -274,7 +277,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the mime type of the body part</p>
+                                  <p>The MIME type of the body part.</p>
                                 </div>
                               </td>
                             </tr>
@@ -286,7 +289,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the name of the file the data came from</p>
+                                  <p>The name of the file the data came from.</p>
                                 </div>
                               </td>
                             </tr>
@@ -295,7 +298,7 @@
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>returns a Data Object encompassing the combined body parts</p>
+                        <p>Returns a <code>Data</code> object encompassing the combined body parts.</p>
                       </div>
                     </section>
                   </div>
@@ -313,14 +316,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Method to create append a new body part to the multipart form.</p>
+                        <p>Append a new body part to the multipart form, where the original data is in a url described by <code>fileURL</code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">append</span><span class="p">(</span><span class="n">_</span> <span class="nv">fileURL</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">withName</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mimeType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">append</span><span class="p">(</span><span class="n">_</span> <span class="nv">fileURL</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">withName</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mimeType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -336,7 +339,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the url with to extract the data from</p>
+                                  <p>The url to extract the data from.</p>
                                 </div>
                               </td>
                             </tr>
@@ -348,7 +351,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the name/key of the body part</p>
+                                  <p>The name/key of the body part.</p>
                                 </div>
                               </td>
                             </tr>
@@ -360,7 +363,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>the mime type of the body part</p>
+                                  <p>The MIME type of the body part.</p>
                                 </div>
                               </td>
                             </tr>
@@ -369,7 +372,7 @@
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>returns a Data Object encompassing the combined body parts</p>
+                        <p>Returns a <code>Data</code> object encompassing the combined body parts.</p>
                       </div>
                     </section>
                   </div>
@@ -387,20 +390,20 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Method to combine the Multipart form body parts in to a single Data Object</p>
+                        <p>Combine the multipart form body parts into a single <code>Data</code> object.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">toData</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">toData</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
 
                         </div>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>returns a Data Object encompassing the combined body parts</p>
+                        <p>Returns a <code>Data</code> object encompassing the combined body parts.</p>
                       </div>
                     </section>
                   </div>
@@ -413,8 +416,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-11-13)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-02-06)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

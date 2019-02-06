@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>RestToken Class Reference</title>
+    <title>CircuitParameters Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Class/RestToken" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Struct/CircuitParameters" class="dashAnchor"></a>
 
-    <a title="RestToken Class Reference"></a>
+    <a title="CircuitParameters Structure Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">SwiftyRequest Reference</a>
       <img class="carat" src="../img/carat.png" />
-      RestToken Class Reference
+      CircuitParameters Structure Reference
     </p>
 
     <div class="content-wrapper">
@@ -147,15 +147,15 @@
 
         <section class="section">
           <div class="section-content">
-            <h1>RestToken</h1>
+            <h1>CircuitParameters</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">RestToken</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">CircuitParameters</span><span class="o">&lt;</span><span class="kt">A</span><span class="o">&gt;</span></code></pre>
 
                 </div>
               </div>
-            <p>A <code>RestToken</code> object retrieves, stores, and refreshes an authentication token. The token is
-retrieved at a particular URL using basic authentication credentials (i.e. username and password).</p>
+            <p>Encapsulates properties needed to initialize a <code>CircuitBreaker</code> object within the <code><a href="../Classes/RestRequest.html">RestRequest</a></code> initializer.
+<code>A</code> is the type of the fallback&rsquo;s parameter.</p>
 
           </div>
         </section>
@@ -167,9 +167,9 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest9RestTokenC5tokenSSSgvp"></a>
-                    <a name="//apple_ref/swift/Property/token" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest9RestTokenC5tokenSSSgvp">token</a>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV7timeoutSivp"></a>
+                    <a name="//apple_ref/swift/Property/timeout" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV7timeoutSivp">timeout</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -177,14 +177,14 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The string authentication token.</p>
+                        <p>The circuit timeout: defaults to 2000.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -194,9 +194,9 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest9RestTokenC12isRefreshingSbvp"></a>
-                    <a name="//apple_ref/swift/Property/isRefreshing" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest9RestTokenC12isRefreshingSbvp">isRefreshing</a>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV12resetTimeoutSivp"></a>
+                    <a name="//apple_ref/swift/Property/resetTimeout" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV12resetTimeoutSivp">resetTimeout</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -204,14 +204,14 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Denotes whether the token is refreshing.</p>
+                        <p>The circuit timeout: defaults to 60000.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isRefreshing</span> <span class="o">=</span> <span class="kc">false</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">resetTimeout</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -221,9 +221,9 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest9RestTokenC7retriesSivp"></a>
-                    <a name="//apple_ref/swift/Property/retries" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest9RestTokenC7retriesSivp">retries</a>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV11maxFailuresSivp"></a>
+                    <a name="//apple_ref/swift/Property/maxFailures" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV11maxFailuresSivp">maxFailures</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -231,14 +231,14 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Denotes the number of retries.</p>
+                        <p>Max failures allowed: defaults to 5.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">retries</span> <span class="o">=</span> <span class="mi">0</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">maxFailures</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -248,9 +248,9 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest9RestTokenCACSS8tokenURL_SS8usernameSS8passwordtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(tokenURL:username:password:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest9RestTokenCACSS8tokenURL_SS8usernameSS8passwordtcfc">init(tokenURL:username:password:)</a>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV13rollingWindowSivp"></a>
+                    <a name="//apple_ref/swift/Property/rollingWindow" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV13rollingWindowSivp">rollingWindow</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -258,59 +258,16 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Create a <code>RestToken</code>.</p>
+                        <p>Rolling Window: defaults to 10000.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">tokenURL</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">rollingWindow</span><span class="p">:</span><span class="kt">Int</span></code></pre>
 
                         </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>tokenURL</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The URL that shall be used to obtain a token.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>username</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The username credential used to obtain a token.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>password</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The password credential used to obtain a token.</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
                       </div>
                     </section>
                   </div>
@@ -318,9 +275,9 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest9RestTokenC07refreshD0yys5Error_pcSg7failure_yycSg7successtF"></a>
-                    <a name="//apple_ref/swift/Method/refreshToken(failure:success:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest9RestTokenC07refreshD0yys5Error_pcSg7failure_yycSg7successtF">refreshToken(failure:success:)</a>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV8bulkheadSivp"></a>
+                    <a name="//apple_ref/swift/Property/bulkhead" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV8bulkheadSivp">bulkhead</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -328,49 +285,70 @@ retrieved at a particular URL using basic authentication credentials (i.e. usern
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Refresh the authentication token.</p>
+                        <p>Bulkhead: defaults to 0.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">refreshToken</span><span class="p">(</span>
-    <span class="nv">failure</span><span class="p">:</span> <span class="p">((</span><span class="kt">Error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-    <span class="nv">success</span><span class="p">:</span> <span class="p">(()</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">bulkhead</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>failure</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>A function executed if an error occurs.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>success</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>A function executed after a new token is retrieved.</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV8fallbacky0C7Breaker0F5ErrorV_xtcvp"></a>
+                    <a name="//apple_ref/swift/Property/fallback" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV8fallbacky0C7Breaker0F5ErrorV_xtcvp">fallback</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The error fallback callback.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">fallback</span><span class="p">:</span> <span class="p">(</span><span class="kt">BreakerError</span><span class="p">,</span> <span class="kt">A</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest17CircuitParametersVACyxGSS4name_Si7timeoutSi12resetTimeoutSi11maxFailuresSi13rollingWindowSi8bulkheady0C7Breaker0N5ErrorV_xtc8fallbacktcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(name:timeout:resetTimeout:maxFailures:rollingWindow:bulkhead:fallback:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersVACyxGSS4name_Si7timeoutSi12resetTimeoutSi11maxFailuresSi13rollingWindowSi8bulkheady0C7Breaker0N5ErrorV_xtc8fallbacktcfc">init(name:timeout:resetTimeout:maxFailures:rollingWindow:bulkhead:fallback:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initialize a <code>CircuitParameters</code> instance.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"circuitName"</span><span class="p">,</span> <span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">,</span> <span class="nv">resetTimeout</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">60000</span><span class="p">,</span> <span class="nv">maxFailures</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="nv">rollingWindow</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="nv">bulkhead</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">fallback</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">BreakerError</span><span class="p">,</span> <span class="kt">A</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
