@@ -16,10 +16,10 @@
 
 import Foundation
 
-/// Object encapsulating a Multipart Form
+/// Object encapsulating a multipart form.
 public class MultipartFormData {
 
-    /// String denoting the Content Type
+    /// String denoting the `Content-Type` of the request header.
     public var contentType: String { return "multipart/form-data; boundary=\(boundary)" }
 
     // add contentLength?
@@ -41,29 +41,29 @@ public class MultipartFormData {
         return boundary.data(using: .utf8, allowLossyConversion: false)!
     }
 
-    /// Initialize a `MultipartFormData` instance
+    /// Initialize a `MultipartFormData` instance.
     public init() {
         self.boundary = "swiftyrequest.boundary.bd0b4c6e3b9c2126"
     }
 
-    /// Method to create append a new body part to the multipart form.
+    /// Append a new body part to the multipart form, where the original data is in a file described by the `fileName` string.
     ///
-    /// - Parameter Data: the data of the body part
-    /// - Parameter withName: the name/key of the body part
-    /// - Parameter mimeType: the mime type of the body part
-    /// - Parameter fileName: the name of the file the data came from
-    /// - Returns: returns a Data Object encompassing the combined body parts
+    /// - Parameter Data: The data of the body part.
+    /// - Parameter withName: The name/key of the body part.
+    /// - Parameter mimeType: The MIME type of the body part.
+    /// - Parameter fileName: The name of the file the data came from.
+    /// - Returns: Returns a `Data` object encompassing the combined body parts.
     public func append(_ data: Data, withName: String, mimeType: String? = nil, fileName: String? = nil) {
         let bodyPart = BodyPart(key: withName, data: data, mimeType: mimeType, fileName: fileName)
         bodyParts.append(bodyPart)
     }
 
-    /// Method to create append a new body part to the multipart form.
+    /// Append a new body part to the multipart form, where the original data is in a url described by `fileURL`.
     ///
-    /// - Parameter fileURL: the url with to extract the data from
-    /// - Parameter withName: the name/key of the body part
-    /// - Parameter mimeType: the mime type of the body part
-    /// - Returns: returns a Data Object encompassing the combined body parts
+    /// - Parameter fileURL: The url to extract the data from.
+    /// - Parameter withName: The name/key of the body part.
+    /// - Parameter mimeType: The MIME type of the body part.
+    /// - Returns: Returns a `Data` object encompassing the combined body parts.
     public func append(_ fileURL: URL, withName: String, mimeType: String? = nil) {
         if let data = try? Data.init(contentsOf: fileURL) {
             let bodyPart = BodyPart(key: withName, data: data, mimeType: mimeType, fileName: fileURL.lastPathComponent)
@@ -71,9 +71,9 @@ public class MultipartFormData {
         }
     }
 
-    /// Method to combine the Multipart form body parts in to a single Data Object
+    /// Combine the multipart form body parts into a single `Data` object.
     ///
-    /// - Returns: returns a Data Object encompassing the combined body parts
+    /// - Returns: Returns a `Data` object encompassing the combined body parts.
     public func toData() throws -> Data {
         var data = Data()
         for (index, bodyPart) in bodyParts.enumerated() {
@@ -96,7 +96,7 @@ public class MultipartFormData {
     }
 }
 
-/// Object encapsulating a singular part of a Multipart form
+/// Object encapsulating a singular part of a multipart form.
 public struct BodyPart {
 
     private(set) var key: String
@@ -116,11 +116,11 @@ public struct BodyPart {
         return header
     }
 
-    /// Initialize a `BodyPart` instance
+    /// Initialize a `BodyPart` instance.
     ///
     /// - Parameters:
-    ///   - key: the body part identifier
-    ///   - value: the value of the BodyPart
+    ///   - key: The body part identifier.
+    ///   - value: The value of the `BodyPart`.
     public init?(key: String, value: Any) {
         let string = String(describing: value)
         guard let data = string.data(using: .utf8) else {
@@ -131,13 +131,13 @@ public struct BodyPart {
         self.data = data
     }
 
-    /// Initialize a `BodyPart` instance
+    /// Initialize a `BodyPart` instance.
     ///
     /// - Parameters:
-    ///   - key: the body part identifier
-    ///   - data: the data of the BodyPart
-    ///   - mimeType: the mime type
-    ///   - fileType: the data's file name
+    ///   - key: The body part identifier.
+    ///   - data: The data of the BodyPart.
+    ///   - mimeType: The MIME type.
+    ///   - fileType: The data's file name.
     public init(key: String, data: Data, mimeType: String? = nil, fileName: String? = nil) {
         self.key = key
         self.data = data
@@ -145,9 +145,9 @@ public struct BodyPart {
         self.fileName = fileName
     }
 
-    /// Method to construct the content of the BodyPart
+    /// Construct the content of the `BodyPart`.
     ///
-    /// - Returns: returns a Data Object consisting of the header and data
+    /// - Returns: Returns a `Data` object consisting of the header and data.
     public func content() throws -> Data {
         var result = Data()
         let headerString = header
