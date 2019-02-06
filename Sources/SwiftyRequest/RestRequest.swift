@@ -18,7 +18,7 @@ import Foundation
 import CircuitBreaker
 import LoggerAPI
 
-/// Object containing everything needed to build HTTP requests and execute them
+/// Object containing everything needed to build and execute HTTP requests.
 public class RestRequest: NSObject  {
 
     // Check if there exists a self-signed certificate and whether it's a secure connection
@@ -28,7 +28,7 @@ public class RestRequest: NSObject  {
     // The client certificate for 2-way SSL
     private let clientCertificate: ClientCertificate?
 
-    /// A default `URLSession` instance
+    /// A default `URLSession` instance.
     private var session: URLSession {
         var session = URLSession(configuration: URLSessionConfiguration.default)
         if isSecure && isSelfSigned {
@@ -42,11 +42,23 @@ public class RestRequest: NSObject  {
     // The HTTP Request
     private var request: URLRequest
 
-    /// `CircuitBreaker` instance for this `RestRequest`
+    /// The currently configured `CircuitBreaker` instance for this `RestRequest`. In order to create a
+    /// `CircuitBreaker` you should set the `circuitParameters` property.
     public var circuitBreaker: CircuitBreaker<(Data?, HTTPURLResponse?, Error?) -> Void, String>?
 
     /// Parameters for a `CircuitBreaker` instance.
-    /// When set, a new circuitBreaker instance is created
+    /// When these parameters are set, a new `circuitBreaker` instance is created.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// let circuitParameters = CircuitParameters(timeout: 2000,
+    ///                                           maxFailures: 2,
+    ///                                           fallback: breakFallback)
+    ///
+    /// let request = RestRequest(method: .get, url: "http://myApiCall/hello")
+    /// request.credentials = .apiKey,
+    /// request.circuitParameters = circuitParameters
+    /// ```
     public var circuitParameters: CircuitParameters<String>? = nil {
         didSet {
             if let params = circuitParameters {
@@ -62,14 +74,19 @@ public class RestRequest: NSObject  {
         }
     }
 
-    // MARK: HTTP Request Paramters
-    /// URL `String` used to store a url containing replacable template values
+    // MARK: HTTP Request Parameters
+    /// URL `String` used to store a url containing replaceable template values.
     private var urlTemplate: String?
 
-    /// The string representation of HTTP request url
+    /// The string representation of the HTTP request url.
     private var url: String
 
-    /// The HTTP request method: defaults to Get
+    /// The HTTP method specified in the request, defaults to GET.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// request.method = .put
+    /// ```
     public var method: HTTPMethod {
         get {
             return HTTPMethod(fromRawValue: request.httpMethod ?? "unknown")
@@ -79,7 +96,17 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP Credentials
+    /// The HTTP authentication credentials for the request.
+    ///
+    /// ### Usage Example: ###
+    /// The example below uses an API key to specify the authentication credentials. You can also use `.bearerAuthentication`
+    /// and pass in a base64 encoded String as the token, or `.basicAuthentication` where the username and password values to
+    /// authenticate with are passed in.
+    ///
+    /// ```swift
+    /// let request = RestRequest(url: apiURL)
+    /// request.credentials = .apiKey
+    /// ```
     public var credentials: Credentials? {
         didSet {
             // set the request's authentication credentials
@@ -99,7 +126,17 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP Header Parameters
+    /// The HTTP header fields which form the header section of the request message.
+    ///
+    /// Header fields are colon-separated key-value pairs in string format.  Existing header fields which are not one of the
+    /// four`RestRequest` supported headers ("Authorization", "Accept", "Content-Type" and "User-Agent") will be cleared
+    /// (set to nil) then the passed in HTTP parameters will be set (or replaced).
+    ///
+    /// ### Usage Example: ###
+    ///
+    /// ```swift
+    /// request.headerParameters = ["Cookie" : "v1"]
+    /// ```
     public var headerParameters: [String: String] {
         get {
             return request.allHTTPHeaderFields ?? [:]
@@ -115,7 +152,13 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP Accept Type Header: defaults to application/json
+    /// The HTTP `Accept` header, i.e. the media type that is acceptable for the response, it defaults to
+    /// "application/json".
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// request.acceptType = "text/html"
+    /// ```
     public var acceptType: String? {
         get {
             return request.value(forHTTPHeaderField: "Accept")
@@ -125,7 +168,13 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP Content Type Header: defaults to application/json
+    /// HTTP `Content-Type` header, i.e. the media type of the body of the request, it defaults to
+    /// "application/json".
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// request.contentType = "application/x-www-form-urlencoded"
+    /// ```
     public var contentType: String? {
         get {
             return request.value(forHTTPHeaderField: "Content-Type")
@@ -135,7 +184,14 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP User-Agent Header
+    /// HTTP `User-Agent` header, i.e. the user agent string of the software that is acting on behalf of the user.
+    /// If you pass in `<productName>/<productVersion>` the value will be set to
+    /// `<productName>/<productVersion> <operatingSystem>/<operatingSystemVersion>`.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// request.productInfo = "swiftyrequest-sdk/2.0.4"
+    /// ```
     public var productInfo: String? {
         get {
             return request.value(forHTTPHeaderField: "User-Agent")
@@ -145,7 +201,12 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP Message Body
+    /// The HTTP message body, i.e. the body of the request.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// request.messageBody = data
+    /// ``
     public var messageBody: Data? {
         get {
             return request.httpBody
@@ -155,7 +216,16 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// HTTP Request Query Items
+    /// The HTTP query items to specify in the request URL. If there are query items already specified in the request URL they
+    /// will be replaced.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// request.queryItems = [
+    ///                        URLQueryItem(name: "flamingo", value: "pink"),
+    ///                        URLQueryItem(name: "seagull", value: "white")
+    ///                      ]
+    /// ```
     public var queryItems: [URLQueryItem]?  {
         set {
             // Replace queryitems on request.url with new queryItems
@@ -174,12 +244,18 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Initialize a `RestRequest` instance
+    /// Initialize a `RestRequest` instance.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// let request = RestRequest(method: .get, url: "http://myApiCall/hello")
+    /// ```
     ///
     /// - Parameters:
-    ///   - url: URL string to use for network request
-    ///   - containsSelfSignedCert: Pass `True` to use self signed certificates
-    ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL
+    ///   - method: The method specified in the request, defaults to GET.
+    ///   - url: URL string to use for the network request.
+    ///   - containsSelfSignedCert: Pass `True` to use self signed certificates.
+    ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL.
     public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
 
         self.isSecure = url.hasPrefix("https")
@@ -191,7 +267,7 @@ public class RestRequest: NSObject  {
         let urlObject = urlComponents.url ?? URL(string: "n/a")!
         self.request = URLRequest(url: urlObject)
 
-        // Set inital fields
+        // Set initial fields
         self.url = url
 
         super.init()
@@ -207,9 +283,9 @@ public class RestRequest: NSObject  {
     }
 
     // MARK: Response methods
-    /// Request response method that either invokes `CircuitBreaker` or executes the HTTP request
+    /// Request response method that either invokes `CircuitBreaker` or executes the HTTP request.
     ///
-    /// - Parameter completionHandler: Callback used on completion of operation
+    /// - Parameter completionHandler: Callback used on completion of operation.
     public func response(completionHandler: @escaping (Data?, HTTPURLResponse?, Error?) -> Void) {
         if let breaker = circuitBreaker {
             breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
@@ -233,12 +309,12 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Request response method with the expected result of a `Data` object
+    /// Request response method with the expected result of a `Data` object.
     ///
     /// - Parameters:
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - templateParams: URL templating parameters used for substitution if possible.
+    ///   - queryItems: Array containing `URLQueryItem` objects that will be appended to the request's URL.
+    ///   - completionHandler: Callback used on completion of the operation.
     public func responseData(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
                              completionHandler: @escaping (RestResponse<Data>) -> Void) {
@@ -273,14 +349,14 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Request response method with the expected result of the object, `T` specified
+    /// Request response method with the expected result of the object `T` specified.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure
-    ///   - path: Array of Json keys leading to desired Json
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - responseToError: Error callback closure in case of request failure.
+    ///   - path: Array of JSON keys leading to desired JSON.
+    ///   - templateParams: URL templating parameters used for substitution if possible.
+    ///   - queryItems: Array containing `URLQueryItem` objects that will be appended to the request's URL.
+    ///   - completionHandler: Callback used on completion of the operation.
     public func responseObject<T: JSONDecodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         path: [JSONPathType]? = nil,
@@ -351,14 +427,13 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Request response method with the expected result of an array of type `T` specified
+    /// Request response method with the expected result of the object `T` specified.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure
-    ///   - path: Array of Json keys leading to desired Json
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - responseToError: Error callback closure in case of request failure.
+    ///   - templateParams: URL templating parameters used for substitution if possible.
+    ///   - queryItems: Array containing `URLQueryItem` objects that will be appended to the request's URL.
+    ///   - completionHandler: Callback used on completion of the operation.
     public func responseObject<T: Decodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
@@ -406,14 +481,14 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Request response method with the expected result of an array of type `T` specified
+    /// Request response method with the expected result of an array of type `T` specified.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure
-    ///   - path: Array of Json keys leading to desired Json
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - responseToError: Error callback closure in case of request failure.
+    ///   - path: Array of JSON keys leading to desired JSON.
+    ///   - templateParams: URL templating parameters used for substitution if possible.
+    ///   - queryItems: Array containing `URLQueryItem` objects that will be appended to the request's URL.
+    ///   - completionHandler: Callback used on completion of the operation.
     public func responseArray<T: JSONDecodable>(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         path: [JSONPathType]? = nil,
@@ -485,13 +560,13 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Request response method with the expected result of a `String`
+    /// Request response method with the expected result of a `String`.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - responseToError: Error callback closure in case of request failure.
+    ///   - templateParams: URL templating parameters used for substitution if possible.
+    ///   - queryItems: Array containing `URLQueryItem` objects that will be appended to the request's URL.
+    ///   - completionHandler: Callback used on completion of the operation.
     public func responseString(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
@@ -550,13 +625,13 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Request response method to use when there is no expected result
+    /// Request response method to use when there is no expected result.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure
-    ///   - templateParams: URL templating parameters used for substituion if possible
-    ///   - queryItems: array containing `URLQueryItem` objects that will be appended to the request's URL
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - responseToError: Error callback closure in case of request failure.
+    ///   - templateParams: URL templating parameters used for substitution if possible.
+    ///   - queryItems: Array containing `URLQueryItem` objects that will be appended to the request's URL.
+    ///   - completionHandler: Callback used on completion of operation.
     public func responseVoid(
         responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
         templateParams: [String: String]? = nil,
@@ -595,11 +670,11 @@ public class RestRequest: NSObject  {
         }
     }
 
-    /// Utility method to download a file from a remote origin
+    /// Utility method to download a file from a remote origin.
     ///
     /// - Parameters:
-    ///   - destination: URL destination to save the file to
-    ///   - completionHandler: Callback used on completion of operation
+    ///   - destination: URL destination to save the file to.
+    ///   - completionHandler: Callback used on completion of the operation.
     public func download(to destination: URL, completionHandler: @escaping (HTTPURLResponse?, Error?) -> Void) {
         let task = session.downloadTask(with: request) { (source, response, error) in
             do {
@@ -618,9 +693,9 @@ public class RestRequest: NSObject  {
         task.resume()
     }
 
-    /// Method used by `CircuitBreaker` as the contextCommand
+    /// Method used by `CircuitBreaker` as the contextCommand.
     ///
-    /// - Parameter invocation: `Invocation` contains a command argument, Void return type, and a String fallback arguement
+    /// - Parameter invocation: `Invocation` contains a command argument, `Void` return type, and a `String` fallback arguement.
     private func handleInvocation(invocation: Invocation<(Data?, HTTPURLResponse?, Error?) -> Void, String>) {
         let task = session.dataTask(with: request) { (data, response, error) in
             if error != nil {
@@ -679,32 +754,32 @@ public class RestRequest: NSObject  {
     }
 }
 
-/// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` init.
-/// `A` is the type of the fallback's parameter
+/// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` initializer.
+/// `A` is the type of the fallback's parameter.
 public struct CircuitParameters<A> {
 
-    /// The circuit name: defaults to '1000'test'
+    /// The circuit name: defaults to "circuitName".
     let name: String
 
-    /// The circuit timeout: defaults to 1000
+    /// The circuit timeout: defaults to 2000.
     public let timeout: Int
 
-    /// The circuit timeout: defaults to 60000
+    /// The circuit timeout: defaults to 60000.
     public let resetTimeout: Int
 
-    /// Max failures allowed: defaults to 5
+    /// Max failures allowed: defaults to 5.
     public let maxFailures: Int
 
-    /// Rolling Window: defaults to 10000
-    public let rollingWindow: Int
+    /// Rolling Window: defaults to 10000.
+    public let rollingWindow:Int
 
-    /// Bulkhead: defaults to 0
+    /// Bulkhead: defaults to 0.
     public let bulkhead: Int
 
-    /// The error fallback callback
+    /// The error fallback callback.
     public let fallback: (BreakerError, A) -> Void
 
-    /// Initialize a `CircuitPrameters` instance
+    /// Initialize a `CircuitParameters` instance.
     public init(name: String = "circuitName", timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
         self.name = name
         self.timeout = timeout
@@ -716,66 +791,66 @@ public struct CircuitParameters<A> {
     }
 }
 
-/// Contains data associated with a finished network request.
-/// With `T` being the type of the response expected to be received
+/// Contains data associated with a finished network request,
+/// with `T` being the type of response we expect to receive.
 public struct RestResponse<T> {
 
-    /// The rest request
+    /// The rest request.
     public let request: URLRequest?
 
-    /// The response to the request
+    /// The response to the request.
     public let response: HTTPURLResponse?
 
-    /// The Response Data
+    /// The Response Data.
     public let data: Data?
 
-    /// The Reponse Result
+    /// The Reponse Result.
     public let result: Result<T>
 }
 
-/// Enum to differentiate a success or failure
+/// Enum to differentiate a success or failure.
 public enum Result<T> {
-    /// a success of generic type `T`
+    /// A success of generic type `T`.
     case success(T)
 
-    /// a failure with an `Error` object
+    /// A failure with an `Error` object.
     case failure(Error)
 }
 
-/// Enum used to specify the type of authentication being used
+/// Enum used to specify the type of authentication being used.
 public enum Credentials {
-    /// an API key is being used, no additional data needed
+    /// An API key is being used, no additional data needed.
     case apiKey
 
-    /// Note: The bearer token should be base64 encoded
+    /// Note: The bearer token should be base64 encoded.
     case bearerAuthentication(token: String)
 
-    /// a basic username/password authentication is being used with said value, passed in
+    /// A basic username/password authentication is being used with the values passed in.
     case basicAuthentication(username: String, password: String)
 }
 
-/// Enum describing error types that can occur during a rest request and response
+/// Enum describing error types that can occur during a rest request and response.
 public enum RestError: Error, CustomStringConvertible {
 
-    /// no data was returned from the network
+    /// No data was returned from the network.
     case noData
 
-    /// data couldn't be parsed correctly
+    /// Data couldn't be parsed correctly.
     case serializationError
 
-    /// failure to encode data into a certain format
+    /// Failure to encode data into a certain format.
     case encodingError
 
-    /// failure in file manipulation
+    /// Failure in file manipulation.
     case fileManagerError
 
-    /// the file trying to be accessed is invalid
+    /// The file trying to be accessed is invalid.
     case invalidFile
 
-    /// the url substitution attempted could not be made
+    /// The url substitution attempted could not be made.
     case invalidSubstitution
 
-    /// Error response status
+    /// Error response status.
     case erroredResponseStatus(Int)
 
     /// Error Description
@@ -791,7 +866,7 @@ public enum RestError: Error, CustomStringConvertible {
         }
     }
 
-    /// Computed Property to extract error code
+    /// Computed Property to extract the error code.
     public var code: Int? {
         switch self {
         case .erroredResponseStatus(let status): return status
@@ -803,7 +878,7 @@ public enum RestError: Error, CustomStringConvertible {
 // URL Session extension
 extension RestRequest: URLSessionDelegate {
 
-    /// URL session function to allow trusting certain URLs
+    /// URL session function to allow trusting certain URLs.
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let method = challenge.protectionSpace.authenticationMethod
         let host = challenge.protectionSpace.host
@@ -864,14 +939,14 @@ extension RestRequest: URLSessionDelegate {
 
 }
 
-/// Struct to store client certificate name and path
+/// Represents a reference to a client certificate.
 public struct ClientCertificate {
-    /// The name for the client certificate
+    /// The name for the client certificate.
     public let name: String
-    /// The path to the client certificate
+    /// The path to the client certificate.
     public let path: String
 
-    /// Initialize a `ClientCertificate` instance
+    /// Initialize a `ClientCertificate` instance.
     public init(name: String, path: String) {
       self.name = name
       self.path = path
