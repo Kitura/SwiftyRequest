@@ -125,7 +125,10 @@
                 <a class="nav-group-task-link" href="../Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
+                <a class="nav-group-task-link" href="../Structs/CircuitParameters.html">CircuitParameters</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ClientCertificate.html">ClientCertificate</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/JSONWrapper.html">JSONWrapper</a>
@@ -147,11 +150,11 @@
             <h1>RestRequest</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">RestRequest</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">RestRequest</span><span class="p">:</span> <span class="kt">NSObject</span></code></pre>
 
                 </div>
               </div>
-            <p>Object containing everything needed to build HTTP requests and execute them</p>
+            <p>Object containing everything needed to build and execute HTTP requests.</p>
 
           </div>
         </section>
@@ -163,9 +166,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcytSSGSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcSSGSgvp"></a>
                     <a name="//apple_ref/swift/Property/circuitBreaker" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcytSSGSgv">circuitBreaker</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcSSGSgvp">circuitBreaker</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -173,14 +176,15 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p><code>CircuitBreaker</code> instance for this <code>RestRequest</code></p>
+                        <p>The currently configured <code>CircuitBreaker</code> instance for this <code>RestRequest</code>. In order to create a
+<code>CircuitBreaker</code> you should set the <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgvp">circuitParameters</a></code> property.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitBreaker</span><span class="p">:</span> <span class="kt">CircuitBreaker</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">Data</span><span class="p">?,</span> <span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="kt">Void</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitBreaker</span><span class="p">:</span> <span class="kt">CircuitBreaker</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">Data</span><span class="p">?,</span> <span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -190,9 +194,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgvp"></a>
                     <a name="//apple_ref/swift/Property/circuitParameters" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgv">circuitParameters</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C17circuitParametersAA07CircuitE0VySSGSgvp">circuitParameters</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -201,14 +205,23 @@
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Parameters for a <code>CircuitBreaker</code> instance.
-When set, a new circuitBreaker instance is created</p>
+When these parameters are set, a new <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C14circuitBreaker07CircuitE0AECyy10Foundation4DataVSg_So15HTTPURLResponseCSgs5Error_pSgtcSSGSgvp">circuitBreaker</a></code> instance is created.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">circuitParameters</span> <span class="o">=</span> <span class="kt">CircuitParameters</span><span class="p">(</span><span class="nv">timeout</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+                                          <span class="nv">maxFailures</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                                          <span class="nv">fallback</span><span class="p">:</span> <span class="n">breakFallback</span><span class="p">)</span>
+
+<span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="s">"http://myApiCall/hello"</span><span class="p">)</span>
+<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span><span class="p">,</span>
+<span class="n">request</span><span class="o">.</span><span class="n">circuitParameters</span> <span class="o">=</span> <span class="n">circuitParameters</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitParameters</span><span class="p">:</span> <span class="kt"><a href="../Structs.html#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitParameters</span><span class="p">:</span> <span class="kt"><a href="../Structs/CircuitParameters.html">CircuitParameters</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span></code></pre>
 
                         </div>
                       </div>
@@ -219,19 +232,19 @@ When set, a new circuitBreaker instance is created</p>
             </div>
             <div class="task-group">
               <div class="task-name-container">
-                <a name="/HTTP%20Request%20Paramters"></a>
-                <a name="//apple_ref/swift/Section/HTTP Request Paramters" class="dashAnchor"></a>
-                <a href="#/HTTP%20Request%20Paramters">
-                  <h3 class="section-name">HTTP Request Paramters</h3>
+                <a name="/HTTP%20Request%20Parameters"></a>
+                <a name="//apple_ref/swift/Section/HTTP Request Parameters" class="dashAnchor"></a>
+                <a href="#/HTTP%20Request%20Parameters">
+                  <h3 class="section-name">HTTP Request Parameters</h3>
                 </a>
               </div>
               <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C6methodAA10HTTPMethodOv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C6methodAA10HTTPMethodOvp"></a>
                     <a name="//apple_ref/swift/Property/method" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6methodAA10HTTPMethodOv">method</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6methodAA10HTTPMethodOvp">method</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -239,14 +252,17 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The HTTP request method: defaults to Get</p>
+                        <p>The HTTP method specified in the request, defaults to GET.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="o">.</span><span class="n">put</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span></code></pre>
 
                         </div>
                       </div>
@@ -256,9 +272,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C11credentialsAA11CredentialsOSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C11credentialsAA11CredentialsOSgvp"></a>
                     <a name="//apple_ref/swift/Property/credentials" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11credentialsAA11CredentialsOSgv">credentials</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11credentialsAA11CredentialsOSgvp">credentials</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -266,14 +282,22 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Credentials</p>
+                        <p>The HTTP authentication credentials for the request.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+
+<p>The example below uses an API key to specify the authentication credentials. You can also use <code>.bearerAuthentication</code>
+and pass in a base64 encoded String as the token, or <code>.basicAuthentication</code> where the username and password values to
+authenticate with are passed in.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="n">apiURL</span><span class="p">)</span>
+<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">credentials</span><span class="p">:</span> <span class="kt"><a href="../Enums/Credentials.html">Credentials</a></span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">credentials</span><span class="p">:</span> <span class="kt"><a href="../Enums/Credentials.html">Credentials</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -283,9 +307,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C16headerParameterss10DictionaryVyS2SGv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C16headerParameterss10DictionaryVyS2SGvp"></a>
                     <a name="//apple_ref/swift/Property/headerParameters" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C16headerParameterss10DictionaryVyS2SGv">headerParameters</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C16headerParameterss10DictionaryVyS2SGvp">headerParameters</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -293,14 +317,21 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Header Parameters</p>
+                        <p>The HTTP header fields which form the header section of the request message.</p>
+
+<p>Header fields are colon-separated key-value pairs in string format.  Existing header fields which are not one of the
+four<code>RestRequest</code> supported headers (<q>Authorization</q>, <q>Accept</q>, <q>Content-Type</q> and <q>User-Agent</q>) will be cleared
+(set to nil) then the passed in HTTP parameters will be set (or replaced).</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">headerParameters</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Cookie"</span> <span class="p">:</span> <span class="s">"v1"</span><span class="p">]</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">headerParameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">headerParameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]</span></code></pre>
 
                         </div>
                       </div>
@@ -310,9 +341,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C10acceptTypeSSSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C10acceptTypeSSSgvp"></a>
                     <a name="//apple_ref/swift/Property/acceptType" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C10acceptTypeSSSgv">acceptType</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C10acceptTypeSSSgvp">acceptType</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -320,14 +351,18 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Accept Type Header: defaults to application/json</p>
+                        <p>The HTTP <code>Accept</code> header, i.e. the media type that is acceptable for the response, it defaults to
+<q>application/json</q>.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">acceptType</span> <span class="o">=</span> <span class="s">"text/html"</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">acceptType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">acceptType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -337,9 +372,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C11contentTypeSSSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C11contentTypeSSSgvp"></a>
                     <a name="//apple_ref/swift/Property/contentType" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11contentTypeSSSgv">contentType</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11contentTypeSSSgvp">contentType</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -347,14 +382,18 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Content Type Header: defaults to application/json</p>
+                        <p>HTTP <code>Content-Type</code> header, i.e. the media type of the body of the request, it defaults to
+<q>application/json</q>.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="s">"application/x-www-form-urlencoded"</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">contentType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">contentType</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -364,9 +403,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C11productInfoSSSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C11productInfoSSSgvp"></a>
                     <a name="//apple_ref/swift/Property/productInfo" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11productInfoSSSgv">productInfo</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11productInfoSSSgvp">productInfo</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -374,14 +413,19 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP User-Agent Header</p>
+                        <p>HTTP <code>User-Agent</code> header, i.e. the user agent string of the software that is acting on behalf of the user.
+If you pass in <code>&lt;productName&gt;/&lt;productVersion&gt;</code> the value will be set to
+<code>&lt;productName&gt;/&lt;productVersion&gt; &lt;operatingSystem&gt;/&lt;operatingSystemVersion&gt;</code>.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">productInfo</span> <span class="o">=</span> <span class="s">"swiftyrequest-sdk/2.0.4"</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">productInfo</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">productInfo</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -391,9 +435,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C11messageBody10Foundation4DataVSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C11messageBody10Foundation4DataVSgvp"></a>
                     <a name="//apple_ref/swift/Property/messageBody" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11messageBody10Foundation4DataVSgv">messageBody</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C11messageBody10Foundation4DataVSgvp">messageBody</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -401,14 +445,18 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Message Body</p>
+                        <p>The HTTP message body, i.e. the body of the request.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">messageBody</span> <span class="o">=</span> <span class="n">data</span>
+<span class="err">``</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">messageBody</span><span class="p">:</span> <span class="kt">Data</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">messageBody</span><span class="p">:</span> <span class="kt">Data</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -418,9 +466,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgv"></a>
+                    <a name="/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp"></a>
                     <a name="//apple_ref/swift/Property/queryItems" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgv">queryItems</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">queryItems</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -428,14 +476,21 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Request Query Items</p>
+                        <p>The HTTP query items to specify in the request URL. If there are query items already specified in the request URL they
+will be replaced.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">queryItems</span> <span class="o">=</span> <span class="p">[</span>
+                       <span class="kt">URLQueryItem</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"flamingo"</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="s">"pink"</span><span class="p">),</span>
+                       <span class="kt">URLQueryItem</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"seagull"</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="s">"white"</span><span class="p">)</span>
+                     <span class="p">]</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span></code></pre>
 
                         </div>
                       </div>
@@ -445,9 +500,9 @@ When set, a new circuitBreaker instance is created</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0CAcA10HTTPMethodO6method_SS3urltcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(method:url:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0CAcA10HTTPMethodO6method_SS3urltcfc">init(method:url:)</a>
+                    <a name="/s:13SwiftyRequest04RestB0CAcA10HTTPMethodO6method_SS3urlSbSg22containsSelfSignedCertAA17ClientCertificateVSg06clientL0tcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(method:url:containsSelfSignedCert:clientCertificate:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0CAcA10HTTPMethodO6method_SS3urlSbSg22containsSelfSignedCertAA17ClientCertificateVSg06clientL0tcfc">init(method:url:containsSelfSignedCert:clientCertificate:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -455,14 +510,17 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Initialize a <code>RestRequest</code> instance</p>
+                        <p>Initialize a <code>RestRequest</code> instance.</p>
+<h3 id='usage-example' class='heading'>Usage Example:</h3>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="s">"http://myApiCall/hello"</span><span class="p">)</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">containsSelfSignedCert</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">?</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">clientCertificate</span><span class="p">:</span> <span class="kt"><a href="../Structs/ClientCertificate.html">ClientCertificate</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -473,12 +531,48 @@ When set, a new circuitBreaker instance is created</p>
                             <tr>
                               <td>
                                 <code>
+                                <em>method</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The method specified in the request, defaults to GET.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
                                 <em>url</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL string to use for network request</p>
+                                  <p>URL string to use for the network request.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>containsSelfSignedCert</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Pass <code>True</code> to use self signed certificates.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>clientCertificate</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Pass in <code><a href="../Structs/ClientCertificate.html">ClientCertificate</a></code> with the certificate name and path to use client certificates for 2-way SSL.</p>
                                 </div>
                               </td>
                             </tr>
@@ -512,14 +606,14 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method that either invokes <code>CircuitBreaker</code> or executes the HTTP request</p>
+                        <p>Request response method that either invokes <code>CircuitBreaker</code> or executes the HTTP request.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">response</span><span class="p">(</span><span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Data</span><span class="p">?,</span> <span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">response</span><span class="p">(</span><span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Data</span><span class="p">?,</span> <span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -535,7 +629,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -558,16 +652,16 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method with the expected result of a <code>Data</code> object</p>
+                        <p>Request response method with the expected result of a <code>Data</code> object.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">responseData</span><span class="p">(</span><span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-                             <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-                             <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">Data</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">responseData</span><span class="p">(</span><span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                         <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                         <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">Data</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -583,7 +677,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL templating parameters used for substituion if possible</p>
+                                  <p>URL templating parameters used for substituion if possible.</p>
                                 </div>
                               </td>
                             </tr>
@@ -595,7 +689,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                  <p>Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to <code>nil</code>, which means that this parameter will be ignored, and <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">RestRequest.queryItems</a></code> will be used instead. Note that if you wish to clear any existing query parameters, then you should set <code>request.queryItems = nil</code> before calling this function.</p>
                                 </div>
                               </td>
                             </tr>
@@ -607,7 +701,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -630,19 +724,19 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method with the expected result of the object, <code>T</code> specified</p>
+                        <p>Request response method with the expected result of the object <code>T</code> specified.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseObject</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span>
-        <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">path</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseObject</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">path</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -658,7 +752,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Error callback closure in case of request failure</p>
+                                  <p>Error callback closure in case of request failure.</p>
                                 </div>
                               </td>
                             </tr>
@@ -670,7 +764,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Array of Json keys leading to desired Json</p>
+                                  <p>Array of Json keys leading to desired JSON.</p>
                                 </div>
                               </td>
                             </tr>
@@ -682,7 +776,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL templating parameters used for substituion if possible</p>
+                                  <p>URL templating parameters used for substitution if possible.</p>
                                 </div>
                               </td>
                             </tr>
@@ -694,7 +788,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                  <p>Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to <code>nil</code>, which means that this parameter will be ignored, and <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">RestRequest.queryItems</a></code> will be used instead. Note that if you wish to clear any existing query parameters, then you should set <code>request.queryItems = nil</code> before calling this function.</p>
                                 </div>
                               </td>
                             </tr>
@@ -706,7 +800,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -729,18 +823,18 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method with the expected result of an array of type <code>T</code> specified</p>
+                        <p>Request response method with the expected result of the object <code>T</code> specified.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseObject</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt">Decodable</span><span class="o">&gt;</span><span class="p">(</span>
-        <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseObject</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt">Decodable</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -756,19 +850,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Error callback closure in case of request failure</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>path</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Array of Json keys leading to desired Json</p>
+                                  <p>Error callback closure in case of request failure.</p>
                                 </div>
                               </td>
                             </tr>
@@ -780,7 +862,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL templating parameters used for substituion if possible</p>
+                                  <p>URL templating parameters used for substitution if possible.</p>
                                 </div>
                               </td>
                             </tr>
@@ -792,7 +874,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                  <p>Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to <code>nil</code>, which means that this parameter will be ignored, and <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">RestRequest.queryItems</a></code> will be used instead. Note that if you wish to clear any existing query parameters, then you should set <code>request.queryItems = nil</code> before calling this function.</p>
                                 </div>
                               </td>
                             </tr>
@@ -804,7 +886,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -827,19 +909,19 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method with the expected result of an array of type <code>T</code> specified</p>
+                        <p>Request response method with the expected result of an array of type <code>T</code> specified.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseArray</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span>
-        <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">path</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="p">[</span><span class="kt">T</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">responseArray</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">:</span> <span class="kt"><a href="../Protocols/JSONDecodable.html">JSONDecodable</a></span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">path</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/JSONPathType.html">JSONPathType</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="p">[</span><span class="kt">T</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -855,7 +937,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Error callback closure in case of request failure</p>
+                                  <p>Error callback closure in case of request failure.</p>
                                 </div>
                               </td>
                             </tr>
@@ -867,7 +949,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Array of Json keys leading to desired Json</p>
+                                  <p>Array of JSON keys leading to desired JSON.</p>
                                 </div>
                               </td>
                             </tr>
@@ -879,7 +961,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL templating parameters used for substituion if possible</p>
+                                  <p>URL templating parameters used for substitution if possible.</p>
                                 </div>
                               </td>
                             </tr>
@@ -891,7 +973,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                  <p>Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to <code>nil</code>, which means that this parameter will be ignored, and <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">RestRequest.queryItems</a></code> will be used instead. Note that if you wish to clear any existing query parameters, then you should set <code>request.queryItems = nil</code> before calling this function.</p>
                                 </div>
                               </td>
                             </tr>
@@ -903,7 +985,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -926,18 +1008,18 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method with the expected result of a <code>String</code></p>
+                        <p>Request response method with the expected result of a <code>String</code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">responseString</span><span class="p">(</span>
-        <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">responseString</span><span class="p">(</span>
+    <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -953,7 +1035,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Error callback closure in case of request failure</p>
+                                  <p>Error callback closure in case of request failure.</p>
                                 </div>
                               </td>
                             </tr>
@@ -965,7 +1047,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL templating parameters used for substituion if possible</p>
+                                  <p>URL templating parameters used for substituion if possible.</p>
                                 </div>
                               </td>
                             </tr>
@@ -977,7 +1059,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                  <p>Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to <code>nil</code>, which means that this parameter will be ignored, and <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">RestRequest.queryItems</a></code> will be used instead. Note that if you wish to clear any existing query parameters, then you should set <code>request.queryItems = nil</code> before calling this function.</p>
                                 </div>
                               </td>
                             </tr>
@@ -989,7 +1071,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1012,18 +1094,18 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request response method to use when there is no expected result</p>
+                        <p>Request response method to use when there is no expected result.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">responseVoid</span><span class="p">(</span>
-        <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-        <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">responseVoid</span><span class="p">(</span>
+    <span class="nv">responseToError</span><span class="p">:</span> <span class="p">((</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Data</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Error</span><span class="p">?)?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt"><a href="../Structs/RestResponse.html">RestResponse</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -1039,7 +1121,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Error callback closure in case of request failure</p>
+                                  <p>Error callback closure in case of request failure.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1051,7 +1133,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL templating parameters used for substituion if possible</p>
+                                  <p>URL templating parameters used for substituion if possible.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1063,7 +1145,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>array containing <code>URLQueryItem</code> objects that will be appended to the request&rsquo;s URL</p>
+                                  <p>Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to <code>nil</code>, which means that this parameter will be ignored, and <code><a href="../Classes/RestRequest.html#/s:13SwiftyRequest04RestB0C10queryItemsSay10Foundation12URLQueryItemVGSgvp">RestRequest.queryItems</a></code> will be used instead. Note that if you wish to clear any existing query parameters, then you should set <code>request.queryItems = nil</code> before calling this function.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1075,7 +1157,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of operation.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1098,14 +1180,14 @@ When set, a new circuitBreaker instance is created</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Utility method to download a file from a remote origin</p>
+                        <p>Utility method to download a file from a remote origin.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">download</span><span class="p">(</span><span class="n">to</span> <span class="nv">destination</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">download</span><span class="p">(</span><span class="n">to</span> <span class="nv">destination</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">HTTPURLResponse</span><span class="p">?,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -1121,7 +1203,7 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>URL destination to save the file to</p>
+                                  <p>URL destination to save the file to.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1133,12 +1215,43 @@ When set, a new circuitBreaker instance is created</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback used on completion of operation</p>
+                                  <p>Callback used on completion of the operation.</p>
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@CM@SwiftyRequest@objc(cs)RestRequest(im)URLSession:didReceiveChallenge:completionHandler:"></a>
+                    <a name="//apple_ref/swift/Method/urlSession(_:didReceive:completionHandler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@CM@SwiftyRequest@objc(cs)RestRequest(im)URLSession:didReceiveChallenge:completionHandler:">urlSession(_:didReceive:completionHandler:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>URL session function to allow trusting certain URLs.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">urlSession</span><span class="p">(</span><span class="n">_</span> <span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span><span class="p">,</span> <span class="n">didReceive</span> <span class="nv">challenge</span><span class="p">:</span> <span class="kt">URLAuthenticationChallenge</span><span class="p">,</span> <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">URLSession</span><span class="o">.</span><span class="kt">AuthChallengeDisposition</span><span class="p">,</span> <span class="kt">URLCredential</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -1151,8 +1264,8 @@ When set, a new circuitBreaker instance is created</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2017-11-13)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-02-06)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
