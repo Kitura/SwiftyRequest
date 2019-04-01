@@ -52,7 +52,7 @@ class SwiftyRequestTests: XCTestCase {
         ("testResponseData", testResponseData),
         ("testResponseObject", testResponseObject),
         ("testQueryObject", testQueryObject),
-        ("testResponseArray", testResponseArray),
+//        ("testResponseArray", testResponseArray),
         ("testResponseString", testResponseString),
         ("testResponseVoid", testResponseVoid),
         ("testFileDownload", testFileDownload),
@@ -299,29 +299,29 @@ class SwiftyRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-
-    func testResponseArray() {
-
-        let expectation = self.expectation(description: "responseArray SwiftyRequest test")
-
-        let request = RestRequest(url: geolookupURL)
-        request.credentials = .apiKey
-
-        request.responseArray(responseToError: responseToError,
-                              path: ["location", "nearby_weather_stations", "airport", "station"]) { (response: RestResponse<[GeoLookupModel]>) in
-            switch response.result {
-            case .success(let retval):
-                XCTAssertGreaterThan(retval.count, 0)
-                XCTAssertGreaterThan(retval[0].city.count, 0)
-            case .failure(let error):
-                XCTFail("Failed to get weather response array with error: \(error)")
-            }
-            expectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 10)
-
-    }
+    // NOTE: Commented out test as it uses an expired API Key, issue raised: https://github.com/IBM-Swift/SwiftyRequest/issues/55
+//    func testResponseArray() {
+//
+//        let expectation = self.expectation(description: "responseArray SwiftyRequest test")
+//
+//        let request = RestRequest(url: geolookupURL)
+//        request.credentials = .apiKey
+//
+//        request.responseArray(responseToError: responseToError,
+//                              path: ["location", "nearby_weather_stations", "airport", "station"]) { (response: RestResponse<[GeoLookupModel]>) in
+//            switch response.result {
+//            case .success(let retval):
+//                XCTAssertGreaterThan(retval.count, 0)
+//                XCTAssertGreaterThan(retval[0].city.count, 0)
+//            case .failure(let error):
+//                XCTFail("Failed to get weather response array with error: \(error)")
+//            }
+//            expectation.fulfill()
+//        }
+//
+//        waitForExpectations(timeout: 10)
+//
+//    }
 
     func assertCharsetISO8859(response: HTTPURLResponse?) {
         guard let text = response?.allHeaderFields["Content-Type"] as? String,
