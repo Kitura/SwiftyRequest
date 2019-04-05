@@ -1,7 +1,7 @@
-// swift-tools-version:5.0
+// swift-tools-version:4.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 /*
- * Copyright IBM Corporation 2017-2019
+ * Copyright IBM Corporation 2017
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
