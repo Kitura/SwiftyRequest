@@ -21,6 +21,10 @@ import LoggerAPI
 /// Object containing everything needed to build and execute HTTP requests.
 public class RestRequest: NSObject  {
 
+    deinit {
+        session.finishTasksAndInvalidate()
+    }
+    
     // Check if there exists a self-signed certificate and whether it's a secure connection
     private let isSecure: Bool
     private let isSelfSigned: Bool
@@ -29,15 +33,7 @@ public class RestRequest: NSObject  {
     private let clientCertificate: ClientCertificate?
 
     /// A default `URLSession` instance.
-    private var session: URLSession {
-        var session = URLSession(configuration: URLSessionConfiguration.default)
-        if isSecure && isSelfSigned {
-            let config = URLSessionConfiguration.default
-            config.requestCachePolicy = .reloadIgnoringLocalCacheData
-            session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
-        }
-        return session
-    }
+    private var session: URLSession = URLSession.shared
 
     // The HTTP Request
     private var request: URLRequest
@@ -272,6 +268,12 @@ public class RestRequest: NSObject  {
 
         super.init()
 
+        if isSecure && isSelfSigned {
+            let config = URLSessionConfiguration.default
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
+        }
+        
         self.method = method
         self.acceptType = "application/json"
         self.contentType = "application/json"
