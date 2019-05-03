@@ -22,9 +22,13 @@ import LoggerAPI
 public class RestRequest: NSObject  {
 
     deinit {
+        #if swift(>=4.1)
         if session != URLSession.shared {
             session.finishTasksAndInvalidate()
         }
+        #else
+        session.finishTasksAndInvalidate()
+        #endif
     }
     
     // Check if there exists a self-signed certificate and whether it's a secure connection
