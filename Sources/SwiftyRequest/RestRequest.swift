@@ -752,6 +752,7 @@ public class RestRequest: NSObject  {
         }
 
         self.request.url = urlComponents.url
+        self.url = urlComponents.url?.absoluteString ?? "Epic Fail"
 
         return nil
     }
