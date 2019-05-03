@@ -22,7 +22,9 @@ import LoggerAPI
 public class RestRequest: NSObject  {
 
     deinit {
-        session.finishTasksAndInvalidate()
+        if session != URLSession.shared {
+            session.finishTasksAndInvalidate()
+        }
     }
     
     // Check if there exists a self-signed certificate and whether it's a secure connection
@@ -33,7 +35,11 @@ public class RestRequest: NSObject  {
     private let clientCertificate: ClientCertificate?
 
     /// A default `URLSession` instance.
+    #if swift(>=4.1)
     private var session: URLSession = URLSession.shared
+    #else
+    private var session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
+    #endif
 
     // The HTTP Request
     private var request: URLRequest
@@ -64,7 +70,7 @@ public class RestRequest: NSObject  {
                                                 maxFailures: params.maxFailures,
                                                 rollingWindow: params.rollingWindow,
                                                 bulkhead: params.bulkhead,
-                                                command: handleInvocation,
+                                                command: { [weak self] param in self?.handleInvocation(invocation: param) },
                                                 fallback: params.fallback)
             }
         }
