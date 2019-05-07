@@ -67,6 +67,11 @@ class SwiftyRequestTests: XCTestCase {
         ("testQueryTemplateParamsObject", testQueryTemplateParamsObject)
     ]
 
+    // Enable logging output for tests
+    override func setUp() {
+        PrintLogger.use(colored: true)
+    }
+
     // MARK: Helper methods
 
     private func responseToError(response: HTTPURLResponse?, data: Data?) -> Error? {
@@ -196,7 +201,6 @@ class SwiftyRequestTests: XCTestCase {
     }
 
     func testResponseData() {
-
         let expectation = self.expectation(description: "responseData SwiftyRequest test")
 
         let request = RestRequest(url: jsonURL, containsSelfSignedCert: true)
