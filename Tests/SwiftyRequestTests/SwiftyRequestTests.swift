@@ -2,7 +2,17 @@ import XCTest
 import CircuitBreaker
 @testable import SwiftyRequest
 
-/// URL for the weather underground that many of the tests use
+/// URLs for the local test server that these tests use. The TLS certificate
+/// provided by this server is a self-signed certificate that will not be
+/// trusted by default.
+///
+/// Note: For testing locally, you must first start the server: build and
+/// run the project under TestServer/
+///
+/// Note also: For testing locally under Linux, you must arrange for the
+/// self-signed certificate to be trusted, as Foundation does not yet support
+/// trusting self-signed certificates. An example of how to do this can be
+/// found under linux/before_tests.sh
 let echoURL = "http://localhost:8080/echoJSON"
 let echoURLSecure = "https://localhost:8443/ssl/echoJSON"
 let jsonURL = "https://localhost:8443/ssl/json"
@@ -10,6 +20,8 @@ let jsonArrayURL = "https://localhost:8443/ssl/jsonArray"
 let templatedJsonURL = "https://localhost:8443/ssl/json/{name}/{city}/"
 let friendsURL = "https://localhost:8443/ssl/friends"
 let insecureUrl = "http://localhost:8080/"
+
+/// URL for a well-known server that provides a valid TLS certificate.
 let sslValidCertificateURL = "https://www.google.com"
 
 // MARK: Helper structs
@@ -480,7 +492,7 @@ class SwiftyRequestTests: XCTestCase {
         var count = 0
         var fallbackCalled = false
 
-        let request = RestRequest(url: "http://notreal/blah")
+        let request = RestRequest(url: "http://localhost:12345/blah")
 
         let breakFallback = { (error: BreakerError, msg: String) in
             /// After maxFailures, the circuit should be open
