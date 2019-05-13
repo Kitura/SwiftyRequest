@@ -24,16 +24,27 @@ extension String {
     ///
     /// - Parameter params: parameters to be inserted into the url
     /// - Returns: a `URLComponents` object with expanded url or nil if no substitution was made
+    /// :nodoc:
     public func expand(params: [String: String]) -> URLComponents? {
+        return URLComponents(string: expandString(params: params)) ?? nil
+    }
+
+    /// A string url expansion method that replaces templated values in a url, with parameters
+    /// The template value pattern to be replaced should look like this `{key}`
+    /// You can include multiple patterns in a URL as long as you have key and values to replace them
+    ///
+    /// - Parameter params: parameters to be inserted into the url
+    /// - Returns: a String containing the expanded URL.
+    func expandString(params: [String: String]) -> String {
 
         var urlString = self
         for (key, value) in params {
             urlString = urlString.replacingOccurrences(of: "{" + key + "}", with: value)
         }
-        return URLComponents(string: urlString) ?? nil
+        return urlString
     }
 
-    /// Creates a user agent string to explain the current platform being used. 
+    /// Creates a user agent string to explain the current platform being used.
     /// `self` is expected to be product info, typically in the format `<productName>/<productVersion>`
     ///
     /// - Returns: user agent `String`

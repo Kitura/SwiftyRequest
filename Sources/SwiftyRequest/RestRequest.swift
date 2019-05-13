@@ -758,13 +758,16 @@ public class RestRequest: NSObject  {
         }
 
         // Get urlTemplate if available, otherwise just use the request's url
-        let urlString = urlTemplate ?? url
+        let urlString = (self.urlTemplate ?? self.url).expandString(params: params)
 
-        guard let urlComponents = urlString.expand(params: params) else {
+        // Confirm that the resulting URL is valid
+        guard let urlComponents = URLComponents(string: urlString) else {
             return RestError.invalidSubstitution
         }
 
+        // Replace the unexpanded URL with the expanded one.
         self.request.url = urlComponents.url
+        self.url = urlString
 
         return nil
     }
