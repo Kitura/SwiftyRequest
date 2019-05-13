@@ -21,6 +21,16 @@ import LoggerAPI
 /// Object containing everything needed to build and execute HTTP requests.
 public class RestRequest: NSObject  {
 
+    deinit {
+        #if swift(>=4.1)
+        if session != URLSession.shared {
+            session.finishTasksAndInvalidate()
+        }
+        #else
+        session.finishTasksAndInvalidate()
+        #endif
+    }
+    
     // Check if there exists a self-signed certificate and whether it's a secure connection
     private let isSecure: Bool
     private let isSelfSigned: Bool
@@ -29,15 +39,11 @@ public class RestRequest: NSObject  {
     private let clientCertificate: ClientCertificate?
 
     /// A default `URLSession` instance.
-    private var session: URLSession {
-        var session = URLSession(configuration: URLSessionConfiguration.default)
-        if isSecure && isSelfSigned {
-            let config = URLSessionConfiguration.default
-            config.requestCachePolicy = .reloadIgnoringLocalCacheData
-            session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
-        }
-        return session
-    }
+    #if swift(>=4.1)
+    private var session: URLSession = URLSession.shared
+    #else
+    private var session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
+    #endif
 
     // The HTTP Request
     private var request: URLRequest
@@ -68,7 +74,8 @@ public class RestRequest: NSObject  {
                                                 maxFailures: params.maxFailures,
                                                 rollingWindow: params.rollingWindow,
                                                 bulkhead: params.bulkhead,
-                                                command: handleInvocation,
+                                                // We capture a weak reference to self to prevent a retain cycle from `handleInvocation` -> RestRequest` -> `circuitBreaker` -> `handleInvocation`. To do this we have explicitly declared the handleInvocation function as a closure.
+                                                command: { [weak self] invocation in self?.handleInvocation(invocation: invocation) },
                                                 fallback: params.fallback)
             }
         }
@@ -272,6 +279,12 @@ public class RestRequest: NSObject  {
 
         super.init()
 
+        if isSecure && isSelfSigned {
+            let config = URLSessionConfiguration.default
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
+        }
+        
         self.method = method
         self.acceptType = "application/json"
         self.contentType = "application/json"
