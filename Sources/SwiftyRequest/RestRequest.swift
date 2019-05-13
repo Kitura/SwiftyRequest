@@ -74,7 +74,8 @@ public class RestRequest: NSObject  {
                                                 maxFailures: params.maxFailures,
                                                 rollingWindow: params.rollingWindow,
                                                 bulkhead: params.bulkhead,
-                                                command: { [weak self] param in self?.handleInvocation(invocation: param) },
+                                                // We capture a weak reference to self to prevent a retain cycle from `handleInvocation` -> RestRequest` -> `circuitBreaker` -> `handleInvocation`. To do this we have explicitly declared the handleInvocation function as a closure.
+                                                command: { [weak self] invocation in self?.handleInvocation(invocation: invocation) },
                                                 fallback: params.fallback)
             }
         }
