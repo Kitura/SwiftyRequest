@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name        = "SwiftyRequest"
-  s.version     = "2.0.3"
+  s.version     = "2.0.6"
   s.summary     = "SwiftyRequest is an HTTP networking library built for Swift."
   s.homepage    = "https://github.com/IBM-Swift/SwiftyRequest"
   s.license     = { :type => "Apache License, Version 2.0" }
