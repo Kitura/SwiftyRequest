@@ -25,7 +25,7 @@ extension String {
     /// - Parameter params: parameters to be inserted into the url
     /// - Returns: a `URLComponents` object with expanded url or nil if no substitution was made
     /// :nodoc:
-    public func expand(params: [String: String]) -> URLComponents? {
+    func expand(params: [String: String]) -> URLComponents? {
         return URLComponents(string: expandString(params: params)) ?? nil
     }
 
@@ -48,7 +48,7 @@ extension String {
     /// `self` is expected to be product info, typically in the format `<productName>/<productVersion>`
     ///
     /// - Returns: user agent `String`
-    public func generateUserAgent() -> String {
+    func generateUserAgent() -> String {
 
         let operatingSystem: String = {
             #if os(iOS)

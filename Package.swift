@@ -28,12 +28,13 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/IBM-Swift/CircuitBreaker.git", .upToNextMajor(from: "5.0.0")),
-        .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", .upToNextMajor(from: "1.0.0"))
+        .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/swift-server/async-http-client.git", .branch("master")),
     ],
     targets: [
         .target(
             name: "SwiftyRequest",
-            dependencies: ["CircuitBreaker", "LoggerAPI"]
+            dependencies: ["CircuitBreaker", "LoggerAPI", "AsyncHTTPClient"]
         ),
         .testTarget(
             name: "SwiftyRequestTests",
