@@ -38,11 +38,11 @@ public class RestRequest: NSObject  {
     // The client certificate for 2-way SSL
     private let clientCertificate: ClientCertificate?
 
-    /// A default `URLSession` instance.
+    /// The `URLSession` instance that will be used to send the requests. Defaults to `URLSession.shared`.
     #if swift(>=4.1)
-    private var session: URLSession = URLSession.shared
+    public var session: URLSession = URLSession.shared
     #else
-    private var session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
+    public var session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
     #endif
 
     // The HTTP Request
