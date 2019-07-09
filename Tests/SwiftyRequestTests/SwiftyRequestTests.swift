@@ -2,6 +2,12 @@ import XCTest
 import CircuitBreaker
 @testable import SwiftyRequest
 
+#if swift(>=4.1)
+  #if canImport(FoundationNetworking)
+    import FoundationNetworking
+  #endif
+#endif
+
 /// URLs for the local test server that these tests use. The TLS certificate
 /// provided by this server is a self-signed certificate that will not be
 /// trusted by default.

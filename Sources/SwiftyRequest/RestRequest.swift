@@ -18,6 +18,12 @@ import Foundation
 import CircuitBreaker
 import LoggerAPI
 
+#if swift(>=4.1)
+  #if canImport(FoundationNetworking)
+    import FoundationNetworking
+  #endif
+#endif
+
 /// Object containing everything needed to build and execute HTTP requests.
 public class RestRequest: NSObject  {
 
@@ -244,7 +250,7 @@ public class RestRequest: NSObject  {
             }
         }
         get {
-            if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
+            if let currentURL = request.url, let urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
                 return urlComponents.queryItems
             }
             return nil
