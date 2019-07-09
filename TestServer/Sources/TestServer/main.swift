@@ -1,6 +1,23 @@
 import Kitura
 import HeliumLogger
 import FileKit
+import Foundation
+
+func cookieHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
+    let number = request.parameters["number"].map { Int($0) ?? 0 } ?? 0
+    for no in 0..<number {
+    var cookieProps: [HTTPCookiePropertyKey: Any]
+    cookieProps = [
+        HTTPCookiePropertyKey.domain: "localhost",
+        HTTPCookiePropertyKey.path: "/",
+        HTTPCookiePropertyKey.name: "name\(no)",
+        HTTPCookiePropertyKey.value: "value\(no)",
+    ]
+    let cookie = HTTPCookie(properties: cookieProps)
+    response.cookies["name\(no)"] = cookie
+    }
+    try response.status(.OK).end()
+}
 
 // Enable logging
 HeliumLogger.use(.info)
@@ -40,6 +57,7 @@ router.post("/echoJSON") {
         try response.status(.badRequest).end()
     }
 }
+router.get("/cookies/:number", handler: cookieHandler)
 
 // Create a router that will be used for SSL requests
 let sslRouter = Router()
@@ -81,6 +99,8 @@ sslRouter.get("/ssl/friends") {
     let friends = FriendData(friends: params)
     try response.send(json: friends).end()
 }
+
+sslRouter.get("/ssl/cookies/:number", handler: cookieHandler)
 
 // Add an HTTP server and connect it to the router
 Kitura.addHTTPServer(onPort: 8080, with: router)
