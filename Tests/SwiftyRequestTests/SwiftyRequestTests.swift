@@ -183,7 +183,7 @@ class SwiftyRequestTests: XCTestCase {
             switch response.result {
             case .success :
                 let cookies = response.cookies
-                XCTAssertNil(cookies, "No cookies expected in response but found \(cookies?.count) cookies.")
+                XCTAssertNil(cookies, "No cookies expected in response but found \(cookies!.count) cookies.")
             case .failure(let error):
                 XCTFail("Failed to get data response with error: \(error)")
             }
