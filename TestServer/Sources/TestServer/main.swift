@@ -6,15 +6,15 @@ import Foundation
 func cookieHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
     let number = request.parameters["number"].map { Int($0) ?? 0 } ?? 0
     for no in 0..<number {
-    var cookieProps: [HTTPCookiePropertyKey: Any]
-    cookieProps = [
-        HTTPCookiePropertyKey.domain: "localhost",
-        HTTPCookiePropertyKey.path: "/",
-        HTTPCookiePropertyKey.name: "name\(no)",
-        HTTPCookiePropertyKey.value: "value\(no)",
-    ]
-    let cookie = HTTPCookie(properties: cookieProps)
-    response.cookies["name\(no)"] = cookie
+        var cookieProps: [HTTPCookiePropertyKey: Any]
+        cookieProps = [
+            HTTPCookiePropertyKey.domain: "localhost",
+            HTTPCookiePropertyKey.path: "/",
+            HTTPCookiePropertyKey.name: "name\(no)",
+            HTTPCookiePropertyKey.value: "value\(no)",
+        ]
+        let cookie = HTTPCookie(properties: cookieProps)
+        response.cookies["name\(no)"] = cookie
     }
     try response.status(.OK).end()
 }

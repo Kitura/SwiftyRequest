@@ -327,14 +327,16 @@ public class RestRequest: NSObject  {
             task.resume()
         }
     }
+
     private func getCookies(from response: HTTPURLResponse?) -> [HTTPCookie]? {
-        guard let headers = response?.allHeaderFields else{
+        guard let headers = response?.allHeaderFields else {
             return nil
         }
         var headerFields = [String : String]()
-        for (key, value) in headers{
-            guard let key = key as? String, let value = value as? String else{
-                continue }
+        for (key, value) in headers {
+            guard let key = key as? String, let value = value as? String else {
+                continue
+            }
             headerFields[key] = value
         }
         guard headerFields["Set-Cookie"] != nil else {
