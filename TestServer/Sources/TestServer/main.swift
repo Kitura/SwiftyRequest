@@ -2,8 +2,10 @@ import Kitura
 import HeliumLogger
 import FileKit
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
+#if swift(>=4.1)
+    #if canImport(FoundationNetworking)
+        import FoundationNetworking
+    #endif
 #endif
 
 func cookieHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
