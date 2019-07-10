@@ -17,7 +17,7 @@
 import Foundation
 import CircuitBreaker
 import LoggerAPI
-#if canImport(FoundationNetworking)
+#if swift(>=4.1) && canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
 
@@ -331,6 +331,7 @@ public class RestRequest: NSObject  {
         }
     }
 
+    // Function to get cookies from HTTPURLResponse headers.
     private func getCookies(from response: HTTPURLResponse?) -> [HTTPCookie]? {
         guard let headers = response?.allHeaderFields else {
             return nil
@@ -897,7 +898,7 @@ public struct RestResponse<T> {
     /// The Reponse Result.
     public let result: Result<T>
 
-    // The cookies
+    /// The cookies from HTTPURLResponse
     public let cookies: [HTTPCookie]?
 }
 
