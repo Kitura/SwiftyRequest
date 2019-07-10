@@ -2,6 +2,9 @@ import Kitura
 import HeliumLogger
 import FileKit
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 func cookieHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
     let number = request.parameters["number"].map { Int($0) ?? 0 } ?? 0

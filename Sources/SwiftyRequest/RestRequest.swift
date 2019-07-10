@@ -17,6 +17,9 @@
 import Foundation
 import CircuitBreaker
 import LoggerAPI
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 #if swift(>=4.1)
   #if canImport(FoundationNetworking)
