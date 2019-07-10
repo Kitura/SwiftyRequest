@@ -140,7 +140,7 @@ class SwiftyRequestTests: XCTestCase {
         request.responseData { response in
             switch response.result {
             case .success :
-                let cookies = response.cookies
+                let cookies = response.cookies?.sorted{ $0.name < $1.name }
                 XCTAssertEqual(cookies?.count, 2)
                 for no in [0,1] {
                     XCTAssertEqual(cookies?[no].name, "name\(no)")
