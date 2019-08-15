@@ -328,6 +328,26 @@ public class RestRequest: NSObject  {
         }
     }
 
+    // Function to get cookies from HTTPURLResponse headers.
+    private func getCookies(from response: HTTPURLResponse?) -> [HTTPCookie]? {
+        guard let headers = response?.allHeaderFields else {
+            return nil
+        }
+        var headerFields = [String : String]()
+        for (key, value) in headers {
+            guard let key = key as? String, let value = value as? String else {
+                continue
+            }
+            headerFields[key] = value
+        }
+        guard headerFields["Set-Cookie"] != nil else {
+            return nil
+        }
+        let url = response?.url
+        let dummyUrl = URL(string:"http://example.com")!
+        return HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url ?? dummyUrl)
+    }
+
     /// Request response method with the expected result of a `Data` object.
     ///
     /// - Parameters:
@@ -340,7 +360,7 @@ public class RestRequest: NSObject  {
 
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<Data>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
             completionHandler(dataResponse)
             return
         }
@@ -355,19 +375,22 @@ public class RestRequest: NSObject  {
 
             if let error = error {
                 let result = Result<Data>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
 
             guard let data = data else {
                 let result = Result<Data>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
             let result = Result.success(data)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            let cookies = self.getCookies(from: response)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
             completionHandler(dataResponse)
         }
     }
@@ -389,7 +412,7 @@ public class RestRequest: NSObject  {
 
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<T>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
             completionHandler(dataResponse)
             return
         }
@@ -404,7 +427,8 @@ public class RestRequest: NSObject  {
 
             if let error = error {
                 let result = Result<T>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -412,7 +436,8 @@ public class RestRequest: NSObject  {
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<T>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -420,7 +445,8 @@ public class RestRequest: NSObject  {
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<T>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -449,7 +475,8 @@ public class RestRequest: NSObject  {
             }
 
             // execute callback
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            let cookies = self.getCookies(from: response)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
             completionHandler(dataResponse)
         }
     }
@@ -469,7 +496,7 @@ public class RestRequest: NSObject  {
 
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<T>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
             completionHandler(dataResponse)
             return
         }
@@ -484,7 +511,8 @@ public class RestRequest: NSObject  {
 
             if let error = error ?? responseToError?(response, data) {
                 let result = Result<T>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -492,7 +520,8 @@ public class RestRequest: NSObject  {
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<T>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -507,7 +536,8 @@ public class RestRequest: NSObject  {
             }
 
             // execute callback
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            let cookies = self.getCookies(from: response)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
             completionHandler(dataResponse)
         }
     }
@@ -529,7 +559,7 @@ public class RestRequest: NSObject  {
 
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<[T]>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
             completionHandler(dataResponse)
             return
         }
@@ -544,7 +574,8 @@ public class RestRequest: NSObject  {
 
             if let error = error {
                 let result = Result<[T]>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -552,7 +583,8 @@ public class RestRequest: NSObject  {
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<[T]>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -560,7 +592,8 @@ public class RestRequest: NSObject  {
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<[T]>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -590,7 +623,8 @@ public class RestRequest: NSObject  {
             }
 
             // execute callback
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            let cookies = self.getCookies(from: response)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
             completionHandler(dataResponse)
         }
     }
@@ -610,7 +644,7 @@ public class RestRequest: NSObject  {
 
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<String>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
             completionHandler(dataResponse)
             return
         }
@@ -625,7 +659,8 @@ public class RestRequest: NSObject  {
 
             if let error = error {
                 let result = Result<String>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -633,7 +668,8 @@ public class RestRequest: NSObject  {
             if let responseToError = responseToError,
                 let error = responseToError(response, data) {
                 let result = Result<String>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -641,7 +677,8 @@ public class RestRequest: NSObject  {
             // ensure data is not nil
             guard let data = data else {
                 let result = Result<String>.failure(RestError.noData)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
@@ -652,14 +689,16 @@ public class RestRequest: NSObject  {
             // parse data as a string
             guard let string = String(data: data, encoding: encoding) else {
                 let result = Result<String>.failure(RestError.serializationError)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
 
             // execute callback
             let result = Result.success(string)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            let cookies = self.getCookies(from: response)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
             completionHandler(dataResponse)
         }
     }
@@ -679,7 +718,7 @@ public class RestRequest: NSObject  {
 
         if  let error = performSubstitutions(params: templateParams) {
             let result = Result<Void>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result)
+            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
             completionHandler(dataResponse)
             return
         }
@@ -694,21 +733,24 @@ public class RestRequest: NSObject  {
 
             if let error = error {
                 let result = Result<Void>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
 
             if let responseToError = responseToError, let error = responseToError(response, data) {
                 let result = Result<Void>.failure(error)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+                let cookies = self.getCookies(from: response)
+                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
                 completionHandler(dataResponse)
                 return
             }
 
             // execute callback
             let result = Result<Void>.success(())
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result)
+            let cookies = self.getCookies(from: response)
+            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
             completionHandler(dataResponse)
         }
     }
@@ -852,6 +894,9 @@ public struct RestResponse<T> {
 
     /// The Reponse Result.
     public let result: Result<T>
+
+    /// The cookies from HTTPURLResponse
+    public let cookies: [HTTPCookie]?
 }
 
 /// Enum to differentiate a success or failure.
