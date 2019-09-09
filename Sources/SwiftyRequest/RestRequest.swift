@@ -98,11 +98,6 @@ public class RestRequest {
     deinit {
         try? session.syncShutdown()
     }
-    
-    // Check if there exists a self-signed certificate and whether it's a secure connection
-    private let isSecure: Bool
-    private let isSelfSigned: Bool
-    
 
     /// A default `HTTPClient` instance.
     private var session: HTTPClient
@@ -326,23 +321,30 @@ public class RestRequest {
     /// - Parameters:
     ///   - method: The method specified in the request, defaults to GET.
     ///   - url: URL string to use for the network request.
-    ///   - containsSelfSignedCert: Pass `True` to use self signed certificates.
+    ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
     ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL.
-    public init(method: HTTPMethod = .GET, url: String, containsSelfSignedCert: Bool = false) throws {
-
-        self.isSecure = url.hasPrefix("https")
-        self.isSelfSigned = containsSelfSignedCert
+    public init(method: HTTPMethod = .GET, url: String, insecure: Bool = false, clientCertificate: NIOSSLCertificate? = nil) throws {
         self.mutableRequest = MutableRequest(method: method, url: url)
-        if containsSelfSignedCert {
-            self.session =  HTTPClient(eventLoopGroupProvider: .createNew, configuration: HTTPClient.Configuration(certificateVerification: .none))
-        } else {
-            self.session = HTTPClient(eventLoopGroupProvider: .createNew)
-        }
+        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate)
 
-        // Set initial fields
+        // Set initial headers
         self.acceptType = "application/json"
         self.contentType = "application/json"
 
+    }
+
+    private static func createHTTPClient(insecure: Bool, clientCertificate: NIOSSLCertificate?) -> HTTPClient {
+        let chain: [NIOSSLCertificateSource]
+        if let clientCertificate = clientCertificate {
+            chain = [.certificate(clientCertificate)]
+        } else {
+            chain = []
+        }
+        let tlsConfiguration = TLSConfiguration.forClient(
+            certificateVerification: (insecure ? .none : .fullVerification),
+            certificateChain: chain)
+        let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration)
+        return HTTPClient(eventLoopGroupProvider: .createNew, configuration: config)
     }
 
     // MARK: Response methods

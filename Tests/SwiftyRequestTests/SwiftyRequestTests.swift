@@ -258,7 +258,7 @@ class SwiftyRequestTests: XCTestCase {
     func testResponseData() {
         let expectation = self.expectation(description: "responseData SwiftyRequest test")
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -282,7 +282,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let expectation = self.expectation(description: "responseObject SwiftyRequest test")
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -307,7 +307,7 @@ class SwiftyRequestTests: XCTestCase {
         
         let expectation = self.expectation(description: "responseObject SwiftyRequest test")
         
-        guard let request = try? RestRequest(url: friendsURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: friendsURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -336,7 +336,7 @@ class SwiftyRequestTests: XCTestCase {
     func testDecodableResponseObject() {
         let expectation = self.expectation(description: "responseObject SwiftyRequest test")
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -360,7 +360,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let expectation = self.expectation(description: "responseArray SwiftyRequest test")
 
-        guard let request = try? RestRequest(url: jsonArrayURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonArrayURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -400,7 +400,7 @@ class SwiftyRequestTests: XCTestCase {
         let expectation = self.expectation(description: "responseString SwiftyRequest test")
 
         /// Standard
-        guard let request1 = try? RestRequest(url:jsonURL, containsSelfSignedCert: true) else {
+        guard let request1 = try? RestRequest(url:jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
 
@@ -437,7 +437,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let expectation = self.expectation(description: "responseVoid SwiftyRequest test")
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -492,7 +492,7 @@ class SwiftyRequestTests: XCTestCase {
 
     func testRequestUserAgent() {
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -509,7 +509,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: jsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -590,7 +590,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
-        guard let request = try? RestRequest(url: templatedJsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: templatedJsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         request.circuitParameters = circuitParameters
@@ -656,7 +656,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
-        guard let request = try? RestRequest(url: templatedJsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: templatedJsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -684,7 +684,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let request: RestRequest
         do {
-            request = try RestRequest(url: jsonURL, containsSelfSignedCert: true)
+            request = try RestRequest(url: jsonURL, insecure: true)
         } catch {
             return XCTFail(error.localizedDescription)
         }
@@ -714,7 +714,7 @@ class SwiftyRequestTests: XCTestCase {
         let circuitParameters = CircuitParameters(timeout: 3000, fallback: failureFallback)
         let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
 
-        guard let request = try? RestRequest(url: friendsURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: friendsURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -730,7 +730,7 @@ class SwiftyRequestTests: XCTestCase {
                     XCTAssertEqual(queryItems, "friend=brian&friend=george&friend=melissa%2Btempe&friend=mika")
                 }
             case .failure(let error):
-                XCTFail("Failed to get weather response data with error: \(error)")
+                XCTFail("Failed to get friends response data with error: \(error)")
             }
             expectation.fulfill()
         }
@@ -744,7 +744,8 @@ class SwiftyRequestTests: XCTestCase {
                 let queryItems = [URLQueryItem(name: "friend", value: "brian"), URLQueryItem(name: "friend", value: "george"), URLQueryItem(name: "friend", value: "melissa+tempe"), URLQueryItem(name: "friend", value: "mika")]
                 request.responseData(queryItems: queryItems, completionHandler: completionHandlerFour)
             case .failure(let error):
-                XCTFail("Failed to get weather response data with error: \(error)")
+                XCTFail("Failed to get friends response data with error: \(error)")
+                expectation.fulfill()
             }
         }
 
@@ -761,7 +762,8 @@ class SwiftyRequestTests: XCTestCase {
                 request.queryItems = nil
                 request.responseData(completionHandler: completionHandlerThree)
             case .failure(let error):
-                XCTFail("Failed to get weather response data with error: \(error)")
+                XCTFail("Failed to get friends response data with error: \(error)")
+                expectation.fulfill()
             }
         }
 
@@ -777,7 +779,8 @@ class SwiftyRequestTests: XCTestCase {
 
                 request.responseData(queryItems: [URLQueryItem(name: "friend", value: "darren+fink")], completionHandler: completionHandlerTwo)
             case .failure(let error):
-                XCTFail("Failed to get weather response data with error: \(error)")
+                XCTFail("Failed to get friends response data with error: \(error)")
+                expectation.fulfill()
             }
         }
 
@@ -798,7 +801,7 @@ class SwiftyRequestTests: XCTestCase {
         let circuitParameters = CircuitParameters(timeout: 3000, fallback: failureFallback)
         let initialQueryItems = [URLQueryItem(name: "friend", value: "bill")]
         
-        guard let request = try? RestRequest(url: friendsURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: friendsURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         request.circuitParameters = circuitParameters
@@ -869,7 +872,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
-        guard let request = try? RestRequest(url: templatedJsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: templatedJsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
@@ -895,7 +898,7 @@ class SwiftyRequestTests: XCTestCase {
         
         let circuitParameters = CircuitParameters(fallback: failureFallback)
         
-        guard let request = try? RestRequest(url: templatedJsonURL, containsSelfSignedCert: true) else {
+        guard let request = try? RestRequest(url: templatedJsonURL, insecure: true) else {
             return XCTFail("Invalid URL")
         }
         
