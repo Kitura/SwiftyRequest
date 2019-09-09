@@ -22,11 +22,75 @@ import NIO
 import NIOHTTP1
 import NIOSSL
 
-#if swift(>=4.1)
-  #if canImport(FoundationNetworking)
-    import FoundationNetworking
-  #endif
-#endif
+fileprivate class MutableRequest {
+    /// Request HTTP method
+    var method: HTTPMethod
+    /// Remote URL. May contain templated parameters
+    var urlString: String
+    /// Request custom HTTP Headers, defaults to no headers.
+    var headers: HTTPHeaders
+    /// Request body, defaults to no body.
+    var body: HTTPClient.Body?
+    /// Query items that will be added to the request URL.
+    var queryItems: [URLQueryItem]?
+
+    init(method: HTTPMethod = .GET, url: String) {
+        self.method = method
+        self.urlString = url
+        self.headers = HTTPHeaders()
+        self.body = nil
+    }
+
+    /// Creates an (immutable) HTTPClient.Request using this wrapper's current values.
+    /// Can optionally perform substitutions on a templated URL.
+    func makeRequest(substitutions: [String: String]? = nil) throws -> HTTPClient.Request {
+        // Perform substitutions on templated URL, if necessary.
+        var url = try performSubstitutions(params: substitutions)
+        if let queryItems = self.queryItems {
+            url = try resolveQueryItems(url: url, queryItems: queryItems)
+        }
+        return try HTTPClient.Request(url: url, method: method, headers: headers, body: body)
+    }
+
+    // Replace queryitems in URL with new queryItems
+    private func resolveQueryItems(url: URL, queryItems: [URLQueryItem]) throws -> URL {
+        if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            urlComponents.queryItems = queryItems
+            // Must encode "+" to %2B (URLComponents does not do this)
+            urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+            guard let url = urlComponents.url else {
+                throw RestError.invalidURL(description: "'\(urlComponents)' is not a valid URL")
+            }
+            return url
+        } else {
+            throw RestError.invalidURL(description: "URLComponents cannot resolve '\(url)'")
+        }
+    }
+
+    /// Method to perform substitution on `String` URL if it contains templated placeholders
+    ///
+    /// - Parameter params: optional dictionary of parameters to substitute in
+    /// - Returns: returns a `URL` if template substitution was successful, or if the `url` is not templated.
+    /// - throws: `RestError.invalidSubstitution` if parameters were provided and the resulting URL was not valid,
+    /// - throws: `HTTPClientError.invalidURL` if no parameters were provided and the `urlString` is not a valid URL.
+    private func performSubstitutions(params: [String: String]?) throws -> URL {
+        guard let params = params, urlString.contains("{") else {
+            // No parameters provided, or no parameters required - create a plain URL
+            guard let simpleURL = URL(string: self.urlString) else {
+                throw RestError.invalidURL(description: "'\(urlString)' is not a valid URL")
+            }
+            return simpleURL
+        }
+        // Replace templated elements with provided values
+        let expandedUrlString = urlString.expandString(params: params)
+        // Confirm that the resulting URL is valid
+        guard let expandedURL = URL(string: expandedUrlString) else {
+            throw RestError.invalidSubstitution
+        }
+        return expandedURL
+    }
+
+}
 
 /// Object containing everything needed to build and execute HTTP requests.
 public class RestRequest {
@@ -40,20 +104,11 @@ public class RestRequest {
     private let isSelfSigned: Bool
     
 
-<<<<<<< HEAD
-    /// The `URLSession` instance that will be used to send the requests. Defaults to `URLSession.shared`.
-    #if swift(>=4.1)
-    public var session: URLSession = URLSession.shared
-    #else
-    public var session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
-    #endif
-=======
     /// A default `HTTPClient` instance.
     private var session: HTTPClient
->>>>>>> Use nio-http-client under the covers
 
     // The HTTP Request
-    private var request: HTTPClient.Request
+    private var mutableRequest: MutableRequest
 
     /// The currently configured `CircuitBreaker` instance for this `RestRequest`. In order to create a
     /// `CircuitBreaker` you should set the `circuitParameters` property.
@@ -74,37 +129,33 @@ public class RestRequest {
     public var circuitParameters: CircuitParameters<String>? = nil {
         didSet {
             if let params = circuitParameters {
-                circuitBreaker = CircuitBreaker(name: params.name,
-                                                timeout: params.timeout,
-                                                resetTimeout: params.resetTimeout,
-                                                maxFailures: params.maxFailures,
-                                                rollingWindow: params.rollingWindow,
-                                                bulkhead: params.bulkhead,
-                                                // We capture a weak reference to self to prevent a retain cycle from `handleInvocation` -> RestRequest` -> `circuitBreaker` -> `handleInvocation`. To do this we have explicitly declared the handleInvocation function as a closure.
-                                                command: { [weak self] invocation in
-                                                    let request = invocation.commandArgs.0
-                                                    self?.session.execute(request: request).whenComplete { result in
-                                                        switch result {
-                                                        case .failure(let error):
-                                                            invocation.notifyFailure(error: BreakerError(reason: error.localizedDescription))
-                                                        case .success(_):
-                                                            invocation.notifySuccess()
-                                                        }
-                                                        let callback = invocation.commandArgs.1
-                                                        callback(result)
-                                                    }
+                circuitBreaker = CircuitBreaker(
+                    name: params.name,
+                    timeout: params.timeout,
+                    resetTimeout: params.resetTimeout,
+                    maxFailures: params.maxFailures,
+                    rollingWindow: params.rollingWindow,
+                    bulkhead: params.bulkhead,
+                    // We capture a weak reference to self to prevent a retain cycle from `handleInvocation` -> RestRequest` -> `circuitBreaker` -> `handleInvocation`. To do this we have explicitly declared the handleInvocation function as a closure.
+                    command: { [weak self] invocation in
+                        let request = invocation.commandArgs.0
+                        self?.session.execute(request: request).whenComplete { result in
+                            switch result {
+                            case .failure(let error):
+                                invocation.notifyFailure(error: BreakerError(reason: error.localizedDescription))
+                            case .success(_):
+                                invocation.notifySuccess()
+                            }
+                            let callback = invocation.commandArgs.1
+                            callback(result)
+                        }
                     },
-                                                fallback: params.fallback)
+                    fallback: params.fallback)
             }
         }
     }
 
     // MARK: HTTP Request Parameters
-    /// URL `String` used to store a url containing replaceable template values.
-    private var urlTemplate: String?
-
-    /// The string representation of the HTTP request url.
-    private var url: String
 
     /// The HTTP method specified in the request, defaults to GET.
     ///
@@ -114,10 +165,10 @@ public class RestRequest {
     /// ```
     public var method: HTTPMethod {
         get {
-            return request.method
+            return mutableRequest.method
         }
         set {
-            request.method = newValue
+            mutableRequest.method = newValue
         }
     }
 
@@ -136,9 +187,9 @@ public class RestRequest {
         didSet {
             // set the request's authentication credentials
             if let credentials = credentials {
-                request.headers.replaceOrAdd(name: "Authorization", value: credentials.authheader)
+                mutableRequest.headers.replaceOrAdd(name: "Authorization", value: credentials.authheader)
             } else {
-                request.headers.remove(name: "Authorization")
+                mutableRequest.headers.remove(name: "Authorization")
             }
         }
     }
@@ -154,10 +205,10 @@ public class RestRequest {
     /// ```
     public var headerParameters: HTTPHeaders {
         get {
-            return request.headers
+            return mutableRequest.headers
         }
         set {
-            request.headers.add(contentsOf: newValue)
+            mutableRequest.headers.add(contentsOf: newValue)
         }
     }
 
@@ -170,13 +221,13 @@ public class RestRequest {
     /// ```
     public var acceptType: String? {
         get {
-            return request.headers["Accept"].first
+            return mutableRequest.headers["Accept"].first
         }
         set {
             if let value = newValue {
-                request.headers.replaceOrAdd(name: "Accept", value: value)
+                mutableRequest.headers.replaceOrAdd(name: "Accept", value: value)
             } else {
-                request.headers.remove(name: "Accept")
+                mutableRequest.headers.remove(name: "Accept")
             }
         }
     }
@@ -190,13 +241,13 @@ public class RestRequest {
     /// ```
     public var contentType: String? {
         get {
-            return request.headers["Content-Type"].first
+            return mutableRequest.headers["Content-Type"].first
         }
         set {
             if let value = newValue {
-                request.headers.replaceOrAdd(name: "Content-Type", value: value)
+                mutableRequest.headers.replaceOrAdd(name: "Content-Type", value: value)
             } else {
-                request.headers.remove(name: "Content-Type")
+                mutableRequest.headers.remove(name: "Content-Type")
             }
         }
     }
@@ -211,13 +262,13 @@ public class RestRequest {
     /// ```
     public var productInfo: String? {
         get {
-            return request.headers["User-Agent"].first
+            return mutableRequest.headers["User-Agent"].first
         }
         set {
             if let value = newValue {
-                request.headers.replaceOrAdd(name: "User-Agent", value: value.generateUserAgent())
+                mutableRequest.headers.replaceOrAdd(name: "User-Agent", value: value.generateUserAgent())
             } else {
-                request.headers.remove(name: "User-Agent")
+                mutableRequest.headers.remove(name: "User-Agent")
             }
         }
     }
@@ -238,9 +289,9 @@ public class RestRequest {
         set {
             _messageBody = newValue
             if let data = newValue {
-                request.body = .data(data)
+                mutableRequest.body = .data(data)
             } else {
-                request.body = nil
+                mutableRequest.body = nil
             }
         }
     }
@@ -257,29 +308,13 @@ public class RestRequest {
     /// ```
     public var queryItems: [URLQueryItem]?  {
         set {
-            if let updatedURL = setQueryItems(url: request.url, queryItems: newValue) {
-                request.url = updatedURL
-            } 
+            mutableRequest.queryItems = newValue
         }
         get {
-            if let urlComponents = URLComponents(url: request.url, resolvingAgainstBaseURL: false) {
-                return urlComponents.queryItems
-            }
-            return nil
+            return mutableRequest.queryItems
         }
     }
     
-    // Replace queryitems on request.url with new queryItems
-    private func setQueryItems(url: URL, queryItems: [URLQueryItem]?) -> URL? {
-        if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-            urlComponents.queryItems = queryItems
-            // Must encode "+" to %2B (URLComponents does not do this)
-            urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
-            return urlComponents.url 
-        } else {
-            return nil
-        }
-    }
 
     /// Initialize a `RestRequest` instance.
     ///
@@ -297,15 +332,7 @@ public class RestRequest {
 
         self.isSecure = url.hasPrefix("https")
         self.isSelfSigned = containsSelfSignedCert
-
-        // Instantiate basic mutable request
-        if url.contains("{") {
-            // Is a template URL which is not valid and will be replaced so use temporary value
-            self.request = try HTTPClient.Request(url: "http://template")
-            self.urlTemplate = url
-        } else {
-            self.request = try HTTPClient.Request(url: url)
-        }
+        self.mutableRequest = MutableRequest(method: method, url: url)
         if containsSelfSignedCert {
             self.session =  HTTPClient(eventLoopGroupProvider: .createNew, configuration: HTTPClient.Configuration(certificateVerification: .none))
         } else {
@@ -313,9 +340,6 @@ public class RestRequest {
         }
 
         // Set initial fields
-        self.url = url
-        
-        self.method = method
         self.acceptType = "application/json"
         self.contentType = "application/json"
 
@@ -326,7 +350,13 @@ public class RestRequest {
     ///
     /// - Parameter completionHandler: Callback used on completion of operation.
     public func response(completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
-        response(request: self.request, completionHandler: completionHandler)
+        do {
+            let request = try self.mutableRequest.makeRequest()
+            response(request: request, completionHandler: completionHandler)
+        } catch {
+            return completionHandler(.failure(error))
+        }
+
     }
     
     func response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
@@ -378,22 +408,18 @@ public class RestRequest {
                              queryItems: [URLQueryItem]? = nil,
                              completionHandler: @escaping (Result<RestResponse<Data>, Error>) -> Void) {
 
-        var request = self.request
-        
-        guard let url = performSubstitutions(params: templateParams),
-            let host = url.host,
-            let scheme = url.scheme
-        else {
-            return completionHandler(.failure(RestError.invalidSubstitution))
-        }
-        request.url = url
-        request.host = host
-        request.scheme = scheme
-        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
-        if let query = queryItems, let queryURL = setQueryItems(url: request.url, queryItems: query) {
-            request.url = queryURL
+        if let queryItems = queryItems {
+            mutableRequest.queryItems = queryItems
+        }
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch {
+            return completionHandler(.failure(error))
         }
 
         response(request: request) { result in
@@ -425,24 +451,20 @@ public class RestRequest {
                                              queryItems: [URLQueryItem]? = nil,
                                              completionHandler: @escaping (Result<RestResponse<T>, Error>) -> Void) {
 
-        var request = self.request
-        
-        guard let url = performSubstitutions(params: templateParams),
-            let host = url.host,
-            let scheme = url.scheme
-            else {
-                return completionHandler(.failure(RestError.invalidSubstitution))
-        }
-        request.url = url
-        request.host = host
-        request.scheme = scheme
-        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
-        if let query = queryItems, let queryURL = setQueryItems(url: request.url, queryItems: query) {
-            request.url = queryURL
+        if let queryItems = queryItems {
+            mutableRequest.queryItems = queryItems
         }
-        
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch {
+            return completionHandler(.failure(error))
+        }
+
         response(request: request) { result in
             switch result {
             case .failure(let error):
@@ -477,24 +499,20 @@ public class RestRequest {
                               queryItems: [URLQueryItem]? = nil,
                               completionHandler: @escaping (Result<RestResponse<[Any]>, Error>) -> Void) {
         
-        var request = self.request
-        
-        guard let url = performSubstitutions(params: templateParams),
-            let host = url.host,
-            let scheme = url.scheme
-            else {
-                return completionHandler(.failure(RestError.invalidSubstitution))
-        }
-        request.url = url
-        request.host = host
-        request.scheme = scheme
-        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
-        if let query = queryItems, let queryURL = setQueryItems(url: request.url, queryItems: query) {
-            request.url = queryURL
+        if let queryItems = queryItems {
+            mutableRequest.queryItems = queryItems
         }
-        
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch {
+            return completionHandler(.failure(error))
+        }
+
         response(request: request) { result in
             switch result {
             case .failure(let error):
@@ -527,22 +545,18 @@ public class RestRequest {
                               queryItems: [URLQueryItem]? = nil,
                               completionHandler: @escaping (Result<RestResponse<[String: Any]>, Error>) -> Void) {
         
-        var request = self.request
-        
-        guard let url = performSubstitutions(params: templateParams),
-            let host = url.host,
-            let scheme = url.scheme
-            else {
-                return completionHandler(.failure(RestError.invalidSubstitution))
-        }
-        request.url = url
-        request.host = host
-        request.scheme = scheme
-        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
-        if let query = queryItems, let queryURL = setQueryItems(url: request.url, queryItems: query) {
-            request.url = queryURL
+        if let queryItems = queryItems {
+            mutableRequest.queryItems = queryItems
+        }
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch {
+            return completionHandler(.failure(error))
         }
 
         response(request: request) { result in
@@ -578,22 +592,18 @@ public class RestRequest {
                                queryItems: [URLQueryItem]? = nil,
                                completionHandler: @escaping (Result<RestResponse<String>, Error>) -> Void) {
         
-        var request = self.request
-        
-        guard let url = performSubstitutions(params: templateParams),
-            let host = url.host,
-            let scheme = url.scheme
-            else {
-                return completionHandler(.failure(RestError.invalidSubstitution))
-        }
-        request.url = url
-        request.host = host
-        request.scheme = scheme
-        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
-        if let query = queryItems, let queryURL = setQueryItems(url: request.url, queryItems: query) {
-            request.url = queryURL
+        if let queryItems = queryItems {
+            mutableRequest.queryItems = queryItems
+        }
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch {
+            return completionHandler(.failure(error))
         }
 
         response(request: request) { result in
@@ -631,22 +641,18 @@ public class RestRequest {
                              queryItems: [URLQueryItem]? = nil,
                              completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
         
-        var request = self.request
-        
-        guard let url = performSubstitutions(params: templateParams),
-            let host = url.host,
-            let scheme = url.scheme
-            else {
-                return completionHandler(.failure(RestError.invalidSubstitution))
-        }
-        request.url = url
-        request.host = host
-        request.scheme = scheme
-        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
-        if let query = queryItems, let queryURL = setQueryItems(url: request.url, queryItems: query) {
-            request.url = queryURL
+        if let queryItems = queryItems {
+            mutableRequest.queryItems = queryItems
+        }
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch {
+            return completionHandler(.failure(error))
         }
 
         response(request: request) { result in
@@ -733,39 +739,18 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of the operation.
     public func download(to destination: URL, completionHandler: @escaping (Result<HTTPResponseHead, Error>) -> Void) {
         let delegate = DownloadDelegate(destination: destination)
-        
+
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest()
+        } catch {
+            return completionHandler(.failure(error))
+        }
+
         session.execute(request: request, delegate: delegate).futureResult.whenComplete({ result in
             completionHandler(result)
         })
-    }
-
-    /// Method to perform substitution on `String` URL if it contains templated placeholders
-    ///
-    /// - Parameter params: dictionary of parameters to substitute in
-    /// - Returns: returns either a `RestError` or nil if there were no problems setting new URL on our `URLRequest` object
-    private func performSubstitutions(params: [String: String]?) -> URL? {
-
-        guard let templateURL = self.urlTemplate else {
-            // No templating required
-            return self.request.url
-        } 
-        
-        guard let params = params else {
-            // Expected to replace values but no template provided
-            return nil
-        }
-        
-        // Get urlTemplate if available, otherwise just use the request's url
-        let urlString = templateURL.expandString(params: params)
-
-        // Confirm that the resulting URL is valid
-        guard let newURL = URL(string: urlString) else {
-            // Expected to replace values but no template provided
-            return nil
-        }
-        
-        return newURL
-        
     }
 
     /// Method to identify the charset encoding defined by the Content-Type header

@@ -667,7 +667,7 @@ class SwiftyRequestTests: XCTestCase {
             case .success(_):
                 XCTFail("Request should have failed with no parameters passed into a templated URL")
             case .failure(let error):
-                XCTAssertEqual(error as? RestError, RestError.invalidSubstitution)
+                XCTAssertEqual(error as? RestError, RestError.invalidURL())
             }
             expectation.fulfill()
         }
@@ -682,8 +682,11 @@ class SwiftyRequestTests: XCTestCase {
 
         let circuitParameters = CircuitParameters(fallback: failureFallback)
 
-        guard let request = try? RestRequest(url: jsonURL, containsSelfSignedCert: true) else {
-            return XCTFail("Invalid URL")
+        let request: RestRequest
+        do {
+            request = try RestRequest(url: jsonURL, containsSelfSignedCert: true)
+        } catch {
+            return XCTFail(error.localizedDescription)
         }
         
         request.circuitParameters = circuitParameters

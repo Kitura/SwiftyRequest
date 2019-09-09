@@ -41,9 +41,15 @@ public struct RestError: Error, CustomStringConvertible, Equatable {
     
     /// The url substitution attempted could not be made.
     public static let invalidSubstitution = RestError(internalError: .invalidSubstitution, description: "Invalid Data", response: nil)
-    
+
+    /// The requested resource could not be downloaded.
     public static let downloadError = RestError(internalError: .downloadError, description: "Failed to download file", response: nil)
     
+    /// The url provided was not valid.
+    public static func invalidURL(description: String = "Invalid URL") -> RestError {
+        return RestError(internalError: .invalidURL, description: description, response: nil)
+    }
+
     /// No data was returned from the network.
     public static func noData(response: HTTPClient.Response) -> RestError {
         return RestError(internalError: .noData, description: "No Data", response: response)
@@ -52,8 +58,8 @@ public struct RestError: Error, CustomStringConvertible, Equatable {
     /// No data was returned from the network.
     public static func decodingError(error: Error, response: HTTPClient.Response) -> RestError {
         return RestError(internalError: .decodingError, description: "Decoding failed with error: \(error.localizedDescription)", response: response)
-    } 
-//    
+    }
+
     /// Data couldn't be parsed correctly.
     public static func serializationError(response: HTTPClient.Response) -> RestError {
         return RestError(internalError: .serializationError, description: "Serialization Error", response: response)
@@ -67,7 +73,7 @@ public struct RestError: Error, CustomStringConvertible, Equatable {
     private let internalError: InternalError
     
     private enum InternalError {
-        case noData, serializationError, encodingError, decodingError, fileManagerError, invalidFile, invalidSubstitution, downloadError, errorStatusCode
+        case noData, serializationError, encodingError, decodingError, fileManagerError, invalidFile, invalidSubstitution, downloadError, errorStatusCode, invalidURL
     }
     
     /// Error Description
