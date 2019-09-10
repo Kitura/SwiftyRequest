@@ -380,26 +380,6 @@ public class RestRequest {
         }
     }
 
-    // Function to get cookies from HTTPURLResponse headers.
-    private func getCookies(from response: HTTPURLResponse?) -> [HTTPCookie]? {
-        guard let headers = response?.allHeaderFields else {
-            return nil
-        }
-        var headerFields = [String : String]()
-        for (key, value) in headers {
-            guard let key = key as? String, let value = value as? String else {
-                continue
-            }
-            headerFields[key] = value
-        }
-        guard headerFields["Set-Cookie"] != nil else {
-            return nil
-        }
-        let url = response?.url
-        let dummyUrl = URL(string:"http://example.com")!
-        return HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url ?? dummyUrl)
-    }
-
     /// Request response method with the expected result of a `Data` object.
     ///
     /// - Parameters:
@@ -438,7 +418,8 @@ public class RestRequest {
                                                         status: response.status,
                                                         headers: response.headers,
                                                         request: request,
-                                                        body: Data(bodyBytes)))) 
+                                                        body: Data(bodyBytes),
+                                                        cookies: response.cookies)))
             }
         }
     }
@@ -483,7 +464,8 @@ public class RestRequest {
                                                             status: response.status,
                                                             headers: response.headers,
                                                             request: request,
-                                                            body: object))) 
+                                                            body: object,
+                                                            cookies: response.cookies)))
                 } catch {
                     return completionHandler(.failure(RestError.decodingError(error: error, response: response)))
                 }
@@ -532,7 +514,8 @@ public class RestRequest {
                                                                status: response.status,
                                                                headers: response.headers,
                                                                request: request,
-                                                               body: object))) 
+                                                               body: object,
+                                                               cookies: response.cookies)))
             }
         }
     }
@@ -578,7 +561,8 @@ public class RestRequest {
                                                                status: response.status,
                                                                headers: response.headers,
                                                                request: request,
-                                                               body: object))) 
+                                                               body: object,
+                                                               cookies: response.cookies)))
             }
         }
     }
@@ -628,7 +612,8 @@ public class RestRequest {
                                                                status: response.status,
                                                                headers: response.headers,
                                                                request: request,
-                                                               body: object))) 
+                                                               body: object,
+                                                               cookies: response.cookies)))
             }
         }
     }

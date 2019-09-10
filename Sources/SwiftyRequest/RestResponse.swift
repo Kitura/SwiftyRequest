@@ -33,4 +33,6 @@ public struct RestResponse<T> {
     public var request: HTTPClient.Request
     /// The body of the response as the expected type.
     public var body: T
+    /// The cookies from the response.
+    public var cookies: [HTTPClient.Cookie]
 }

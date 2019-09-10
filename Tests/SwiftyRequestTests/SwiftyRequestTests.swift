@@ -101,16 +101,17 @@ class SwiftyRequestTests: XCTestCase {
 
     func testMultipleCookies() {
         let expectation = self.expectation(description: "testtestMultipleCookies")
-        let request = RestRequest(method: .get, url:"http://localhost:8080/cookies/2")
-        request.credentials = .apiKey
-        request.responseData { response in
-            switch response.result {
-            case .success :
-                let cookies = response.cookies?.sorted{ $0.name < $1.name }
-                XCTAssertEqual(cookies?.count, 2)
-                for no in [0,1] {
-                    XCTAssertEqual(cookies?[no].name, "name\(no)")
-                    XCTAssertEqual(cookies?[no].value, "value\(no)")
+        guard let request = try? RestRequest(method: .GET, url: "http://localhost:8080/cookies/2") else {
+            return XCTFail("Invalid URL")
+        }
+        request.responseVoid { result in
+            switch result {
+            case .success(let response):
+                let cookies = response.cookies.sorted{ $0.name < $1.name }
+                XCTAssertEqual(cookies.count, 2)
+                for no in 0..<cookies.count {
+                    XCTAssertEqual(cookies[no].name, "name\(no)")
+                    XCTAssertEqual(cookies[no].value, "value\(no)")
                 }
             case .failure(let error):
                 XCTFail("Failed to get cookies with error: \(error)")
@@ -123,15 +124,18 @@ class SwiftyRequestTests: XCTestCase {
 
     func testCookie() {
         let expectation = self.expectation(description: "testCookie")
-        let request = RestRequest(method: .get, url:"http://localhost:8080/cookies/1")
-        request.credentials = .apiKey
-        request.responseData { response in
-            switch response.result {
-            case .success :
+        guard let request = try? RestRequest(method: .GET, url: "http://localhost:8080/cookies/1") else {
+            return XCTFail("Invalid URL")
+        }
+        request.responseVoid { result in
+            switch result {
+            case .success(let response):
                 let cookies = response.cookies
-                XCTAssertEqual(cookies?.count, 1)
-                XCTAssertEqual(cookies?[0].name, "name0")
-                XCTAssertEqual(cookies?[0].value, "value0")
+                XCTAssertEqual(cookies.count, 1)
+                if cookies.count > 0 {
+                    XCTAssertEqual(cookies[0].name, "name0")
+                    XCTAssertEqual(cookies[0].value, "value0")
+                }
             case .failure(let error):
                 XCTFail("Failed to get cookies with error: \(error)")
             }
@@ -143,13 +147,14 @@ class SwiftyRequestTests: XCTestCase {
 
     func testNoCookies() {
         let expectation = self.expectation(description: "testNoCookies")
-        let request = RestRequest(method: .get, url:"http://localhost:8080/cookies/0")
-        request.credentials = .apiKey
-        request.responseData { response in
-            switch response.result {
-            case .success :
+        guard let request = try? RestRequest(method: .GET, url: "http://localhost:8080/cookies/0") else {
+            return XCTFail("Invalid URL")
+        }
+        request.responseVoid { result in
+            switch result {
+            case .success(let response):
                 let cookies = response.cookies
-                XCTAssertNil(cookies, "No cookies expected in response but found \(cookies!.count) cookies.")
+                XCTAssertEqual(cookies.count, 0, "No cookies expected in response but found \(cookies.count) cookies.")
             case .failure(let error):
                 XCTFail("Failed to get data response with error: \(error)")
             }
