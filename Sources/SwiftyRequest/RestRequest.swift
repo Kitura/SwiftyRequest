@@ -685,7 +685,7 @@ public class RestRequest {
         func didReceiveHead(task: HTTPClient.Task<Response>, _ head: HTTPResponseHead) -> EventLoopFuture<Void> {
             // this is executed when we receive HTTP Reponse head part of the request (it contains response code and headers), called once
             self.responseHead = head
-            return task.eventLoop.makeSucceededFuture(())
+            return task.currentEventLoop.makeSucceededFuture(())
         }
         
         func didReceivePart(task: HTTPClient.Task<Response>, _ buffer: ByteBuffer) -> EventLoopFuture<Void> {
@@ -698,7 +698,7 @@ public class RestRequest {
             } catch {
                 self.error = error
             }
-            return task.eventLoop.makeSucceededFuture(())
+            return task.currentEventLoop.makeSucceededFuture(())
         }
         
         func didFinishRequest(task: HTTPClient.Task<HTTPResponseHead>) throws -> HTTPResponseHead {
@@ -763,22 +763,23 @@ public class RestRequest {
 }
 
 /// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` initializer.
-/// `A` is the type of the fallback's parameter.
+/// `A` is the type of the fallback's parameter.  See the CircuitBreaker documentation for a full explanation
+/// of these parameters.
 public struct CircuitParameters<A> {
 
     /// The circuit name: defaults to "circuitName".
     let name: String
 
-    /// The circuit timeout: defaults to 2000.
+    /// The circuit timeout in milliseconds: defaults to 2000.
     public let timeout: Int
 
-    /// The circuit timeout: defaults to 60000.
+    /// The circuit timeout in milliseconds: defaults to 60000.
     public let resetTimeout: Int
 
     /// Max failures allowed: defaults to 5.
     public let maxFailures: Int
 
-    /// Rolling Window: defaults to 10000.
+    /// Rolling Window in milliseconds: defaults to 10000.
     public let rollingWindow:Int
 
     /// Bulkhead: defaults to 0.
