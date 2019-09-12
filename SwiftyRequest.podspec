@@ -8,6 +8,7 @@ Pod::Spec.new do |s|
   s.author     = "IBM"
   s.module_name  = 'SwiftyRequest'
   s.ios.deployment_target = "10.0"
+  s.osx.deployment_target = "10.11"
   s.source   = { :git => "https://github.com/IBM-Swift/SwiftyRequest.git", :tag => s.version }
   s.source_files = "Sources/**/*.swift"
   s.dependency 'LoggerAPI', '~> 1.7'
