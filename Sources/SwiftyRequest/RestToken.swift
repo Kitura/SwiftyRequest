@@ -58,12 +58,12 @@ public class RestToken {
     public func refreshToken(
         failure: ((Error) -> Void)? = nil,
         success: (() -> Void)? = nil) {
-        let request = try? RestRequest(url: tokenURL)
+        let request = RestRequest(url: tokenURL)
 
-        request?.credentials = credentials
+        request.credentials = credentials
 
         // TODO - validate request
-        request?.responseString() { response in
+        request.responseString() { response in
             switch response {
             case .success(let token):
                 self.token = token.body

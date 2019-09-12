@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016,2017
+ * Copyright IBM Corporation 2016-2019
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -322,8 +322,8 @@ public class RestRequest {
     ///   - method: The method specified in the request, defaults to GET.
     ///   - url: URL string to use for the network request.
     ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
-    ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL.
-    public init(method: HTTPMethod = .GET, url: String, insecure: Bool = false, clientCertificate: NIOSSLCertificate? = nil) throws {
+    ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
+    public init(method: HTTPMethod = .GET, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil) {
         self.mutableRequest = MutableRequest(method: method, url: url)
         self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate)
 
@@ -333,16 +333,19 @@ public class RestRequest {
 
     }
 
-    private static func createHTTPClient(insecure: Bool, clientCertificate: NIOSSLCertificate?) -> HTTPClient {
+    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil) -> HTTPClient {
         let chain: [NIOSSLCertificateSource]
+        let key: NIOSSLPrivateKeySource?
         if let clientCertificate = clientCertificate {
-            chain = [.certificate(clientCertificate)]
+            chain = [.certificate(clientCertificate.certificate)]
+            key = NIOSSLPrivateKeySource.privateKey(clientCertificate.privateKey)
         } else {
             chain = []
+            key = nil
         }
         let tlsConfiguration = TLSConfiguration.forClient(
             certificateVerification: (insecure ? .none : .fullVerification),
-            certificateChain: chain)
+            certificateChain: chain, privateKey: key)
         let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration)
         return HTTPClient(eventLoopGroupProvider: .createNew, configuration: config)
     }
