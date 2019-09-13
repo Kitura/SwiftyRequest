@@ -1,3 +1,18 @@
+/*
+* Copyright IBM Corporation 2017-2019
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 import Kitura
 import HeliumLogger
 import FileKit
@@ -8,24 +23,8 @@ import Foundation
     #endif
 #endif
 
-func cookieHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
-    let number = request.parameters["number"].map { Int($0) ?? 0 } ?? 0
-    for no in 0..<number {
-        var cookieProps: [HTTPCookiePropertyKey: Any]
-        cookieProps = [
-            HTTPCookiePropertyKey.domain: "localhost",
-            HTTPCookiePropertyKey.path: "/",
-            HTTPCookiePropertyKey.name: "name\(no)",
-            HTTPCookiePropertyKey.value: "value\(no)",
-        ]
-        let cookie = HTTPCookie(properties: cookieProps)
-        response.cookies["name\(no)"] = cookie
-    }
-    try response.status(.OK).end()
-}
-
 // Enable logging
-HeliumLogger.use(.info)
+HeliumLogger.use(.debug)
 
 // Pre-canned test data to be returned as JSON
 var testData: TestData = TestData(name: "Paddington", age: 1, height: 106.68, address: TestAddress(number: 32, street: "Windsor Gardens", city: "London"))
@@ -62,7 +61,6 @@ router.post("/echoJSON") {
         try response.status(.badRequest).end()
     }
 }
-router.get("/cookies/:number", handler: cookieHandler)
 
 // Create a router that will be used for SSL requests
 let sslRouter = Router()
@@ -105,7 +103,20 @@ sslRouter.get("/ssl/friends") {
     try response.send(json: friends).end()
 }
 
+// Cookies
+
+router.get("/cookies/:number", handler: cookieHandler)
 sslRouter.get("/ssl/cookies/:number", handler: cookieHandler)
+
+// Basic Authentication
+
+sslRouter.get("/ssl/basic/user", handler: basicAuthHandler)
+userStore["1"] = User(id: 1, name: "Dave", date: Date(timeIntervalSince1970: 0))
+
+// JWT Authentication
+
+sslRouter.post("/ssl/jwt/generateJWT", handler: generateJWTHandler)
+sslRouter.get("/ssl/jwt/user", handler: jwtAuthHandler)
 
 // Add an HTTP server and connect it to the router
 Kitura.addHTTPServer(onPort: 8080, with: router)
