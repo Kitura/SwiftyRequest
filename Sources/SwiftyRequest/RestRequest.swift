@@ -22,6 +22,8 @@ import NIO
 import NIOHTTP1
 import NIOSSL
 
+fileprivate let globalELG = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+
 fileprivate class MutableRequest {
     /// Request HTTP method
     var method: HTTPMethod
@@ -347,7 +349,7 @@ public class RestRequest {
             certificateVerification: (insecure ? .none : .fullVerification),
             certificateChain: chain, privateKey: key)
         let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration)
-        return HTTPClient(eventLoopGroupProvider: .createNew, configuration: config)
+        return HTTPClient(eventLoopGroupProvider: .shared(globalELG), configuration: config)
     }
 
     /// Convenience function to encode an `Encodable` type as the request body, using a
