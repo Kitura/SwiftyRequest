@@ -27,6 +27,11 @@ let jsonArrayURL = "https://localhost:8443/ssl/jsonArray"
 let templatedJsonURL = "https://localhost:8443/ssl/json/{name}/{city}/"
 let friendsURL = "https://localhost:8443/ssl/friends"
 let insecureUrl = "http://localhost:8080/"
+let cookiesURL = "http://localhost:8080/cookies/{numCookies}"
+
+let basicAuthUserURL = "https://localhost:8443/ssl/basic/user/{id}"
+let jwtAuthUserURL = "https://localhost:8443/ssl/jwt/user"
+let jwtGenerateURL = "https://localhost:8443/ssl/jwt/generateJWT"
 
 /// URL for a well-known server that provides a valid TLS certificate.
 let sslValidCertificateURL = "https://swift.org"
@@ -50,6 +55,18 @@ public struct TestAddress: Codable {
 
 public struct FriendData: Codable {
     let friends: [String]
+}
+
+struct JWTUser: Codable, Equatable {
+    let name: String
+
+    public static func ==(lhs: JWTUser, rhs: JWTUser) -> Bool {
+        return (lhs.name == rhs.name)
+    }
+}
+
+struct AccessToken: Codable {
+    let accessToken: String
 }
 
 
@@ -94,7 +111,6 @@ class SwiftyRequestTests: XCTestCase {
 
     // MARK: Helper methods
 
-
     let failureFallback = { (error: BreakerError, msg: String) in
         // If this fallback is accessed, we consider it a failure
         if error.description == "BreakerError : An error occurred in an open state. Failing fast." {} else {
@@ -103,14 +119,14 @@ class SwiftyRequestTests: XCTestCase {
         }
     }
 
-    // MARK: SwiftyRequest Tests
+    // MARK: Cookies tests
 
     func testMultipleCookies() {
-        let expectation = self.expectation(description: "testtestMultipleCookies")
+        let expectation = self.expectation(description: "Test multiple cookies are received")
 
-        let request = RestRequest(method: .GET, url: "http://localhost:8080/cookies/2")
+        let request = RestRequest(method: .GET, url: cookiesURL)
 
-        request.responseVoid { result in
+        request.responseVoid(templateParams: ["numCookies": "2"]) { result in
             switch result {
             case .success(let response):
                 let cookies = response.cookies.sorted{ $0.name < $1.name }
@@ -129,11 +145,11 @@ class SwiftyRequestTests: XCTestCase {
     }
 
     func testCookie() {
-        let expectation = self.expectation(description: "testCookie")
+        let expectation = self.expectation(description: "Test a single cookie is received")
 
-        let request = RestRequest(method: .GET, url: "http://localhost:8080/cookies/1")
+        let request = RestRequest(method: .GET, url: cookiesURL)
 
-        request.responseVoid { result in
+        request.responseVoid(templateParams: ["numCookies": "1"]) { result in
             switch result {
             case .success(let response):
                 let cookies = response.cookies
@@ -152,11 +168,11 @@ class SwiftyRequestTests: XCTestCase {
     }
 
     func testNoCookies() {
-        let expectation = self.expectation(description: "testNoCookies")
+        let expectation = self.expectation(description: "Test no cookies are received")
 
-        let request = RestRequest(method: .GET, url: "http://localhost:8080/cookies/0")
+        let request = RestRequest(method: .GET, url: cookiesURL)
 
-        request.responseVoid { result in
+        request.responseVoid(templateParams: ["numCookies": "0"]) { result in
             switch result {
             case .success(let response):
                 let cookies = response.cookies
@@ -169,6 +185,8 @@ class SwiftyRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+
+    // MARK: Basic SwiftyRequest Tests
 
     func testInsecureConnection() {
         let expectation = self.expectation(description: "Insecure Connection test")
@@ -220,6 +238,8 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
+    // Tests that an SSL connection can be successfully made to a URL that provides
+    // a valid certificate.
     func testGetValidCert() {
         let expectation = self.expectation(description: "Connection successful")
 
@@ -237,6 +257,8 @@ class SwiftyRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 20)
     }
+
+    // MARK: Client certificate tests
 
     // Test that we can make a request supplying a client certificate.
     //
@@ -344,6 +366,9 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
+    // MARK: SwiftyRequest Response tests
+
+    // Tests that Data can successfully be received.
     func testResponseData() {
         let expectation = self.expectation(description: "responseData SwiftyRequest test")
 
@@ -940,14 +965,14 @@ class SwiftyRequestTests: XCTestCase {
         
     }
 
-    // Authentication tests
+    // MARK: Authentication tests
 
     /// Tests that a request on a route that requires basic authentication succeeds when a valid username
     /// and password are supplied.
     func testBasicAuthentication() {
         let expectation = self.expectation(description: "Request supplying basic authentication succeeds")
 
-        let request = RestRequest(url: "https://localhost:8443/ssl/basic/user/{id}", insecure: true)
+        let request = RestRequest(url: basicAuthUserURL, insecure: true)
         request.credentials = .basicAuthentication(username: "John", password: "12345")
 
         request.responseData(templateParams: ["id": "1"]) { result in
@@ -968,12 +993,12 @@ class SwiftyRequestTests: XCTestCase {
     func testBasicAuthenticationFails() {
         let expectation = self.expectation(description: "Request supplying invalid authentication fails")
 
-        let request = RestRequest(url: "https://localhost:8443/ssl/basic/user/{id}", insecure: true)
+        let request = RestRequest(url: basicAuthUserURL, insecure: true)
         request.credentials = .basicAuthentication(username: "Banana", password: "WrongPassword")
 
         request.responseData(templateParams: ["id": "1"]) { result in
             switch result {
-            case .success(let response):
+            case .success(_):
                 XCTFail("Authenticated request unexpectedly succeeded with bad credentials")
             case .failure(let error as RestError):
                 guard let response = error.response else {
@@ -990,32 +1015,20 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
-    struct JWTUser: Codable, Equatable {
-        let name: String
-
-        public static func ==(lhs: JWTUser, rhs: JWTUser) -> Bool {
-            return (lhs.name == rhs.name)
-        }
-    }
-
     func testTokenAuthentication() {
         let expectation = self.expectation(description: "Request supplying token authentication succeeds")
 
         // Request a JWT
         let jwtUser = JWTUser(name: "Dave")
-        let jwtRequest = RestRequest(method: .POST, url: "https://localhost:8443/ssl/jwt/generateJWT", insecure: true)
+        let jwtRequest = RestRequest(method: .POST, url: jwtGenerateURL, insecure: true)
         try! jwtRequest.setBodyObject(jwtUser)
 
-        jwtRequest.responseData { result in
+        jwtRequest.responseObject { (result: Result<RestResponse<AccessToken>, Error>) in
             switch result {
             case .success(let response):
-                guard let jwtString = String(data: response.body, encoding: .utf8) else {
-                    XCTFail("Failed to convert response body to JWT string")
-                    return expectation.fulfill()
-                }
-
+                let jwtString = response.body.accessToken
                 // Now supply the JWT as authentication
-                let request = RestRequest(method: .GET, url: "https://localhost:8443/ssl/jwt/user", insecure: true)
+                let request = RestRequest(method: .GET, url: jwtAuthUserURL, insecure: true)
                 request.credentials = .bearerAuthentication(token: jwtString)
                 request.responseObject { (result: Result<RestResponse<JWTUser>, Error>) in
                     switch result {
@@ -1023,19 +1036,12 @@ class SwiftyRequestTests: XCTestCase {
                         XCTAssertEqual(response.status, .ok)
                         XCTAssertEqual(response.body, jwtUser)
                     case .failure(let error):
-                        // TODO: Why is this failing with EventLoopError.shutdown ?
                         XCTFail("Authenticated request failed with error: \(error)")
-                        if let error = error as? RestError {
-                            XCTFail("Request produced response: \(error.response)")
-                        }
                     }
                     expectation.fulfill()
                 }
             case .failure(let error):
                 XCTFail("Request to generate JWT failed with error: \(error)")
-                if let error = error as? RestError {
-                    XCTFail("Request produced response: \(error.response)")
-                }
                 expectation.fulfill()
             }
         }
