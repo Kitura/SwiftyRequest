@@ -22,52 +22,52 @@ import AsyncHTTPClient
 public struct RestError: Error, CustomStringConvertible, Equatable {
     
     /// No data was returned from the network.
-    public static let noData = RestError(internalError: .noData, description: "No Data", response: nil)
+    public static let noData = RestError(internalError: .noData, _description: "No Data", response: nil)
     
     /// Data couldn't be parsed correctly.
-    public static let serializationError = RestError(internalError: .serializationError, description: "Serialization Error", response: nil)
+    public static let serializationError = RestError(internalError: .serializationError, _description: "Serialization Error", response: nil)
     
     /// Failure to encode data into a certain format.
-    public static let encodingError = RestError(internalError: .encodingError, description: "Encoding Error", response: nil)
+    public static let encodingError = RestError(internalError: .encodingError, _description: "Encoding Error", response: nil)
     
     /// Failure to encode data into a certain format.
-    public static let decodingError = RestError(internalError: .decodingError, description: "Decoding Error", response: nil)
+    public static let decodingError = RestError(internalError: .decodingError, _description: "Decoding Error", response: nil)
     
     /// Failure in file manipulation.
-    public static let fileManagerError = RestError(internalError: .fileManagerError, description: "File Manager Error", response: nil)
+    public static let fileManagerError = RestError(internalError: .fileManagerError, _description: "File Manager Error", response: nil)
     
     /// The file trying to be accessed is invalid.
-    public static let invalidFile = RestError(internalError: .invalidFile, description: "Invalid File", response: nil)
+    public static let invalidFile = RestError(internalError: .invalidFile, _description: "Invalid File", response: nil)
     
     /// The url substitution attempted could not be made.
-    public static let invalidSubstitution = RestError(internalError: .invalidSubstitution, description: "Invalid Data", response: nil)
+    public static let invalidSubstitution = RestError(internalError: .invalidSubstitution, _description: "Invalid Data", response: nil)
 
     /// The requested resource could not be downloaded.
-    public static let downloadError = RestError(internalError: .downloadError, description: "Failed to download file", response: nil)
+    public static let downloadError = RestError(internalError: .downloadError, _description: "Failed to download file", response: nil)
     
     /// The url provided was not valid.
     public static func invalidURL(description: String = "Invalid URL") -> RestError {
-        return RestError(internalError: .invalidURL, description: description, response: nil)
+        return RestError(internalError: .invalidURL, _description: description, response: nil)
     }
 
     /// No data was returned from the network.
     public static func noData(response: HTTPClient.Response) -> RestError {
-        return RestError(internalError: .noData, description: "No Data", response: response)
+        return RestError(internalError: .noData, _description: "No Data", response: response)
     } 
     
     /// No data was returned from the network.
     public static func decodingError(error: Error, response: HTTPClient.Response) -> RestError {
-        return RestError(internalError: .decodingError, description: "Decoding failed with error: \(error.localizedDescription)", response: response)
+        return RestError(internalError: .decodingError, _description: "Decoding failed with error: \(error.localizedDescription)", response: response)
     }
 
     /// Data couldn't be parsed correctly.
     public static func serializationError(response: HTTPClient.Response) -> RestError {
-        return RestError(internalError: .serializationError, description: "Serialization Error", response: response)
+        return RestError(internalError: .serializationError, _description: "Serialization Error", response: response)
     }
     
     /// Data couldn't be parsed correctly.
     public static func errorStatusCode(response: HTTPClient.Response) -> RestError {
-        return RestError(internalError: .errorStatusCode, description: "Got response with Status code outside of 200 range", response: response)
+        return RestError(internalError: .errorStatusCode, _description: "Got response with Status code outside of 200 range", response: response)
     }
     
     private let internalError: InternalError
@@ -75,9 +75,17 @@ public struct RestError: Error, CustomStringConvertible, Equatable {
     private enum InternalError {
         case noData, serializationError, encodingError, decodingError, fileManagerError, invalidFile, invalidSubstitution, downloadError, errorStatusCode, invalidURL
     }
-    
+
+    private let _description: String
+
     /// Error Description
-    public let description: String
+    public var description: String {
+        if let response = response {
+             return "\(_description) - status: \(response.status)"
+         } else {
+             return _description
+         }
+    }
     
     /// A human readable description of the error.
     public var localizedDescription: String {
