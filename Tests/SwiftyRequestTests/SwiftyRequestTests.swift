@@ -60,6 +60,8 @@ class SwiftyRequestTests: XCTestCase {
         ("testEchoData", testEchoData),
         ("testGetValidCert", testGetValidCert),
         ("testClientCertificate", testClientCertificate),
+        ("testClientCertificateFileUnencrypted", testClientCertificateFileUnencrypted),
+        ("testClientCertificateMissingPassphrase", testClientCertificateMissingPassphrase),
         ("testResponseData", testResponseData),
         ("testResponseObject", testResponseObject),
         ("testQueryObject", testQueryObject),
@@ -286,6 +288,57 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 20)
+    }
+
+    /// Test that we are unable to load a certificate and encrypted private key from a PEM file when
+    /// the required passphrase is not specified.
+    func testClientCertificateMissingPassphrase() {
+        // URL of Tests/SwiftyRequestTests directory
+        let testDirectoryURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
+        // File containing certificate and unencrypted private key
+        let relativePath = "Certificates/badssl.com-client.pem"
+        // Absolute file path of PEM file
+        let filePath = testDirectoryURL.appendingPathComponent(relativePath).path
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: filePath))
+        do {
+            // ClientCertificate will throw if the certificate and key cannot be extracted
+            // from the given file.
+            _ = try ClientCertificate(pemFile: filePath)
+            XCTFail("Expected ClientCertificate creation to fail, no passphrase provided")
+        } catch let error as NIOSSLError {
+            XCTAssertEqual(error, .failedToLoadPrivateKey)
+        } catch {
+            XCTFail("Error was \(error), expected NIOSSLError.failedToLoadPrivateKey")
+        }
+    }
+
+    /// Test that we are able to load a certificate and unencrypted private key from a PEM file.
+    /// No passphrase is supplied when creating the ClientCertificate.
+    /// Note that we do not test that we can make a request using this certificate, as we are
+    /// storing it locally and it could have expired.  We simply test that the key can be consumed
+    /// by NIOSSL.
+    func testClientCertificateFileUnencrypted() {
+        let expectation = self.expectation(description: "Successfully supplied Client Certificate")
+
+        // URL of Tests/SwiftyRequestTests directory
+        let testDirectoryURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
+        // File containing certificate and unencrypted private key
+        let relativePath = "Certificates/badssl.com-nopwd.pem"
+        // Absolute file path of PEM file
+        let filePath = testDirectoryURL.appendingPathComponent(relativePath).path
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: filePath))
+        do {
+            // ClientCertificate will throw if the certificate and key cannot be extracted
+            // from the given file.
+            _ = try ClientCertificate(pemFile: filePath)
+            expectation.fulfill()
+        } catch {
+            XCTFail("Error decoding PEM file: \(error)")
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 10)
     }
 
     func testResponseData() {
