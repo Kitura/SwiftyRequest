@@ -350,6 +350,14 @@ public class RestRequest {
         return HTTPClient(eventLoopGroupProvider: .createNew, configuration: config)
     }
 
+    /// Convenience function to encode an `Encodable` type as the request body, using a
+    /// default `JSONEncoder`.
+    /// - Parameter obj: The value to encode as JSON
+    /// - throws: If the value cannot be encoded.
+    public func setBodyObject<T: Encodable>(_ obj: T) throws {
+        self.messageBody = try JSONEncoder().encode(obj)
+    }
+
     // MARK: Response methods
     /// Request response method that either invokes `CircuitBreaker` or executes the HTTP request.
     ///

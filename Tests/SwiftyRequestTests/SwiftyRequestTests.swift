@@ -81,7 +81,10 @@ class SwiftyRequestTests: XCTestCase {
         ("testQueryTemplateParamsObject", testQueryTemplateParamsObject),
         ("testMultipleCookies",testMultipleCookies),
         ("testCookie",testCookie),
-        ("testNoCookies",testNoCookies)
+        ("testNoCookies",testNoCookies),
+        ("testBasicAuthentication", testBasicAuthentication),
+        ("testBasicAuthenticationFails", testBasicAuthenticationFails),
+        ("testTokenAuthentication", testTokenAuthentication),
     ]
 
     // Enable logging output for tests
@@ -935,6 +938,108 @@ class SwiftyRequestTests: XCTestCase {
  
         waitForExpectations(timeout: 10)
         
+    }
+
+    // Authentication tests
+
+    /// Tests that a request on a route that requires basic authentication succeeds when a valid username
+    /// and password are supplied.
+    func testBasicAuthentication() {
+        let expectation = self.expectation(description: "Request supplying basic authentication succeeds")
+
+        let request = RestRequest(url: "https://localhost:8443/ssl/basic/user/{id}", insecure: true)
+        request.credentials = .basicAuthentication(username: "John", password: "12345")
+
+        request.responseData(templateParams: ["id": "1"]) { result in
+            switch result {
+            case .success(let response):
+                XCTAssertEqual(response.status, .ok)
+            case .failure(let error):
+                XCTFail("Authenticated request failed with error: \(error)")
+            }
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 10)
+    }
+
+    /// Tests that a request on a route that requires basic authentication fails, when the supplied username
+    /// and password are invalid.
+    func testBasicAuthenticationFails() {
+        let expectation = self.expectation(description: "Request supplying invalid authentication fails")
+
+        let request = RestRequest(url: "https://localhost:8443/ssl/basic/user/{id}", insecure: true)
+        request.credentials = .basicAuthentication(username: "Banana", password: "WrongPassword")
+
+        request.responseData(templateParams: ["id": "1"]) { result in
+            switch result {
+            case .success(let response):
+                XCTFail("Authenticated request unexpectedly succeeded with bad credentials")
+            case .failure(let error as RestError):
+                guard let response = error.response else {
+                    XCTFail("No response returned in RestError")
+                    return expectation.fulfill()
+                }
+                XCTAssertEqual(response.status, .unauthorized)
+            case .failure(let error):
+                XCTFail("Unexpected error: \(error)")
+            }
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 10)
+    }
+
+    struct JWTUser: Codable, Equatable {
+        let name: String
+
+        public static func ==(lhs: JWTUser, rhs: JWTUser) -> Bool {
+            return (lhs.name == rhs.name)
+        }
+    }
+
+    func testTokenAuthentication() {
+        let expectation = self.expectation(description: "Request supplying token authentication succeeds")
+
+        // Request a JWT
+        let jwtUser = JWTUser(name: "Dave")
+        let jwtRequest = RestRequest(method: .POST, url: "https://localhost:8443/ssl/jwt/generateJWT", insecure: true)
+        try! jwtRequest.setBodyObject(jwtUser)
+
+        jwtRequest.responseData { result in
+            switch result {
+            case .success(let response):
+                guard let jwtString = String(data: response.body, encoding: .utf8) else {
+                    XCTFail("Failed to convert response body to JWT string")
+                    return expectation.fulfill()
+                }
+
+                // Now supply the JWT as authentication
+                let request = RestRequest(method: .GET, url: "https://localhost:8443/ssl/jwt/user", insecure: true)
+                request.credentials = .bearerAuthentication(token: jwtString)
+                request.responseObject { (result: Result<RestResponse<JWTUser>, Error>) in
+                    switch result {
+                    case .success(let response):
+                        XCTAssertEqual(response.status, .ok)
+                        XCTAssertEqual(response.body, jwtUser)
+                    case .failure(let error):
+                        // TODO: Why is this failing with EventLoopError.shutdown ?
+                        XCTFail("Authenticated request failed with error: \(error)")
+                        if let error = error as? RestError {
+                            XCTFail("Request produced response: \(error.response)")
+                        }
+                    }
+                    expectation.fulfill()
+                }
+            case .failure(let error):
+                XCTFail("Request to generate JWT failed with error: \(error)")
+                if let error = error as? RestError {
+                    XCTFail("Request produced response: \(error.response)")
+                }
+                expectation.fulfill()
+            }
+        }
+        waitForExpectations(timeout: 10)
     }
 
 }
