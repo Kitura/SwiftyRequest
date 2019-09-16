@@ -17,11 +17,6 @@ import Kitura
 import HeliumLogger
 import FileKit
 import Foundation
-#if swift(>=4.1)
-    #if canImport(FoundationNetworking)
-        import FoundationNetworking
-    #endif
-#endif
 
 // Enable logging
 HeliumLogger.use(.debug)

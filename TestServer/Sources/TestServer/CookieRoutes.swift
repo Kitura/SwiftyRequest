@@ -15,6 +15,11 @@
 */
 import Kitura
 import Foundation
+#if swift(>=4.1)
+    #if canImport(FoundationNetworking)
+        import FoundationNetworking
+    #endif
+#endif
 
 func cookieHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
     let number = request.parameters["number"].map { Int($0) ?? 0 } ?? 0
