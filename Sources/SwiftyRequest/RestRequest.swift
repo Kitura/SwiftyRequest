@@ -362,19 +362,19 @@ public class RestRequest {
 
     // MARK: Response methods
     /// Request response method that either invokes `CircuitBreaker` or executes the HTTP request.
+    /// Note: this is equivalent to `responseVoid(templateParams:queryItems:completionHandler:)`.
     ///
-    /// - Parameter completionHandler: Callback used on completion of operation.
-    public func response(completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
-        do {
-            let request = try self.mutableRequest.makeRequest()
-            response(request: request, completionHandler: completionHandler)
-        } catch {
-            return completionHandler(.failure(error))
-        }
-
+    /// - Parameters:
+    ///   - templateParams: URL templating parameters used for substituion if possible.
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
+    ///   - completionHandler: Callback used on completion of operation.
+    public func response(templateParams: [String: String]? = nil,
+                         queryItems: [URLQueryItem]? = nil,
+                         completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
+        responseVoid(templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
     
-    func response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
+    private func _response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
         if let breaker = circuitBreaker {
             breaker.run(commandArgs: (request, completionHandler), fallbackArgs: "Circuit is open")
         } else {
@@ -417,7 +417,7 @@ public class RestRequest {
             return completionHandler(.failure(error))
         }
 
-        response(request: request) { result in
+        _response(request: request) { result in
             switch result {
             case .failure(let error):
                 return completionHandler(.failure(error))
@@ -461,7 +461,7 @@ public class RestRequest {
             return completionHandler(.failure(error))
         }
 
-        response(request: request) { result in
+        _response(request: request) { result in
             switch result {
             case .failure(let error):
                 return completionHandler(.failure(error))
@@ -510,7 +510,7 @@ public class RestRequest {
             return completionHandler(.failure(error))
         }
 
-        response(request: request) { result in
+        _response(request: request) { result in
             switch result {
             case .failure(let error):
                 return completionHandler(.failure(error))
@@ -557,7 +557,7 @@ public class RestRequest {
             return completionHandler(.failure(error))
         }
 
-        response(request: request) { result in
+        _response(request: request) { result in
             switch result {
             case .failure(let error):
                 return completionHandler(.failure(error))
@@ -605,7 +605,7 @@ public class RestRequest {
             return completionHandler(.failure(error))
         }
 
-        response(request: request) { result in
+        _response(request: request) { result in
             switch result {
             case .failure(let error):
                 return completionHandler(.failure(error))
@@ -655,7 +655,7 @@ public class RestRequest {
             return completionHandler(.failure(error))
         }
 
-        response(request: request) { result in
+        _response(request: request) { result in
             switch result {
             case .failure(let error):
                 return completionHandler(.failure(error))
