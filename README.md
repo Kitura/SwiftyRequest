@@ -41,7 +41,9 @@
 
 ## Swift version
 
-This repository supports Swift 4.0.3 and later.
+The latest version of SwiftyRequest requires Swift 5 or later.
+
+Swift 4 support is available in the 2.x release of SwiftyRequest.
 
 ## Installation
 To leverage the `SwiftyRequest` package in your Swift application, you should specify a dependency for it in your `Package.swift` file:
@@ -69,8 +71,8 @@ Example usage of `RestRequest`:
 ```swift
 import SwiftyRequest
 
-let request = RestRequest(method: .get, url: "http://myApiCall/hello")
-request.credentials = .apiKey
+let request = RestRequest(method: .GET, url: "http://myApiCall/hello")
+request.credentials = .basicAuthentication(username: "John", password: "12345")
 ```
 
 You can customize the following parameters in the HTTP request:
@@ -81,17 +83,17 @@ You can customize the following parameters in the HTTP request:
 - `productInfo` : The HTTP `User-Agent` header.
 - `circuitParameters` : A `CircuitParameters` object which includes a reference to a fallback function that will be invoked when the circuit is failing fast (see [CircuitBreaker Integration](#circuitbreaker-integration)).
 - `contentType` : The HTTP `Content-Type header`, defaults to `application/json`.
-- `method` : The HTTP method specified in the request, defaults to `.get`.
-
+- `method` : The HTTP method specified in the request, defaults to `.GET`.
+- `queryItems`: Any query parameters to be appended to the URL.
 
 ### Invoke Response
-In this example, `responseToError` is simply an error handling function.
-The `response` object we get back is of type `RestResponse<String>` so we can perform a switch on the `response.result` to determine if the network call was successful.
+
+The `result` object we get back is of type `Result<RestResponse<String>, Error>` so we can perform a switch to determine if the network call was successful:
 
 ```swift
-request.responseString(responseToError: responseToError) { response in
-    switch response.result {
-    case .success(let result):
+request.responseString { result in
+    switch result {
+    case .success(let response):
         print("Success")
     case .failure(let error):
         print("Failure")
@@ -101,39 +103,39 @@ request.responseString(responseToError: responseToError) { response in
 
 ### Invoke Response with Template Parameters
 
-In this example, we invoke a response method with two template parameters to be used to replace the `{state}` and `{city}` values in the `url`. This allows us to create multiple response invocations with the same `RestRequest` object, but possibly using different url values.
+URLs can be templated with the `{keyName}` syntax, allowing a single `RestRequest` instance to be reused with different parameters.
+
+In this example, we invoke a response method with two template parameters to be used to replace the `{state}` and `{city}` values in the URL:
 
 ```swift
 let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/{state}/{city}.json")
-request.credentials = .apiKey
 
-request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { response in
+request.responseData(templateParams: ["state": "TX", "city": "Austin"]) { result in
 	// Handle response
 }
 ```
 
 ### Invoke Response with Query Parameters
 
-In this example, we invoke a response method with a query parameter to be appended onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`.  If there are query items already specified in the request URL they will be replaced.
+In this example, we invoke a response method with a query parameter to be appended onto the `url` behind the scenes so that the `RestRequest` gets executed with the following url: `http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9`.  Any query items already specified in the request URL will be replaced:
 
 ```swift
 let request = RestRequest(url: "http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json")
-request.credentials = .apiKey
 
-request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { response in
+request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { result in
 	// Handle response
 }
 ```
 
 ## CircuitBreaker Integration
 
-`SwiftyRequest` now has additional built-in functionality for leveraging the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library to increase your application's stability. To make use of this functionality, you just need to provide a `CircuitParameters` object to the `RestRequest` initializer. A `CircuitParameters` object will include a reference to a fallback function that will be invoked when the circuit is failing fast.
+`SwiftyRequest` has built-in functionality for leveraging the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library to increase your application's stability. To make use of this functionality, assign a `CircuitParameters` object to the `circuitParameters` property. This object will include a reference to a fallback function that will be invoked when the circuit is failing fast.
 
 ### Fallback
 Here is an example of a fallback closure:
 
 ```swift
-let fallback = { (error: BreakerError, msg: String) in
+let breakerFallback = { (error: BreakerError, msg: String) in
     print("Fallback closure invoked... circuit must be open.")
 }
 ```
@@ -144,24 +146,28 @@ We initialize the `CircuitParameters` object and create a `RestRequest` instance
 ```swift
 let circuitParameters = CircuitParameters(timeout: 2000,
                                           maxFailures: 2,
-                                          fallback: breakFallback)
+                                          fallback: breakerFallback)
 
-let request = RestRequest(method: .get, url: "http://myApiCall/hello")
-request.credentials = .apiKey,
+let request = RestRequest(method: .GET, url: "http://myApiCall/hello")
 request.circuitParameters = circuitParameters
 ```
 
 At this point, you can use any of the response methods mentioned in the section below.
 
 ## Response Methods
-There are various response methods you can use based on the result type you want, here they are:
 
-- `responseData` returns a `Data` object.
-- `responseObject<T: Codable>` returns a Codable object of type `T`.
-- `responseObject<T: JSONDecodable>` returns an object of type `T`.
-- `responseArray<T: JSONDecodable>` returns an array of type `T`.
-- `responseString` returns a `String`.
-- `responseVoid` returns `Void`.
+`RestRequest` provides a number of `response` functions that call back with a `Result` containing either a response or an error.
+
+To invoke the request and receive a response, you can use the `response` function. The completion handler will be called back with a result of type `Result<HTTPClient.Response, Error>`.
+
+RestRequest provides additional convenience methods you can use based on the type of the response body you expect:
+
+- `responseData` requires that the response contains a body, and calls back with a `Result<RestResponse<Data>, Error>`.
+- `responseObject<T: Decodable>` decodes the response body to the specified type, and calls back with a `Result<RestResponse<T>, Error>`.
+- `responseString` decodes the response body to a String, and calls back with a `Result<RestResponse<String>, Error>`.
+- `responseDictionary` decodes the response body as JSON, and calls back with a `Result<RestResponse<[String: Any]>, Error>`.
+- `responseArray` decodes the response body as a a JSON array, and calls back with a `Result<RestResponse<[Any]>, Error>`.
+- `responseVoid` does not expect a response body, and calls back with a `Result<HTTPClient.Response, Error>`.
 
 ## API documentation
 
