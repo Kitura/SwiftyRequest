@@ -80,9 +80,9 @@ class SwiftyRequestTests: XCTestCase {
         ("testClientCertificateFileUnencrypted", testClientCertificateFileUnencrypted),
         ("testClientCertificateMissingPassphrase", testClientCertificateMissingPassphrase),
         ("testResponseData", testResponseData),
-        ("testResponseObject", testResponseObject),
+        ("testResponseJSONDictionary", testResponseJSONDictionary),
         ("testQueryObject", testQueryObject),
-        ("testResponseArray", testResponseArray),
+        ("testResponseJSONArray", testResponseJSONArray),
         ("testResponseString", testResponseString),
         ("testResponseVoid", testResponseVoid),
         ("testFileDownload", testFileDownload),
@@ -126,7 +126,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let request = RestRequest(method: .GET, url: cookiesURL)
 
-        request.responseVoid(templateParams: ["numCookies": "2"]) { result in
+        request.response(templateParams: ["numCookies": "2"]) { result in
             switch result {
             case .success(let response):
                 let cookies = response.cookies.sorted{ $0.name < $1.name }
@@ -149,7 +149,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let request = RestRequest(method: .GET, url: cookiesURL)
 
-        request.responseVoid(templateParams: ["numCookies": "1"]) { result in
+        request.response(templateParams: ["numCookies": "1"]) { result in
             switch result {
             case .success(let response):
                 let cookies = response.cookies
@@ -172,7 +172,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let request = RestRequest(method: .GET, url: cookiesURL)
 
-        request.responseVoid(templateParams: ["numCookies": "0"]) { result in
+        request.response(templateParams: ["numCookies": "0"]) { result in
             switch result {
             case .success(let response):
                 let cookies = response.cookies
@@ -344,8 +344,6 @@ class SwiftyRequestTests: XCTestCase {
     /// storing it locally and it could have expired.  We simply test that the key can be consumed
     /// by NIOSSL.
     func testClientCertificateFileUnencrypted() {
-        let expectation = self.expectation(description: "Successfully supplied Client Certificate")
-
         // URL of Tests/SwiftyRequestTests directory
         let testDirectoryURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
         // File containing certificate and unencrypted private key
@@ -358,19 +356,16 @@ class SwiftyRequestTests: XCTestCase {
             // ClientCertificate will throw if the certificate and key cannot be extracted
             // from the given file.
             _ = try ClientCertificate(pemFile: filePath)
-            expectation.fulfill()
         } catch {
             XCTFail("Error decoding PEM file: \(error)")
-            expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
     }
 
     // MARK: SwiftyRequest Response tests
 
     // Tests that Data can successfully be received.
     func testResponseData() {
-        let expectation = self.expectation(description: "responseData SwiftyRequest test")
+        let expectation = self.expectation(description: "Data can be received")
 
         let request = RestRequest(url: jsonURL, insecure: true)
 
@@ -388,9 +383,9 @@ class SwiftyRequestTests: XCTestCase {
 
     }
 
-    // Tests that a JSONDecodable response can be received
-    func testResponseObject() {
-        let expectation = self.expectation(description: "responseObject SwiftyRequest test")
+    // Tests that a JSON response can be received and decoded to a [String:Any] dictionary.
+    func testResponseJSONDictionary() {
+        let expectation = self.expectation(description: "JSON can be received and decoded into a [String:Any] dictionary")
 
         let request = RestRequest(url: jsonURL, insecure: true)
         request.acceptType = "application/json"
@@ -436,7 +431,7 @@ class SwiftyRequestTests: XCTestCase {
 
     // Tests that a Codable object can be received.
     func testDecodableResponseObject() {
-        let expectation = self.expectation(description: "responseObject SwiftyRequest test")
+        let expectation = self.expectation(description: "JSON can be received and decoded into a Struct")
 
         let request = RestRequest(url: jsonURL, insecure: true)
         request.acceptType = "application/json"
@@ -454,9 +449,9 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
-    // Test that an array of JSONDecodable responses can be received.
-    func testResponseArray() {
-        let expectation = self.expectation(description: "responseArray SwiftyRequest test")
+    // Test that a JSON response can be received and decoded into an [Any].
+    func testResponseJSONArray() {
+        let expectation = self.expectation(description: "JSON can be received and decoded into an [Any]")
 
         let request = RestRequest(url: jsonArrayURL, insecure: true)
 
