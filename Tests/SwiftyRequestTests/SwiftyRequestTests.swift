@@ -102,6 +102,7 @@ class SwiftyRequestTests: XCTestCase {
         ("testBasicAuthentication", testBasicAuthentication),
         ("testBasicAuthenticationFails", testBasicAuthenticationFails),
         ("testTokenAuthentication", testTokenAuthentication),
+        ("testHeaders", testHeaders),
     ]
 
     // Enable logging output for tests
@@ -1039,6 +1040,42 @@ class SwiftyRequestTests: XCTestCase {
             }
         }
         waitForExpectations(timeout: 10)
+    }
+
+    // MARK: Headers tests
+
+    // Tests that the mapping of SwiftyRequest's [String:String] API for supplying headers
+    // to HTTPClient's HTTPHeaders functions correctly.
+    // While HTTPHeaders can support multiple values for the same header, SwiftyRequest's
+    // API does not. This decision was taken to preserve the existing headers API from the
+    // previous version of SwiftyRequest.
+    func testHeaders() {
+        // Dummy request to test translation of header dictionaries into HTTPHeaders
+        let request = RestRequest(url: "http://foo.xyz/")
+        // Headers that are set by default
+        let defaultHeaders = ["Accept": "application/json", "Content-Type": "application/json"]
+        // Headers that we want to add
+        let userHeaders = ["a": "A", "b": "B"]
+
+        // Tells Dictionary.merging to overwrite existing keys with the new ones
+        let overwriteExisting: (String, String) -> String = { (_, last) in last }
+
+        // Test that headers can be added
+        request.headerParameters = userHeaders
+        var expectedHeaders = defaultHeaders.merging(userHeaders, uniquingKeysWith: overwriteExisting)
+        XCTAssertEqual(request.headerParameters, expectedHeaders)
+
+        // Test that additional headers can be added
+        let additionalHeaders = ["c": "C"]
+        request.headerParameters = additionalHeaders
+        expectedHeaders = expectedHeaders.merging(additionalHeaders, uniquingKeysWith: overwriteExisting)
+        XCTAssertEqual(request.headerParameters, expectedHeaders)
+
+        // Test that an existing header can be replaced
+        let replacementHeaders = ["a": "Banana"]
+        request.headerParameters = replacementHeaders
+        expectedHeaders = expectedHeaders.merging(replacementHeaders, uniquingKeysWith: overwriteExisting)
+        XCTAssertEqual(request.headerParameters, expectedHeaders)
     }
 
 }

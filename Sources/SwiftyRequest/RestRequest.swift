@@ -202,14 +202,21 @@ public class RestRequest {
     /// ### Usage Example: ###
     ///
     /// ```swift
-    /// request.headerParameters = HTTPHeaders([("Cookie", "v1")])
+    /// request.headerParameters = ["Cookie": "v1"]
     /// ```
-    public var headerParameters: HTTPHeaders {
+    public var headerParameters: [String: String] {
         get {
-            return mutableRequest.headers
+            var dict: [String: String] = [:]
+            for (name, value) in mutableRequest.headers {
+                assert(dict[name] == nil, "Header '\(name)' was already set")
+                dict[name] = value
+            }
+            return dict
         }
         set {
-            mutableRequest.headers.add(contentsOf: newValue)
+            for (name, value) in newValue {
+                mutableRequest.headers.replaceOrAdd(name: name, value: value)
+            }
         }
     }
 
