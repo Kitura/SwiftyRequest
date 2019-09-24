@@ -61,11 +61,11 @@ fileprivate class MutableRequest {
             // Must encode "+" to %2B (URLComponents does not do this)
             urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
             guard let url = urlComponents.url else {
-                throw RestError.invalidURL(description: "'\(urlComponents)' is not a valid URL")
+                throw RestError.invalidURL(urlComponents.description)
             }
             return url
         } else {
-            throw RestError.invalidURL(description: "URLComponents cannot resolve '\(url)'")
+            throw RestError.invalidURL(url.description)
         }
     }
 
@@ -79,7 +79,7 @@ fileprivate class MutableRequest {
         guard let params = params, urlString.contains("{") else {
             // No parameters provided, or no parameters required - create a plain URL
             guard let simpleURL = URL(string: self.urlString) else {
-                throw RestError.invalidURL(description: "'\(urlString)' is not a valid URL")
+                throw RestError.invalidURL(urlString)
             }
             return simpleURL
         }
@@ -109,7 +109,7 @@ public class RestRequest {
 
     /// The currently configured `CircuitBreaker` instance for this `RestRequest`. In order to create a
     /// `CircuitBreaker` you should set the `circuitParameters` property.
-    internal(set) public var circuitBreaker: CircuitBreaker<(HTTPClient.Request, (Result<HTTPClient.Response, Error>) -> Void), String>?
+    internal(set) public var circuitBreaker: CircuitBreaker<(HTTPClient.Request, (Result<HTTPClient.Response, RestError>) -> Void), String>?
 
     /// Parameters for a `CircuitBreaker` instance.
     /// When these parameters are set, a new `circuitBreaker` instance is created.
@@ -137,14 +137,18 @@ public class RestRequest {
                     command: { [weak self] invocation in
                         let request = invocation.commandArgs.0
                         self?.session.execute(request: request).whenComplete { result in
+                            let callback = invocation.commandArgs.1
                             switch result {
+                            case .failure(let error as HTTPClientError):
+                                invocation.notifyFailure(error: BreakerError(reason: error.localizedDescription))
+                                callback(Result<HTTPClient.Response, RestError>.failure(.httpClientError(error)))
                             case .failure(let error):
                                 invocation.notifyFailure(error: BreakerError(reason: error.localizedDescription))
-                            case .success(_):
+                                callback(Result<HTTPClient.Response, RestError>.failure(.otherError(error)))
+                            case .success(let success):
                                 invocation.notifySuccess()
+                                callback(Result<HTTPClient.Response, RestError>.success(success))
                             }
-                            let callback = invocation.commandArgs.1
-                            callback(result)
                         }
                     },
                     fallback: params.fallback)
@@ -370,11 +374,11 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func response(templateParams: [String: String]? = nil,
                          queryItems: [URLQueryItem]? = nil,
-                         completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
+                         completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
         responseVoid(templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
     
-    private func _response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
+    private func _response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
         if let breaker = circuitBreaker {
             breaker.run(commandArgs: (request, completionHandler), fallbackArgs: "Circuit is open")
         } else {
@@ -386,8 +390,10 @@ public class RestRequest {
                     } else {
                         return completionHandler(.failure(RestError.errorStatusCode(response: response)))
                     }
+                case .failure(let error as HTTPClientError):
+                    return completionHandler(.failure(.httpClientError(error)))
                 case .failure(let error):
-                    return completionHandler(.failure(error))
+                    return completionHandler(.failure(.otherError(error)))
                 }
             }
         }
@@ -401,7 +407,7 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseData(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
-                             completionHandler: @escaping (Result<RestResponse<Data>, Error>) -> Void) {
+                             completionHandler: @escaping (Result<RestResponse<Data>, RestError>) -> Void) {
 
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
@@ -413,8 +419,10 @@ public class RestRequest {
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest(substitutions: templateParams)
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         _response(request: request) { result in
@@ -445,7 +453,7 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseObject<T: Decodable>(templateParams: [String: String]? = nil,
                                              queryItems: [URLQueryItem]? = nil,
-                                             completionHandler: @escaping (Result<RestResponse<T>, Error>) -> Void) {
+                                             completionHandler: @escaping (Result<RestResponse<T>, RestError>) -> Void) {
 
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
@@ -457,8 +465,10 @@ public class RestRequest {
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest(substitutions: templateParams)
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         _response(request: request) { result in
@@ -494,7 +504,7 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseArray(templateParams: [String: String]? = nil,
                               queryItems: [URLQueryItem]? = nil,
-                              completionHandler: @escaping (Result<RestResponse<[Any]>, Error>) -> Void) {
+                              completionHandler: @escaping (Result<RestResponse<[Any]>, RestError>) -> Void) {
         
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
@@ -506,8 +516,10 @@ public class RestRequest {
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest(substitutions: templateParams)
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         _response(request: request) { result in
@@ -541,7 +553,7 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseDictionary(templateParams: [String: String]? = nil,
                               queryItems: [URLQueryItem]? = nil,
-                              completionHandler: @escaping (Result<RestResponse<[String: Any]>, Error>) -> Void) {
+                              completionHandler: @escaping (Result<RestResponse<[String: Any]>, RestError>) -> Void) {
         
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
@@ -553,8 +565,10 @@ public class RestRequest {
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest(substitutions: templateParams)
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         _response(request: request) { result in
@@ -589,7 +603,7 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseString(templateParams: [String: String]? = nil,
                                queryItems: [URLQueryItem]? = nil,
-                               completionHandler: @escaping (Result<RestResponse<String>, Error>) -> Void) {
+                               completionHandler: @escaping (Result<RestResponse<String>, RestError>) -> Void) {
         
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
@@ -601,8 +615,10 @@ public class RestRequest {
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest(substitutions: templateParams)
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         _response(request: request) { result in
@@ -639,7 +655,7 @@ public class RestRequest {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseVoid(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
-                             completionHandler: @escaping (Result<HTTPClient.Response, Error>) -> Void) {
+                             completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
         
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
@@ -651,8 +667,10 @@ public class RestRequest {
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest(substitutions: templateParams)
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         _response(request: request) { result in
@@ -737,19 +755,28 @@ public class RestRequest {
     /// - Parameters:
     ///   - destination: URL destination to save the file to.
     ///   - completionHandler: Callback used on completion of the operation.
-    public func download(to destination: URL, completionHandler: @escaping (Result<HTTPResponseHead, Error>) -> Void) {
+    public func download(to destination: URL, completionHandler: @escaping (Result<HTTPResponseHead, RestError>) -> Void) {
         let delegate = DownloadDelegate(destination: destination)
 
         // Create an (immutable) Request from our MutableRequest
         var request: HTTPClient.Request
         do {
             request = try self.mutableRequest.makeRequest()
-        } catch {
+        } catch let error as RestError {
             return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
         }
 
         session.execute(request: request, delegate: delegate).futureResult.whenComplete({ result in
-            completionHandler(result)
+            switch result {
+            case .success(let response):
+                completionHandler(.success(response))
+            case .failure(let error as HTTPClientError):
+                completionHandler(.failure(.httpClientError(error)))
+            case .failure(let error):
+                completionHandler(.failure(.otherError(error)))
+            }
         })
     }
 
@@ -775,59 +802,4 @@ public class RestRequest {
     }
 }
 
-/// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` initializer.
-/// `A` is the type of the fallback's parameter.  See the CircuitBreaker documentation for a full explanation
-/// of these parameters.
-public struct CircuitParameters<A> {
 
-    /// The circuit name: defaults to "circuitName".
-    let name: String
-
-    /// The circuit timeout in milliseconds: defaults to 2000.
-    public let timeout: Int
-
-    /// The circuit timeout in milliseconds: defaults to 60000.
-    public let resetTimeout: Int
-
-    /// Max failures allowed: defaults to 5.
-    public let maxFailures: Int
-
-    /// Rolling Window in milliseconds: defaults to 10000.
-    public let rollingWindow:Int
-
-    /// Bulkhead: defaults to 0.
-    public let bulkhead: Int
-
-    /// The error fallback callback.
-    public let fallback: (BreakerError, A) -> Void
-
-    /// Initialize a `CircuitParameters` instance.
-    public init(name: String = "circuitName", timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
-        self.name = name
-        self.timeout = timeout
-        self.resetTimeout = resetTimeout
-        self.maxFailures = maxFailures
-        self.rollingWindow = rollingWindow
-        self.bulkhead = bulkhead
-        self.fallback = fallback
-    }
-}
-
-/// Struct used to specify the type of authentication being used.
-public struct Credentials {
-    
-    let authheader: String
-
-    /// Note: The bearer token should be base64 encoded.
-    public static func bearerAuthentication(token: String) -> Credentials {
-        return Credentials(authheader: "Bearer \(token)")
-    }
-    
-
-    /// A basic username/password authentication is being used with the values passed in.
-    public static func basicAuthentication(username: String, password: String) -> Credentials {
-        let authData = Data((username + ":" + password).utf8)
-        let authString = authData.base64EncodedString()
-        return Credentials(authheader: "Basic \(authString)")
-    }
-}

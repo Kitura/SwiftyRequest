@@ -413,7 +413,7 @@ class SwiftyRequestTests: XCTestCase {
         
         let queryItems = [URLQueryItem(name: "friend", value: "brian"), URLQueryItem(name: "friend", value: "george"), URLQueryItem(name: "friend", value: "melissa+tempe"), URLQueryItem(name: "friend", value: "mika")]
         
-        let completionHandler = { (response: Result<RestResponse<FriendData>, Error>) in
+        let completionHandler = { (response: Result<RestResponse<FriendData>, RestError>) in
             switch response {
             case .success(let retval):
                 XCTAssertEqual(retval.body.friends.count, 4)
@@ -436,7 +436,7 @@ class SwiftyRequestTests: XCTestCase {
         let request = RestRequest(url: jsonURL, insecure: true)
         request.acceptType = "application/json"
 
-        request.responseObject() { (response: Result<RestResponse<TestData>, Error>) in
+        request.responseObject() { (response: Result<RestResponse<TestData>, RestError>) in
             switch response {
             case .success(let retval):
                 XCTAssertEqual(retval.body.name, "Paddington")
@@ -620,7 +620,7 @@ class SwiftyRequestTests: XCTestCase {
 
         request.circuitParameters = circuitParameters
 
-        let completionHandler = { (response: (Result<RestResponse<String>, Error>)) in
+        let completionHandler = { (response: (Result<RestResponse<String>, RestError>)) in
 
             if fallbackCalled {
                 expectation.fulfill()
@@ -657,18 +657,18 @@ class SwiftyRequestTests: XCTestCase {
         let request = RestRequest(url: templatedJsonURL, insecure: true)
         request.circuitParameters = circuitParameters
 
-        let completionHandlerThree = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerThree = { (response: (Result<RestResponse<Data>, RestError>)) in
 
             switch response {
             case .success(_):
                 XCTFail("Request should have failed with only using one parameter for 2 template spots.")
             case .failure(let error):
-                XCTAssertEqual(error as? RestError, RestError.invalidSubstitution)
+                XCTAssertEqual(error, RestError.invalidSubstitution)
             }
             expectation.fulfill()
         }
 
-        let completionHandlerTwo = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerTwo = { (response: (Result<RestResponse<Data>, RestError>)) in
 
             switch response {
             case .success(let result):
@@ -684,7 +684,7 @@ class SwiftyRequestTests: XCTestCase {
             }
         }
 
-        let completionHandlerOne = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerOne = { (response: (Result<RestResponse<Data>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertGreaterThan(result.body.count, 0)
@@ -725,7 +725,7 @@ class SwiftyRequestTests: XCTestCase {
             case .success(_):
                 XCTFail("Request should have failed with no parameters passed into a templated URL")
             case .failure(let error):
-                XCTAssertEqual(error as? RestError, RestError.invalidURL())
+                XCTAssertEqual(error, RestError.invalidURL)
             }
             expectation.fulfill()
         }
@@ -768,7 +768,7 @@ class SwiftyRequestTests: XCTestCase {
         request.circuitParameters = circuitParameters
 
         // verify query has many parameters
-        let completionHandlerFour = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerFour = { (response: (Result<RestResponse<Data>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertGreaterThan(result.body.count, 0)
@@ -783,7 +783,7 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         // verify query was set to nil
-        let completionHandlerThree = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerThree = { (response: (Result<RestResponse<Data>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertGreaterThan(result.body.count, 0)
@@ -797,7 +797,7 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         // verify query value changed and was encoded properly
-        let completionHandlerTwo = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerTwo = { (response: (Result<RestResponse<Data>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertGreaterThan(result.body.count, 0)
@@ -815,7 +815,7 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         // verfiy query value could be set
-        let completionHandlerOne = { (response: (Result<RestResponse<Data>, Error>)) in
+        let completionHandlerOne = { (response: (Result<RestResponse<Data>, RestError>)) in
             switch response {
             case .success(let retVal):
                 XCTAssertGreaterThan(retVal.body.count, 0)
@@ -851,7 +851,7 @@ class SwiftyRequestTests: XCTestCase {
         request.circuitParameters = circuitParameters
         
         // verify query has many parameters
-        let completionHandlerFour = { (response: (Result<RestResponse<FriendData>, Error>)) in
+        let completionHandlerFour = { (response: (Result<RestResponse<FriendData>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertEqual(result.body.friends.count, 4)
@@ -862,7 +862,7 @@ class SwiftyRequestTests: XCTestCase {
         }
         
         // verify query was set to nil
-        let completionHandlerThree = { (response: (Result<RestResponse<FriendData>, Error>)) in
+        let completionHandlerThree = { (response: (Result<RestResponse<FriendData>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertEqual(result.body.friends.count, 0)
@@ -875,7 +875,7 @@ class SwiftyRequestTests: XCTestCase {
         }
         
         // verify query value changed and was encoded properly
-        let completionHandlerTwo = { (response: (Result<RestResponse<FriendData>, Error>)) in
+        let completionHandlerTwo = { (response: (Result<RestResponse<FriendData>, RestError>)) in
             switch response {
             case .success(let result):
                 XCTAssertEqual(result.body.friends.count, 1)
@@ -889,7 +889,7 @@ class SwiftyRequestTests: XCTestCase {
         }
         
         // verfiy query value could be set
-        let completionHandlerOne = { (response: (Result<RestResponse<FriendData>, Error>)) in
+        let completionHandlerOne = { (response: (Result<RestResponse<FriendData>, RestError>)) in
             switch response {
             case .success(let retVal):
                 XCTAssertEqual(retVal.body.friends.count, 1)
@@ -944,7 +944,7 @@ class SwiftyRequestTests: XCTestCase {
         
         let queryItems = [URLQueryItem(name: "friend", value: "bill")]
         
-        let completionHandler = { (response: (Result<RestResponse<TestData>, Error>)) in
+        let completionHandler = { (response: (Result<RestResponse<TestData>, RestError>)) in
             switch response {
             case .success(let retVal):
                 XCTAssertEqual(retVal.body.name, "Bananaman")
@@ -995,14 +995,12 @@ class SwiftyRequestTests: XCTestCase {
             switch result {
             case .success(_):
                 XCTFail("Authenticated request unexpectedly succeeded with bad credentials")
-            case .failure(let error as RestError):
+            case .failure(let error):
                 guard let response = error.response else {
                     XCTFail("No response returned in RestError")
                     return expectation.fulfill()
                 }
                 XCTAssertEqual(response.status, .unauthorized)
-            case .failure(let error):
-                XCTFail("Unexpected error: \(error)")
             }
             expectation.fulfill()
         }
@@ -1018,14 +1016,14 @@ class SwiftyRequestTests: XCTestCase {
         let jwtRequest = RestRequest(method: .POST, url: jwtGenerateURL, insecure: true)
         try! jwtRequest.setBodyObject(jwtUser)
 
-        jwtRequest.responseObject { (result: Result<RestResponse<AccessToken>, Error>) in
+        jwtRequest.responseObject { (result: Result<RestResponse<AccessToken>, RestError>) in
             switch result {
             case .success(let response):
                 let jwtString = response.body.accessToken
                 // Now supply the JWT as authentication
                 let request = RestRequest(method: .GET, url: jwtAuthUserURL, insecure: true)
                 request.credentials = .bearerAuthentication(token: jwtString)
-                request.responseObject { (result: Result<RestResponse<JWTUser>, Error>) in
+                request.responseObject { (result: Result<RestResponse<JWTUser>, RestError>) in
                     switch result {
                     case .success(let response):
                         XCTAssertEqual(response.status, .ok)
