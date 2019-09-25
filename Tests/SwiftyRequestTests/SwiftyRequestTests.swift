@@ -125,7 +125,7 @@ class SwiftyRequestTests: XCTestCase {
     func testMultipleCookies() {
         let expectation = self.expectation(description: "Test multiple cookies are received")
 
-        let request = RestRequest(method: .GET, url: cookiesURL)
+        let request = RestRequest(method: .get, url: cookiesURL)
 
         request.response(templateParams: ["numCookies": "2"]) { result in
             switch result {
@@ -148,7 +148,7 @@ class SwiftyRequestTests: XCTestCase {
     func testCookie() {
         let expectation = self.expectation(description: "Test a single cookie is received")
 
-        let request = RestRequest(method: .GET, url: cookiesURL)
+        let request = RestRequest(method: .get, url: cookiesURL)
 
         request.response(templateParams: ["numCookies": "1"]) { result in
             switch result {
@@ -171,7 +171,7 @@ class SwiftyRequestTests: XCTestCase {
     func testNoCookies() {
         let expectation = self.expectation(description: "Test no cookies are received")
 
-        let request = RestRequest(method: .GET, url: cookiesURL)
+        let request = RestRequest(method: .get, url: cookiesURL)
 
         request.response(templateParams: ["numCookies": "0"]) { result in
             switch result {
@@ -192,7 +192,7 @@ class SwiftyRequestTests: XCTestCase {
     func testInsecureConnection() {
         let expectation = self.expectation(description: "Insecure Connection test")
         
-        let request = RestRequest(method: .GET, url: insecureUrl)
+        let request = RestRequest(method: .get, url: insecureUrl)
         
         request.response { result in
             switch result {
@@ -216,7 +216,7 @@ class SwiftyRequestTests: XCTestCase {
             return
         }
 
-        let request = RestRequest(method: .POST, url: echoURL)
+        let request = RestRequest(method: .post, url: echoURL)
         request.contentType = "application/json"
         request.acceptType = "application/json"
         request.messageBody = data
@@ -244,7 +244,7 @@ class SwiftyRequestTests: XCTestCase {
     func testGetValidCert() {
         let expectation = self.expectation(description: "Connection successful")
 
-        let request = RestRequest(method: .GET, url: sslValidCertificateURL)
+        let request = RestRequest(method: .get, url: sslValidCertificateURL)
 
         request.responseData { response in
             switch response {
@@ -281,7 +281,7 @@ class SwiftyRequestTests: XCTestCase {
         let privateKeyPassword = "badssl.com"
 
         // Download client certificate from badssl.com
-        let pemRequest = RestRequest(method: .GET, url: certificateURL)
+        let pemRequest = RestRequest(method: .get, url: certificateURL)
 
         pemRequest.responseData { result in
             switch result {
@@ -292,7 +292,7 @@ class SwiftyRequestTests: XCTestCase {
                     let certificate = try ClientCertificate(pemData: pemData, passphrase: privateKeyPassword)
 
                     // Make request to badssl.com that expects the client certificate to be supplied
-                    let request = RestRequest(method: .GET, url: clientURL, clientCertificate: certificate)
+                    let request = RestRequest(method: .get, url: clientURL, clientCertificate: certificate)
 
                     request.responseString { result in
                         switch result {
@@ -1014,7 +1014,7 @@ class SwiftyRequestTests: XCTestCase {
 
         // Request a JWT
         let jwtUser = JWTUser(name: "Dave")
-        let jwtRequest = RestRequest(method: .POST, url: jwtGenerateURL, insecure: true)
+        let jwtRequest = RestRequest(method: .post, url: jwtGenerateURL, insecure: true)
         try! jwtRequest.setBodyObject(jwtUser)
 
         jwtRequest.responseObject { (result: Result<RestResponse<AccessToken>, RestError>) in
@@ -1022,7 +1022,7 @@ class SwiftyRequestTests: XCTestCase {
             case .success(let response):
                 let jwtString = response.body.accessToken
                 // Now supply the JWT as authentication
-                let request = RestRequest(method: .GET, url: jwtAuthUserURL, insecure: true)
+                let request = RestRequest(method: .get, url: jwtAuthUserURL, insecure: true)
                 request.credentials = .bearerAuthentication(token: jwtString)
                 request.responseObject { (result: Result<RestResponse<JWTUser>, RestError>) in
                     switch result {

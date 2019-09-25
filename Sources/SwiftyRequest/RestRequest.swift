@@ -26,7 +26,7 @@ fileprivate let globalELG = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
 fileprivate class MutableRequest {
     /// Request HTTP method
-    var method: HTTPMethod
+    var method: NIOHTTP1.HTTPMethod
     /// Remote URL. May contain templated parameters
     var urlString: String
     /// Request custom HTTP Headers, defaults to no headers.
@@ -36,8 +36,8 @@ fileprivate class MutableRequest {
     /// Query items that will be added to the request URL.
     var queryItems: [URLQueryItem]?
 
-    init(method: HTTPMethod = .GET, url: String) {
-        self.method = method
+    init(method: HTTPMethod = .get, url: String) {
+        self.method = method.httpClientMethod
         self.urlString = url
         self.headers = HTTPHeaders()
         self.body = nil
@@ -166,10 +166,10 @@ public class RestRequest {
     /// ```
     public var method: HTTPMethod {
         get {
-            return mutableRequest.method
+            return HTTPMethod(mutableRequest.method)
         }
         set {
-            mutableRequest.method = newValue
+            mutableRequest.method = newValue.httpClientMethod
         }
     }
 
@@ -336,7 +336,7 @@ public class RestRequest {
     ///   - url: URL string to use for the network request.
     ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
     ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
-    public init(method: HTTPMethod = .GET, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil) {
+    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil) {
         self.mutableRequest = MutableRequest(method: method, url: url)
         self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate)
 
