@@ -322,7 +322,11 @@ public class RestRequest {
             return mutableRequest.queryItems
         }
     }
-    
+
+    @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:)")
+    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
+        self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate)
+    }
 
     /// Initialize a `RestRequest` instance.
     ///
