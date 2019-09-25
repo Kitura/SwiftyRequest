@@ -17,9 +17,10 @@
 import NIO
 import NIOHTTP1
 import AsyncHTTPClient
+import Foundation
 
 /// Enum describing error types that can occur during a rest request and response.
-public struct RestError: Error, CustomStringConvertible, Equatable {
+public struct RestError: Error {
     
     /// No data was returned from the network.
     public static let noData = RestError(.noData, description: "No Data")
@@ -100,22 +101,6 @@ public struct RestError: Error, CustomStringConvertible, Equatable {
 
     private let _description: String
 
-    /// Error Description
-    public var description: String {
-        if let response = response {
-             return "\(_description) - status: \(response.status)"
-        }
-        if let error = error {
-            return "\(_description) - underlying error: \(error)"
-        }
-        return _description
-    }
-    
-    /// A human readable description of the error.
-    public var localizedDescription: String {
-        return description
-    }
-    
     /// The HTTP response that caused the error.
     public let response: HTTPClient.Response?
 
@@ -129,11 +114,40 @@ public struct RestError: Error, CustomStringConvertible, Equatable {
         self.error = error
     }
 
+    /// The data returned in response to an unsuccessful request, or `nil` if the response had no body,
+    /// or if this error does not pertain to a response.
+    public var responseData: Data? {
+        if let body = response?.body, let bytes = body.getBytes(at: 0, length: body.readableBytes) {
+            return Data(bytes)
+        }
+        return nil
+    }
+}
+
+extension RestError: CustomStringConvertible {
+    /// A human readable description of the error.
+    public var description: String {
+        if let response = response {
+             return "\(_description) - status: \(response.status)"
+        }
+        if let error = error {
+            return "\(_description) - underlying error: \(error)"
+        }
+        return _description
+    }
+
+    /// A human readable description of the error.
+    public var localizedDescription: String {
+        return description
+    }
+}
+
+extension RestError: Equatable {
     /// Function to check if two RestError instances are equal. Required for Equatable protocol.
     public static func == (lhs: RestError, rhs: RestError) -> Bool {
         return lhs.internalError == rhs.internalError
     }
-    
+
     /// Function to enable pattern matching against generic Errors.
     public static func ~= (lhs: RestError, rhs: Error) -> Bool {
         guard let rhs = rhs as? RestError else {
