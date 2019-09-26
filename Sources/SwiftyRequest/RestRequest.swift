@@ -727,7 +727,7 @@ public class RestRequest {
         func didReceiveHead(task: HTTPClient.Task<Response>, _ head: HTTPResponseHead) -> EventLoopFuture<Void> {
             // this is executed when we receive HTTP Reponse head part of the request (it contains response code and headers), called once
             self.responseHead = head
-            return task.currentEventLoop.makeSucceededFuture(())
+            return task.eventLoop.makeSucceededFuture(())
         }
         
         func didReceivePart(task: HTTPClient.Task<Response>, _ buffer: ByteBuffer) -> EventLoopFuture<Void> {
@@ -740,7 +740,7 @@ public class RestRequest {
             } catch {
                 self.error = error
             }
-            return task.currentEventLoop.makeSucceededFuture(())
+            return task.eventLoop.makeSucceededFuture(())
         }
         
         func didFinishRequest(task: HTTPClient.Task<HTTPResponseHead>) throws -> HTTPResponseHead {
