@@ -304,6 +304,48 @@ public class RestRequest {
         }
     }
 
+    /// The HTTP message body, i.e. the body of the request, as a JSON dictionary.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// let dict: [String:Any] = ["key": "value"]
+    /// request.messageBodyDictionary = dict
+    /// ``
+    public var messageBodyDictionary: [String: Any]? {
+        get {
+            guard let data = _messageBody else { return nil }
+            return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        }
+        set {
+            if let data = try? JSONSerialization.data(withJSONObject: newValue as Any) {
+                messageBody = data
+            } else {
+                messageBody = nil
+            }
+        }
+    }
+
+    /// The HTTP message body, i.e. the body of the request, as a JSON array.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// let json: [Any] = ["value1", "value2"]
+    /// request.messageBodyArray = json
+    /// ``
+    public var messageBodyArray: [Any]? {
+        get {
+            guard let data = _messageBody else { return nil }
+            return try? JSONSerialization.jsonObject(with: data) as? [Any]
+        }
+        set {
+            if let data = try? JSONSerialization.data(withJSONObject: newValue as Any) {
+                messageBody = data
+            } else {
+                messageBody = nil
+            }
+        }
+    }
+
     /// The HTTP query items to specify in the request URL. If there are query items already specified in the request URL they
     /// will be replaced.
     ///

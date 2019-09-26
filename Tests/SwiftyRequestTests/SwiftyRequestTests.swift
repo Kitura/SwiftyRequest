@@ -21,6 +21,7 @@ import NIOSSL
 /// trusting self-signed certificates. An example of how to do this can be
 /// found under linux/before_tests.sh
 let echoURL = "http://localhost:8080/echoJSON"
+let echoArrayURL = "http://localhost:8080/echoJSONArray"
 let echoURLSecure = "https://localhost:8443/ssl/echoJSON"
 let jsonURL = "https://localhost:8443/ssl/json"
 let jsonArrayURL = "https://localhost:8443/ssl/jsonArray"
@@ -74,7 +75,8 @@ class SwiftyRequestTests: XCTestCase {
 
     static var allTests = [
         ("testInsecureConnection", testInsecureConnection),
-        ("testEchoData", testEchoData),
+        ("testEchoDictionary", testEchoDictionary),
+        ("testEchoArray", testEchoArray),
         ("testGetValidCert", testGetValidCert),
         ("testClientCertificate", testClientCertificate),
         ("testClientCertificateFileUnencrypted", testClientCertificateFileUnencrypted),
@@ -205,31 +207,50 @@ class SwiftyRequestTests: XCTestCase {
         
         waitForExpectations(timeout: 20)
     }
-    
-    func testEchoData() {
+
+    // Tests that a JSON dictionary can be echoed back and is intact.
+    func testEchoDictionary() {
         let expectation = self.expectation(description: "Data Echoed Back")
 
-        let origJson: [String: Any] = ["Hello": "World"]
-
-        guard let data = try? JSONSerialization.data(withJSONObject: origJson, options: []) else {
-            XCTFail("Could not encode json")
-            return
-        }
-
+        let origJson: [String: Any] = ["Hello": "World", "Items": [1, 2, 3]]
         let request = RestRequest(method: .post, url: echoURL)
         request.contentType = "application/json"
         request.acceptType = "application/json"
-        request.messageBody = data
+        request.messageBodyDictionary = origJson
 
-        request.responseData { response in
-            switch response {
-            case .success(let retval):
-                guard let decoded = try? JSONSerialization.jsonObject(with: retval.body, options: []),
-                      let json = decoded as? [String: Any] else {
-                        XCTFail("Could not decode json")
-                        return
+        request.responseDictionary { result in
+            switch result {
+            case .success(let response):
+                XCTAssertEqual("World", response.body["Hello"] as? String)
+                guard let items = response.body["Items"] as? [Int] else {
+                    return XCTFail()
                 }
-                XCTAssertEqual("World", json["Hello"] as? String)
+                XCTAssertEqual(items.first, 1)
+                XCTAssertEqual(items.last, 3)
+            case .failure(let error):
+                XCTFail("Failed to get data response: \(error)")
+            }
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 20)
+    }
+
+    // Tests that a JSON dictionary can be echoed back and is intact.
+    func testEchoArray() {
+        let expectation = self.expectation(description: "Data Echoed Back")
+
+        let origJson: [Any] = ["Hello", "Swift", "World"]
+        let request = RestRequest(method: .post, url: echoArrayURL)
+        request.contentType = "application/json"
+        request.acceptType = "application/json"
+        request.messageBodyArray = origJson
+
+        request.responseArray { result in
+            switch result {
+            case .success(let response):
+                XCTAssertEqual(response.body.first as? String, "Hello")
+                XCTAssertEqual(response.body.last as? String, "World")
             case .failure(let error):
                 XCTFail("Failed to get data response: \(error)")
             }

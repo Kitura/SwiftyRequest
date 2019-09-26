@@ -36,8 +36,11 @@ let sslConfig =  SSLConfig(withChainFilePath: FileKit.projectFolder + "/Credenti
                            usingSelfSignedCerts: true)
 #endif
 
-// Create a new router that will be used for insecure requests
+// Create routers that will be used for insecure and secure requests
 let router = Router()
+let sslRouter = Router()
+
+// MARK: GET request tests
 
 // Handle HTTP GET requests to /
 router.get("/") {
@@ -45,20 +48,6 @@ router.get("/") {
     response.send("Hello, World!")
     next()
 }
-
-// Echo POSTs to /echoJSON that contain a JSON payload
-router.post("/echoJSON", middleware: BodyParser())
-router.post("/echoJSON") {
-    request, response, next in
-    if let data = request.body?.asJSON {
-        try response.send(json: data).end()
-    } else {
-        try response.status(.badRequest).end()
-    }
-}
-
-// Create a router that will be used for SSL requests
-let sslRouter = Router()
 
 // Returns a JSON representation of a TestData object
 sslRouter.get("/ssl/json") { (respondWith: (TestData?, RequestError?) -> Void) in
@@ -80,17 +69,19 @@ sslRouter.get("/ssl/json/:name/:city") {
     try response.send(json: TestData(name: name, age: 1, height: 106.68, address: TestAddress(number: 32, street: "Windsor Gardens", city: city))).end()
 }
 
-// Echo POSTs to /ssl/echoJSON that contain a JSON payload
-sslRouter.post("/ssl/echoJSON", middleware: BodyParser())
-sslRouter.post("/ssl/echoJSON") {
-    request, response, next in
-    if let data = request.body?.asJSON {
-        try response.send(json: data).end()
-    } else {
-        try response.status(.badRequest).end()
-    }
-}
+// MARK: JSON echo tests
 
+// Echo POSTs that contain a JSON payload
+router.post("/echoJSON", middleware: BodyParser())
+router.post("/echoJSON", handler: echoJSONHandler)
+sslRouter.post("/ssl/echoJSON", middleware: BodyParser())
+sslRouter.post("/ssl/echoJSON", handler: echoJSONHandler)
+
+router.post("/echoJSONArray", handler: echoJSONArrayHandler)
+
+// MARK: Query parameters tests
+
+// Tests multiple query parameter values for the same key
 sslRouter.get("/ssl/friends") {
     request, response, next in
     let params = request.queryParametersMultiValues["friend"] ?? []
@@ -98,20 +89,22 @@ sslRouter.get("/ssl/friends") {
     try response.send(json: friends).end()
 }
 
-// Cookies
+// MARK: Cookies
 
 router.get("/cookies/:number", handler: cookieHandler)
 sslRouter.get("/ssl/cookies/:number", handler: cookieHandler)
 
-// Basic Authentication
+// MARK: Basic Authentication
 
 sslRouter.get("/ssl/basic/user", handler: basicAuthHandler)
 userStore["1"] = User(id: 1, name: "Dave", date: Date(timeIntervalSince1970: 0))
 
-// JWT Authentication
+// MARK: JWT Authentication
 
 sslRouter.post("/ssl/jwt/generateJWT", handler: generateJWTHandler)
 sslRouter.get("/ssl/jwt/user", handler: jwtAuthHandler)
+
+// MARK: Start server
 
 // Add an HTTP server and connect it to the router
 Kitura.addHTTPServer(onPort: 8080, with: router)
