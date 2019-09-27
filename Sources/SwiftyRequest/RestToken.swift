@@ -63,10 +63,10 @@ public class RestToken {
         request.credentials = credentials
 
         // TODO - validate request
-        request.responseString(responseToError: nil) { response in
-            switch response.result {
+        request.responseString() { response in
+            switch response {
             case .success(let token):
-                self.token = token
+                self.token = token.body
                 success?()
             case .failure(let error):
                 failure?(error)
