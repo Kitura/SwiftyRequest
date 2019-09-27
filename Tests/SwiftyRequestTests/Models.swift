@@ -13,6 +13,38 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+import Foundation
+
+// The following structs duplicate the types contained within the TestServer
+// project that is used as a backend for these tests.
+
+public struct User: Codable, Equatable {
+    public let id: Int
+    public let name: String
+    public let date: Date
+    public init(id: Int, name: String, date: Date) {
+        self.id = id
+        self.name = name
+        self.date = date
+    }
+
+    public static func ==(lhs: User, rhs: User) -> Bool {
+        return (lhs.id == rhs.id) && (lhs.name == rhs.name) && (lhs.date == rhs.date)
+    }
+
+}
+
+struct AccessToken: Codable {
+    let accessToken: String
+}
+
+struct JWTUser: Codable, Equatable {
+    let name: String
+
+    public static func ==(lhs: JWTUser, rhs: JWTUser) -> Bool {
+        return (lhs.name == rhs.name)
+    }
+}
 
 public struct TestData: Codable {
     let name: String
@@ -30,3 +62,4 @@ public struct TestAddress: Codable {
 public struct FriendData: Codable {
     let friends: [String]
 }
+

@@ -17,10 +17,10 @@ import Kitura
 import Foundation
 import SwiftJWT
 
-var userStore: [String: User] = [:]
+var userStore: [Int: User] = [:]
 
 func basicAuthHandler(profile: MyBasicAuth, id: Int, respondWith: (User?, RequestError?) -> Void) {
-    guard let user = userStore[id.value] else {
+    guard let user = userStore[id] else {
         respondWith(nil, .notFound)
         return
     }

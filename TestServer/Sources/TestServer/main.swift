@@ -24,6 +24,9 @@ HeliumLogger.use(.debug)
 // Pre-canned test data to be returned as JSON
 var testData: TestData = TestData(name: "Paddington", age: 1, height: 106.68, address: TestAddress(number: 32, street: "Windsor Gardens", city: "London"))
 
+userStore[1] = User(id: 1, name: "Dave", date: Date(timeIntervalSince1970: 0))
+userStore[2] = User(id: 2, name: "Helen", date: Date(timeIntervalSinceReferenceDate: 0))
+
 // Import SSL
 #if os(Linux)
 let sslConfig =  SSLConfig(withCACertificateDirectory: nil,
@@ -97,12 +100,17 @@ sslRouter.get("/ssl/cookies/:number", handler: cookieHandler)
 // MARK: Basic Authentication
 
 sslRouter.get("/ssl/basic/user", handler: basicAuthHandler)
-userStore["1"] = User(id: 1, name: "Dave", date: Date(timeIntervalSince1970: 0))
 
 // MARK: JWT Authentication
 
 sslRouter.post("/ssl/jwt/generateJWT", handler: generateJWTHandler)
 sslRouter.get("/ssl/jwt/user", handler: jwtAuthHandler)
+
+// MARK: Backend for testing README example
+
+router.get("/users/:id") { (id: Int, respondWith: (User?, RequestError?) -> Void) in
+    respondWith(userStore[id], nil)
+}
 
 // MARK: Start server
 

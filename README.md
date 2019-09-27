@@ -21,9 +21,9 @@
 
 # SwiftyRequest
 
-`SwiftyRequest` is an HTTP networking library built for Swift.
+`SwiftyRequest` is an HTTP client built for Swift.
 
-`SwiftyRequest` uses `URLSession` for the underlying transport. `URLSession` on Linux is not yet completely implemented so you may find that this library is less reliable on Linux than Darwin (reference issues [#24](https://github.com/IBM-Swift/SwiftyRequest/issues/24) and [#25](https://github.com/IBM-Swift/SwiftyRequest/issues/25), the second of these references a [Foundation PR](https://github.com/apple/swift-corelibs-foundation/pull/1629)).
+The latest release of SwiftyRequest is built upon the Swift-NIO based [`async-http-client`](https://github.com/swift-server/async-http-client).
 
 ## Contents
 * [Features](#features)
@@ -31,12 +31,15 @@
 * [Usage](#usage)
 * [CircuitBreaker Integration](#circuitbreaker-integration)
 * [Response Methods](#response-methods)
+* [Migrating from SwiftyRequest v2 to v3](#migration-from-v2-to-v3)
 
 ## Features
 - Several response methods (e.g. Data, Object, Array, String, etc.) to eliminate boilerplate code in your application.
+- Direct retrieval of `Codable` types.
 - JSON encoding and decoding.
 - Integration with the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library.
 - Authentication tokens.
+- Client Certificate support (2-way SSL).
 - Multipart form data.
 
 ## Swift version
@@ -64,14 +67,14 @@ Add `SwiftyRequest` to your target's dependencies:
 ## Usage
 
 ### Make Requests
-To make outbound HTTP calls using `SwiftyRequest`, create a `RestRequest` instance. The `method` parameter is optional (it defaults to `GET`), the `url` parameter is required.
+To make outbound HTTP calls using `SwiftyRequest`, create a `RestRequest` instance. The `method` parameter is optional (it defaults to `.get`), the `url` parameter is required.
 
 Example usage of `RestRequest`:
 
 ```swift
 import SwiftyRequest
 
-let request = RestRequest(method: .GET, url: "http://myApiCall/hello")
+let request = RestRequest(method: .get, url: "http://myApiCall/hello")
 request.credentials = .basicAuthentication(username: "John", password: "12345")
 ```
 
@@ -168,6 +171,45 @@ RestRequest provides additional convenience methods you can use based on the typ
 - `responseDictionary` decodes the response body as JSON, and calls back with a `Result<RestResponse<[String: Any]>, Error>`.
 - `responseArray` decodes the response body as a a JSON array, and calls back with a `Result<RestResponse<[Any]>, Error>`.
 - `responseVoid` does not expect a response body, and calls back with a `Result<HTTPClient.Response, Error>`.
+
+### Example of handling a response
+
+```swift
+let request = RestRequest(method: .get, url: "http://localhost:8080/users/{userid}")
+
+request.responseObject(templateParams: ["userid": "1"]) { (result: Result<RestResponse<User>, RestError>) in
+    switch result {
+    case .success(let response):
+        let user = response.body
+        print("Successfully retrieved user \(user.name)")
+    case .failure(let error):
+        if let response = error.response {
+            print("Request failed with status: \(response.status)")
+        }
+        if let responseData = error.responseData {
+            // Handle error response body
+        }
+    }
+}
+```
+
+## Migration from v2 to v3
+
+There are a number of changes to the API in SwiftyRequest v3 compared to the v2 release:
+
+- The `RestRequest` initializer parameter  `containsSelfSignedCert` has been renamed `insecure` to better reflect its purpose (turning off SSL certificate verification).  The old name has been deprecated and may be removed in a future release.
+- The `completionHandler` callback of `responseData` (et al) has changed from `(RestResponse<Data>) -> Void` to `(Result<RestResponse<Data>, RestError>) -> Void`.  
+- The `JSONDecodable` and `JSONEncodable` types have been removed in favour of using `Codable` directly.  The `responseObject` function allows you to receive a Codable object in a response.
+- Convenience functions for handling raw JSON have been added.  `responseDictionary` and `responseArray` alow retrieval of JSON as `[String: Any]` and `[Any]` respectively, and sending of raw JSON can be performed by setting the `request.messageBodyDictionary` or `request.messageBodyArray` properties.
+- the `RestError` type is now returned explicitly in the `.failure` case.  If the error pertains to a response with a non-success status code, you can access the response with `error.response`.  If the response also contained body data, it can be retrieved via `error.responseData`.
+
+## Client Certificate support (2-way SSL)
+
+Specify a `ClientCertificate` when creating a `RestRequest` to enable a client certificate to be presented upon a secure request (2-way SSL).
+
+The certificate may be provided in PEM format - either from a file, a string or Data, and an optional passphrase.  The PEM data should contain the certificate and its corresponding private key.  If the private key is encrypted, the corresponding passphrase should be specified when constructing the ClientCertificate.
+
+If you need to handle certificates in other formats, you may create a ClientCertificate directly from a `NIOSSLCertificate` and `NIOSSLPrivateKey`.  For more information on these types, see the documentation for the [`async-http-client` project](https://github.com/swift-server/async-http-client).
 
 ## API documentation
 

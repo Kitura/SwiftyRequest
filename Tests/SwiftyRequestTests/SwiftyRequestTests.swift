@@ -37,40 +37,6 @@ let jwtGenerateURL = "https://localhost:8443/ssl/jwt/generateJWT"
 /// URL for a well-known server that provides a valid TLS certificate.
 let sslValidCertificateURL = "https://swift.org"
 
-// MARK: Helper structs
-
-// The following structs duplicate the types contained within the TestServer
-// project that is used as a backend for these tests.
-public struct TestData: Codable {
-    let name: String
-    let age: Int
-    let height: Double
-    let address: TestAddress
-}
-
-public struct TestAddress: Codable {
-    let number: Int
-    let street: String
-    let city: String
-}
-
-public struct FriendData: Codable {
-    let friends: [String]
-}
-
-struct JWTUser: Codable, Equatable {
-    let name: String
-
-    public static func ==(lhs: JWTUser, rhs: JWTUser) -> Bool {
-        return (lhs.name == rhs.name)
-    }
-}
-
-struct AccessToken: Codable {
-    let accessToken: String
-}
-
-
 class SwiftyRequestTests: XCTestCase {
 
     static var allTests = [
@@ -1097,6 +1063,33 @@ class SwiftyRequestTests: XCTestCase {
         request.headerParameters = replacementHeaders
         expectedHeaders = expectedHeaders.merging(replacementHeaders, uniquingKeysWith: overwriteExisting)
         XCTAssertEqual(request.headerParameters, expectedHeaders)
+    }
+
+    // MARK: Test code examples in README
+
+    func testExampleRequest() {
+        let expectation = self.expectation(description: "Request supplying token authentication succeeds")
+
+        let request = RestRequest(method: .get, url: "http://localhost:8080/users/{userid}")
+
+        request.responseObject(templateParams: ["userid": "1"]) { (result: Result<RestResponse<User>, RestError>) in
+            switch result {
+            case .success(let response):
+                let user = response.body
+                print("Successfully retrieved user \(user.name)")
+                XCTAssertEqual(user.id, 1)
+            case .failure(let error):
+                if let response = error.response {
+                    print("Request failed with status: \(response.status)")
+                }
+                if let responseData = error.responseData {
+                    print("Response returned: \(String(data: responseData, encoding: .utf8) ?? "")")
+                }
+                XCTFail("Request failed")
+            }
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 10)
     }
 
 }
