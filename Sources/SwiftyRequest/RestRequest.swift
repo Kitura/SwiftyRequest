@@ -16,6 +16,7 @@
 
 import Foundation
 import CircuitBreaker
+import Dispatch
 import LoggerAPI
 import AsyncHTTPClient
 import NIO
@@ -431,7 +432,15 @@ public class RestRequest {
         responseVoid(templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
     
-    private func _response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
+    private func _response(request: HTTPClient.Request, completionHandler callback: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
+        // Offload execution of the user's completion handler to avoid inadvertant
+        // blocking of the NIO EventLoop thread.
+        let completionHandler: (Result<HTTPClient.Response, RestError>) -> Void = {
+            result in
+            DispatchQueue.global().async {
+                callback(result)
+            }
+        }
         if let breaker = circuitBreaker {
             breaker.run(commandArgs: (request, completionHandler), fallbackArgs: "Circuit is open")
         } else {
