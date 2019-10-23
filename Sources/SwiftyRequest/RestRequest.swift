@@ -22,6 +22,12 @@ import NIO
 import NIOHTTP1
 import NIOSSL
 
+#if os(Linux)
+import Glibc
+#else
+import Darwin
+#endif
+
 fileprivate class MutableRequest {
     /// Request HTTP method
     var method: NIOHTTP1.HTTPMethod
@@ -101,14 +107,24 @@ public class RestRequest {
 
     fileprivate static var _globalELG: EventLoopGroup?
 
-    /// The global EventLoopGroup used by all instances of RestRequest.
-    /// This can be set once (and once only) by calling `RestRequest.setGlobalELG()`
+    /// Provides access to the global EventLoopGroup used by all instances of RestRequest.
+    /// This can be set once (and once only) by calling `RestRequest.setGlobalELG(elg:)`
     /// before creating a request.
-    /// Defaults to a `MultiThreadedEventLoopGroup` containing a single thread.
+    ///
+    /// Defaults to a `MultiThreadedEventLoopGroup` containing 1 thread per available
+    /// processor.
+    ///
+    /// Note that the default value is assigned lazily, and you cannot call `setGlobalELG` after
+    /// accessing this property.
     public private(set) static var globalELG: EventLoopGroup {
         get {
             if let result = _globalELG { return result }
-            let result = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+            #if os(Linux)
+            let numberOfCores = Int(linux_sched_getaffinity())
+            let result = MultiThreadedEventLoopGroup(numberOfThreads: numberOfCores > 0 ? numberOfCores : System.coreCount)
+            #else
+            let result = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+            #endif
             _globalELG = result
             return result
         }
@@ -117,8 +133,8 @@ public class RestRequest {
         }
     }
 
-    /// Only used by tests to reset ELG
-    internal static func resetELG() {
+    /// Only used by tests to reset the state of the ELG.
+    internal static func _testOnly_resetELG() {
         _globalELG = nil
     }
 
@@ -126,7 +142,9 @@ public class RestRequest {
     /// This can be done once (and once only) by calling `RestRequest.setGlobalELG()`
     /// before creating a request.
     /// - Parameter elg: The EventLoopGroup to be used
-    /// - Throws: if `globalELG` is already set.
+    /// - Throws: if `globalELG` has already been set. This could be because the `globalELG`
+    ///           property has already been accessed, this function has already been called,
+    ///           or a `RestRequest` has been invoked.
     public static func setGlobalELG(_ elg: EventLoopGroup) throws {
         guard RestRequest._globalELG == nil else {
             throw RestError.eventLoopGroupAlreadySet
