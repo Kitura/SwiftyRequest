@@ -14,6 +14,7 @@
 * limitations under the License.
 */
 import Kitura
+import Socket
 import HeliumLogger
 import FileKit
 import Foundation
@@ -123,6 +124,10 @@ router.get("/timeout") { request, response, next in
         next()
     }
 }
+
+// A socket that listens but never accepts connections
+let sleepyServerSocket = try Socket.create(family: .inet)
+try sleepyServerSocket.listen(on: 8081, maxBacklogSize: 1, allowPortReuse: false)
 
 // MARK: Start server
 

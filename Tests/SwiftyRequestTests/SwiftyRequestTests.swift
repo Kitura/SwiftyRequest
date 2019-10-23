@@ -74,7 +74,8 @@ class SwiftyRequestTests: XCTestCase {
         ("testTokenAuthentication", testTokenAuthentication),
         ("testHeaders", testHeaders),
         ("testEventLoopGroup", testEventLoopGroup),
-        ("testTimeout", testTimeout),
+        ("testRequestTimeout", testRequestTimeout),
+        ("testConnectTimeout", testConnectTimeout),
     ]
 
     // Enable logging output for tests
@@ -1118,7 +1119,9 @@ class SwiftyRequestTests: XCTestCase {
 
     // MARK: Timeout tests
 
-    func testTimeout() {
+    /// Makes a request to a route that delays its response for longer than the configured timeout, causing a failure.
+    /// Then tests that a request with the same configuration succeeds if the route responds within the timeout.
+    func testRequestTimeout() {
         let timeoutExpectation = self.expectation(description: "Request times out")
         let successExpectation = self.expectation(description: "Request succeeds")
 
@@ -1131,7 +1134,6 @@ class SwiftyRequestTests: XCTestCase {
             case .success(let response):
                 XCTFail("Request should have timed out, but status was \(response.status)")
             case .failure(let error):
-                print("error = \(error)")
                 XCTAssertEqual(error, RestError.httpClientError(HTTPClientError.readTimeout))
             }
             timeoutExpectation.fulfill()
@@ -1150,6 +1152,32 @@ class SwiftyRequestTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 10)
+    }
+
+    /// Connects to a socket that listens but never accepts a connection, and verifies that the client
+    /// times out with a failure after a specified connect timeout.
+    func testConnectTimeout() {
+        let timeoutExpectation = self.expectation(description: "Request times out")
+        let timeout: TimeAmount = .milliseconds(500)
+
+        let request = RestRequest(method: .get, url: "http://localhost:8081/", timeout: HTTPClient.Configuration.Timeout(connect: timeout, read: nil))
+
+        request.responseVoid { result in
+            switch result {
+            case .success(let response):
+                XCTFail("Connection should have timed out, but status was \(response.status)")
+            case .failure(let error):
+                XCTAssertEqual(error, RestError.otherError(NIO.ChannelError.connectTimeout(timeout)))
+                if let underlyingError = error.error, case let NIO.ChannelError.connectTimeout(timeAmount) = underlyingError {
+                    XCTAssertEqual(timeAmount, timeout, "Timeout amount was incorrect")
+                } else {
+                    XCTFail("Underlying error was not NIO.ChannelError.connectTimeout")
+                }
+            }
+            timeoutExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 20)
     }
 
 }
