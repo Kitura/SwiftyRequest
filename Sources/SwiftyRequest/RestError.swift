@@ -55,6 +55,9 @@ public struct RestError: Error {
     /// An HTTPClient error occurred before invoking the request. See the `error` property for the underlying error.
     public static let httpClientError = RestError(.otherError, description: "HTTPClientError")
 
+    /// An attempt was made to reassign the global `EventLoopGroup` used by `RestRequest` after it had already been initialized.
+    public static let eventLoopGroupAlreadySet = RestError(.eventLoopGroupAlreadySet, description: "The global EventLoopGroup has already been initialized")
+
     /// Another error occurred before invoking the request. See the `error` property for the underlying error.
     public static let otherError = RestError(.otherError, description: "Other Error")
 
@@ -96,7 +99,7 @@ public struct RestError: Error {
     private let internalError: InternalError
     
     private enum InternalError {
-        case noData, serializationError, encodingError, decodingError, fileManagerError, invalidFile, invalidSubstitution, downloadError, errorStatusCode, invalidURL, httpClientError, otherError
+        case noData, serializationError, encodingError, decodingError, fileManagerError, invalidFile, invalidSubstitution, downloadError, errorStatusCode, invalidURL, httpClientError, eventLoopGroupAlreadySet, otherError
     }
 
     private let _description: String

@@ -1,6 +1,7 @@
 import XCTest
 import CircuitBreaker
 import NIOSSL
+import NIO
 @testable import SwiftyRequest
 
 #if swift(>=4.1)
@@ -71,6 +72,7 @@ class SwiftyRequestTests: XCTestCase {
         ("testBasicAuthenticationFails", testBasicAuthenticationFails),
         ("testTokenAuthentication", testTokenAuthentication),
         ("testHeaders", testHeaders),
+        ("testEventLoopGroup", testEventLoopGroup),
     ]
 
     // Enable logging output for tests
@@ -1090,6 +1092,26 @@ class SwiftyRequestTests: XCTestCase {
             expectation.fulfill()
         }
         waitForExpectations(timeout: 10)
+    }
+
+    // MARK: Test configuration parameters
+
+    func testEventLoopGroup() {
+        let myELG = MultiThreadedEventLoopGroup(numberOfThreads: 2)
+
+        // Clear the global ELG
+        RestRequest.resetELG()
+
+        // Access default ELG, and verify it cannot then be set
+        XCTAssertNotNil(RestRequest.globalELG)
+        XCTAssertThrowsError(try RestRequest.setGlobalELG(myELG), "Global ELG should not have been set again")
+
+        // Clear the global ELG
+        RestRequest.resetELG()
+
+        // Verify that the ELG can be set once and only once
+        XCTAssertNoThrow(try RestRequest.setGlobalELG(myELG), "Global ELG could not be set")
+        XCTAssertThrowsError(try RestRequest.setGlobalELG(myELG), "Global ELG should not have been set again")
     }
 
 }

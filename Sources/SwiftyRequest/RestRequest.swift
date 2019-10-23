@@ -22,8 +22,6 @@ import NIO
 import NIOHTTP1
 import NIOSSL
 
-fileprivate let globalELG = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-
 fileprivate class MutableRequest {
     /// Request HTTP method
     var method: NIOHTTP1.HTTPMethod
@@ -99,6 +97,41 @@ public class RestRequest {
 
     deinit {
         try? session.syncShutdown()
+    }
+
+    fileprivate static var _globalELG: EventLoopGroup?
+
+    /// The global EventLoopGroup used by all instances of RestRequest.
+    /// This can be set once (and once only) by calling `RestRequest.setGlobalELG()`
+    /// before creating a request.
+    /// Defaults to a `MultiThreadedEventLoopGroup` containing a single thread.
+    public private(set) static var globalELG: EventLoopGroup {
+        get {
+            if let result = _globalELG { return result }
+            let result = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+            _globalELG = result
+            return result
+        }
+        set {
+            _globalELG = newValue
+        }
+    }
+
+    /// Only used by tests to reset ELG
+    internal static func resetELG() {
+        _globalELG = nil
+    }
+
+    /// Overrides the default `EventLoopGroup` used by all instances of `RestRequest`.
+    /// This can be done once (and once only) by calling `RestRequest.setGlobalELG()`
+    /// before creating a request.
+    /// - Parameter elg: The EventLoopGroup to be used
+    /// - Throws: if `globalELG` is already set.
+    public static func setGlobalELG(_ elg: EventLoopGroup) throws {
+        guard RestRequest._globalELG == nil else {
+            throw RestError.eventLoopGroupAlreadySet
+        }
+        RestRequest.globalELG = elg
     }
 
     /// A default `HTTPClient` instance.
@@ -406,7 +439,7 @@ public class RestRequest {
             certificateVerification: (insecure ? .none : .fullVerification),
             certificateChain: chain, privateKey: key)
         let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration)
-        return HTTPClient(eventLoopGroupProvider: .shared(globalELG), configuration: config)
+        return HTTPClient(eventLoopGroupProvider: .shared(RestRequest.globalELG), configuration: config)
     }
 
     /// Convenience function to encode an `Encodable` type as the request body, using a
