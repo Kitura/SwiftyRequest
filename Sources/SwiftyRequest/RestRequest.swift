@@ -21,6 +21,8 @@ import AsyncHTTPClient
 import NIO
 import NIOHTTP1
 import NIOSSL
+import NIOConcurrencyHelpers
+import Dispatch
 
 #if os(Linux)
 import Glibc
@@ -106,6 +108,8 @@ public class RestRequest {
     }
 
     fileprivate static var _globalELG: EventLoopGroup?
+    fileprivate static var _globalELGIsSet: Atomic<Int> = .init(value: 0)
+    fileprivate static let _globalELGSetter = DispatchQueue(label: "globalELGSetter")
 
     /// Provides access to the global EventLoopGroup used by all instances of RestRequest.
     /// This can be set once (and once only) by calling `RestRequest.setGlobalELG(elg:)`
@@ -118,15 +122,19 @@ public class RestRequest {
     /// accessing this property.
     public private(set) static var globalELG: EventLoopGroup {
         get {
+            _globalELGIsSet.store(1)
             if let result = _globalELG { return result }
-            #if os(Linux)
-            let numberOfCores = Int(linux_sched_getaffinity())
-            let result = MultiThreadedEventLoopGroup(numberOfThreads: numberOfCores > 0 ? numberOfCores : System.coreCount)
-            #else
-            let result = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-            #endif
-            _globalELG = result
-            return result
+            return _globalELGSetter.sync {
+                if let result = _globalELG { return result }
+                #if os(Linux)
+                let numberOfCores = Int(linux_sched_getaffinity())
+                let result = MultiThreadedEventLoopGroup(numberOfThreads: numberOfCores > 0 ? numberOfCores : System.coreCount)
+                #else
+                let result = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+                #endif
+                _globalELG = result
+                return result
+            }
         }
         set {
             _globalELG = newValue
@@ -136,6 +144,7 @@ public class RestRequest {
     /// Only used by tests to reset the state of the ELG.
     internal static func _testOnly_resetELG() {
         _globalELG = nil
+        _globalELGIsSet.store(0)
     }
 
     /// Overrides the default `EventLoopGroup` used by all instances of `RestRequest`.
@@ -146,10 +155,12 @@ public class RestRequest {
     ///           property has already been accessed, this function has already been called,
     ///           or a `RestRequest` has been invoked.
     public static func setGlobalELG(_ elg: EventLoopGroup) throws {
-        guard RestRequest._globalELG == nil else {
+        if _globalELGIsSet.compareAndExchange(expected: 0, desired: 1) {
+            RestRequest.globalELG = elg
+        } else {
             throw RestError.eventLoopGroupAlreadySet
         }
-        RestRequest.globalELG = elg
+
     }
 
     /// A default `HTTPClient` instance.

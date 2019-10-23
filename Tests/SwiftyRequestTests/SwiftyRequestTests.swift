@@ -1129,7 +1129,7 @@ class SwiftyRequestTests: XCTestCase {
         request.responseVoid(queryItems: [delay1s]) { result in
             switch result {
             case .success(let response):
-                XCTFail("Request should have timed out")
+                XCTFail("Request should have timed out, but status was \(response.status)")
             case .failure(let error):
                 print("error = \(error)")
                 XCTAssertEqual(error, RestError.httpClientError(HTTPClientError.readTimeout))
