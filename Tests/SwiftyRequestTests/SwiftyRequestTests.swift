@@ -2,6 +2,7 @@ import XCTest
 import CircuitBreaker
 import NIOSSL
 import NIO
+import AsyncHTTPClient
 @testable import SwiftyRequest
 
 #if swift(>=4.1)
@@ -73,6 +74,7 @@ class SwiftyRequestTests: XCTestCase {
         ("testTokenAuthentication", testTokenAuthentication),
         ("testHeaders", testHeaders),
         ("testEventLoopGroup", testEventLoopGroup),
+        ("testTimeout", testTimeout),
     ]
 
     // Enable logging output for tests
@@ -1112,6 +1114,42 @@ class SwiftyRequestTests: XCTestCase {
         // Verify that the ELG can be set once and only once
         XCTAssertNoThrow(try RestRequest.setGlobalELG(myELG), "Global ELG could not be set")
         XCTAssertThrowsError(try RestRequest.setGlobalELG(myELG), "Global ELG should not have been set again")
+    }
+
+    // MARK: Timeout tests
+
+    func testTimeout() {
+        let timeoutExpectation = self.expectation(description: "Request times out")
+        let successExpectation = self.expectation(description: "Request succeeds")
+
+        let request = RestRequest(method: .get, url: "http://localhost:8080/timeout", timeout: HTTPClient.Configuration.Timeout(connect: nil, read: .milliseconds(500)))
+
+        let delay1s = URLQueryItem(name: "delay", value: "501")
+
+        request.responseVoid(queryItems: [delay1s]) { result in
+            switch result {
+            case .success(let response):
+                XCTFail("Request should have timed out")
+            case .failure(let error):
+                print("error = \(error)")
+                XCTAssertEqual(error, RestError.httpClientError(HTTPClientError.readTimeout))
+            }
+            timeoutExpectation.fulfill()
+        }
+
+        let delayNone = URLQueryItem(name: "delay", value: "100")
+
+        request.responseVoid(queryItems: [delayNone]) { result in
+            switch result {
+            case .success(let response):
+                XCTAssertEqual(response.status, .ok)
+            case .failure(let error):
+                XCTFail("Request should have succeeded, but produced: \(error)")
+            }
+            successExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 10)
     }
 
 }

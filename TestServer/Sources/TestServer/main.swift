@@ -112,6 +112,18 @@ router.get("/users/:id") { (id: Int, respondWith: (User?, RequestError?) -> Void
     respondWith(userStore[id], nil)
 }
 
+// MARK: Timeout tests
+
+router.get("/timeout") { request, response, next in
+    guard let param = request.queryParameters["delay"], let delay = Int(param) else {
+        return try response.status(.badRequest).end()
+    }
+    DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(delay)) {
+        response.status(.OK)
+        next()
+    }
+}
+
 // MARK: Start server
 
 // Add an HTTP server and connect it to the router

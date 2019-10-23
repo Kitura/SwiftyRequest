@@ -433,9 +433,10 @@ public class RestRequest {
     ///   - url: URL string to use for the network request.
     ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
     ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
-    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil) {
+    ///   - timeout: An optional `HTTPClient.Configuration.Timeout` specifying how long to wait for connection or response from a remote service before timing out. Defaults to `nil`, which means no timeout.
+    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil) {
         self.mutableRequest = MutableRequest(method: method, url: url)
-        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate)
+        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout)
 
         // Set initial headers
         self.acceptType = "application/json"
@@ -443,7 +444,7 @@ public class RestRequest {
 
     }
 
-    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil) -> HTTPClient {
+    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?) -> HTTPClient {
         let chain: [NIOSSLCertificateSource]
         let key: NIOSSLPrivateKeySource?
         if let clientCertificate = clientCertificate {
@@ -456,7 +457,8 @@ public class RestRequest {
         let tlsConfiguration = TLSConfiguration.forClient(
             certificateVerification: (insecure ? .none : .fullVerification),
             certificateChain: chain, privateKey: key)
-        let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration)
+        let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration,
+                                              timeout: timeout ?? HTTPClient.Configuration.Timeout())
         return HTTPClient(eventLoopGroupProvider: .shared(RestRequest.globalELG), configuration: config)
     }
 
