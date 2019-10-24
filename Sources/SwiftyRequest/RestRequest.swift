@@ -428,9 +428,9 @@ public class RestRequest {
         }
     }
 
-    @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:)")
-    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
-        self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate)
+    @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:timeout:)")
+    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil) {
+        self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate, timeout: timeout)
     }
 
     /// Initialize a `RestRequest` instance.
