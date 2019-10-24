@@ -15,17 +15,17 @@ matrix:
       dist: xenial
       sudo: required
       services: docker
-      env: DOCKER_IMAGE=swift:5.0.3-xenial SWIFT_SNAPSHOT=5.0.3
+      env: DOCKER_IMAGE=swift:5.0.3-xenial SWIFT_SNAPSHOT=5.0.3 DOCKER_PACKAGES="zlib1g-dev"
     - os: linux
       dist: xenial
       sudo: required
       services: docker
-      env: DOCKER_IMAGE=swift:5.1
+      env: DOCKER_IMAGE=swift:5.1 DOCKER_PACKAGES="zlib1g-dev"
     - os: linux
       dist: xenial
       sudo: required
       services: docker
-      env: DOCKER_IMAGE=swift:5.1 SWIFT_SNAPSHOT=$SWIFT_DEVELOPMENT_SNAPSHOT
+      env: DOCKER_IMAGE=swift:5.1 SWIFT_SNAPSHOT=$SWIFT_DEVELOPMENT_SNAPSHOT DOCKER_PACKAGES="zlib1g-dev"
     - os: osx
       osx_image: xcode10.2
       sudo: required
