@@ -1160,7 +1160,7 @@ class SwiftyRequestTests: XCTestCase {
         let timeoutExpectation = self.expectation(description: "Request times out")
         let timeout: TimeAmount = .milliseconds(500)
 
-        let request = RestRequest(method: .get, url: "http://localhost:8081/", timeout: HTTPClient.Configuration.Timeout(connect: timeout, read: nil))
+        let request = RestRequest(method: .get, url: "http://localhost:8079/", timeout: HTTPClient.Configuration.Timeout(connect: timeout, read: nil))
 
         request.responseVoid { result in
             switch result {

@@ -127,7 +127,7 @@ router.get("/timeout") { request, response, next in
 
 // A socket that listens but never accepts connections
 let sleepyServerSocket = try Socket.create(family: .inet)
-try sleepyServerSocket.listen(on: 8081, maxBacklogSize: 1, allowPortReuse: false)
+try sleepyServerSocket.listen(on: 8079, maxBacklogSize: 1, allowPortReuse: false)
 
 // MARK: Start server
 
