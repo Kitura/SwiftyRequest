@@ -26,6 +26,7 @@ import Dispatch
 
 #if os(Linux)
 import Glibc
+import CLinuxAffinity
 #else
 import Darwin
 #endif
