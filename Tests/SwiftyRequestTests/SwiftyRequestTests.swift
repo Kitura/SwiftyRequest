@@ -1171,7 +1171,7 @@ class SwiftyRequestTests: XCTestCase {
                 if let underlyingError = error.error, case let NIO.ChannelError.connectTimeout(timeAmount) = underlyingError {
                     XCTAssertEqual(timeAmount, timeout, "Timeout amount was incorrect")
                 } else {
-                    XCTFail("Underlying error was not NIO.ChannelError.connectTimeout")
+                    XCTFail("Underlying error was not NIO.ChannelError.connectTimeout, it was: \(error.error ?? error)")
                 }
             }
             timeoutExpectation.fulfill()
