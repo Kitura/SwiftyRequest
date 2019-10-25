@@ -1127,7 +1127,7 @@ class SwiftyRequestTests: XCTestCase {
 
         let request = RestRequest(method: .get, url: "http://localhost:8080/timeout", timeout: HTTPClient.Configuration.Timeout(connect: nil, read: .milliseconds(500)))
 
-        let delay1s = URLQueryItem(name: "delay", value: "501")
+        let delay1s = URLQueryItem(name: "delay", value: "1000")
 
         request.responseVoid(queryItems: [delay1s]) { result in
             switch result {
