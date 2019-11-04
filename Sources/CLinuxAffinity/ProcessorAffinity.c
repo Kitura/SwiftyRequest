@@ -21,7 +21,9 @@
 #include <unistd.h>
 
 // Reference: https://stackoverflow.com/questions/10490756/how-to-use-sched-getaffinity-and-sched-setaffinity-in-linux-from-c
-int linux_sched_getaffinity() {
+// Note: renamed to avoid conflict with same function defined by Kitura-NIO.
+// TODO: both Kitura-NIO and SwiftyRequest should depend on a common helper package.
+int linux_sched_getaffinity_sr() {
     cpu_set_t mask;
     long nproc, i, count = 0;
 

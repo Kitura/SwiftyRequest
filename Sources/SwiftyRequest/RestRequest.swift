@@ -128,7 +128,7 @@ public class RestRequest {
             return _globalELGSetter.sync {
                 if let result = _globalELG { return result }
                 #if os(Linux)
-                let numberOfCores = Int(linux_sched_getaffinity())
+                let numberOfCores = Int(linux_sched_getaffinity_sr())
                 let result = MultiThreadedEventLoopGroup(numberOfThreads: numberOfCores > 0 ? numberOfCores : System.coreCount)
                 #else
                 let result = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)

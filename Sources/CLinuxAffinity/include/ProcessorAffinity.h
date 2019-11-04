@@ -15,5 +15,5 @@
  */
 
 #if __linux__
-int linux_sched_getaffinity();
+int linux_sched_getaffinity_sr();
 #endif
