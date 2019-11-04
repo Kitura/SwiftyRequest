@@ -21,15 +21,6 @@ import AsyncHTTPClient
 import NIO
 import NIOHTTP1
 import NIOSSL
-import NIOConcurrencyHelpers
-import Dispatch
-
-#if os(Linux)
-import Glibc
-import CLinuxAffinity
-#else
-import Darwin
-#endif
 
 fileprivate class MutableRequest {
     /// Request HTTP method
@@ -108,61 +99,8 @@ public class RestRequest {
         try? session.syncShutdown()
     }
 
-    fileprivate static var _globalELG: EventLoopGroup?
-    fileprivate static var _globalELGIsSet: Atomic<Int> = .init(value: 0)
-    fileprivate static let _globalELGSetter = DispatchQueue(label: "globalELGSetter")
-
-    /// Provides access to the global EventLoopGroup used by all instances of RestRequest.
-    /// This can be set once (and once only) by calling `RestRequest.setGlobalELG(elg:)`
-    /// before creating a request.
-    ///
-    /// Defaults to a `MultiThreadedEventLoopGroup` containing 1 thread per available
-    /// processor.
-    ///
-    /// Note that the default value is assigned lazily, and you cannot call `setGlobalELG` after
-    /// accessing this property.
-    public private(set) static var globalELG: EventLoopGroup {
-        get {
-            _globalELGIsSet.store(1)
-            if let result = _globalELG { return result }
-            return _globalELGSetter.sync {
-                if let result = _globalELG { return result }
-                #if os(Linux)
-                let numberOfCores = Int(linux_sched_getaffinity_sr())
-                let result = MultiThreadedEventLoopGroup(numberOfThreads: numberOfCores > 0 ? numberOfCores : System.coreCount)
-                #else
-                let result = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-                #endif
-                _globalELG = result
-                return result
-            }
-        }
-        set {
-            _globalELG = newValue
-        }
-    }
-
-    /// Only used by tests to reset the state of the ELG.
-    internal static func _testOnly_resetELG() {
-        _globalELG = nil
-        _globalELGIsSet.store(0)
-    }
-
-    /// Overrides the default `EventLoopGroup` used by all instances of `RestRequest`.
-    /// This can be done once (and once only) by calling `RestRequest.setGlobalELG()`
-    /// before creating a request.
-    /// - Parameter elg: The EventLoopGroup to be used
-    /// - Throws: if `globalELG` has already been set. This could be because the `globalELG`
-    ///           property has already been accessed, this function has already been called,
-    ///           or a `RestRequest` has been invoked.
-    public static func setGlobalELG(_ elg: EventLoopGroup) throws {
-        if _globalELGIsSet.compareAndExchange(expected: 0, desired: 1) {
-            RestRequest.globalELG = elg
-        } else {
-            throw RestError.eventLoopGroupAlreadySet
-        }
-
-    }
+    /// The default EventLoopGroup used by all RestRequest instances.
+    public static let globalELG: EventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
 
     /// A default `HTTPClient` instance.
     private var session: HTTPClient
@@ -428,9 +366,9 @@ public class RestRequest {
         }
     }
 
-    @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:timeout:)")
-    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil) {
-        self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate, timeout: timeout)
+    @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:timeout:eventLoopGroup:)")
+    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup = RestRequest.globalELG) {
+        self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
     }
 
     /// Initialize a `RestRequest` instance.
@@ -446,9 +384,10 @@ public class RestRequest {
     ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
     ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
     ///   - timeout: An optional `HTTPClient.Configuration.Timeout` specifying how long to wait for connection or response from a remote service before timing out. Defaults to `nil`, which means no timeout.
-    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil) {
+    ///   - eventLoopGroup: The `EventLoopGroup` that should be used for requests. Defaults to a global `MultiThreadedEventLoopGroup` with one thread per processor.
+    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup = RestRequest.globalELG) {
         self.mutableRequest = MutableRequest(method: method, url: url)
-        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout)
+        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
 
         // Set initial headers
         self.acceptType = "application/json"
@@ -456,7 +395,7 @@ public class RestRequest {
 
     }
 
-    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?) -> HTTPClient {
+    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup) -> HTTPClient {
         let chain: [NIOSSLCertificateSource]
         let key: NIOSSLPrivateKeySource?
         if let clientCertificate = clientCertificate {
@@ -471,7 +410,7 @@ public class RestRequest {
             certificateChain: chain, privateKey: key)
         let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration,
                                               timeout: timeout ?? HTTPClient.Configuration.Timeout())
-        return HTTPClient(eventLoopGroupProvider: .shared(RestRequest.globalELG), configuration: config)
+        return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup), configuration: config)
     }
 
     /// Convenience function to encode an `Encodable` type as the request body, using a

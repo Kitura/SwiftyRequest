@@ -1101,20 +1101,7 @@ class SwiftyRequestTests: XCTestCase {
 
     func testEventLoopGroup() {
         let myELG = MultiThreadedEventLoopGroup(numberOfThreads: 2)
-
-        // Clear the global ELG
-        RestRequest._testOnly_resetELG()
-
-        // Access default ELG, and verify it cannot then be set
-        XCTAssertNotNil(RestRequest.globalELG)
-        XCTAssertThrowsError(try RestRequest.setGlobalELG(myELG), "Global ELG should not have been set again")
-
-        // Clear the global ELG
-        RestRequest._testOnly_resetELG()
-
-        // Verify that the ELG can be set once and only once
-        XCTAssertNoThrow(try RestRequest.setGlobalELG(myELG), "Global ELG could not be set")
-        XCTAssertThrowsError(try RestRequest.setGlobalELG(myELG), "Global ELG should not have been set again")
+        let request = RestRequest(method: .get, url: "http://localhost:8080/", eventLoopGroup: myELG)
     }
 
     // MARK: Timeout tests

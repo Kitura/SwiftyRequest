@@ -33,11 +33,8 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "CLinuxAffinity",
-            dependencies: []),
-        .target(
             name: "SwiftyRequest",
-            dependencies: ["CLinuxAffinity", "CircuitBreaker", "LoggerAPI", "AsyncHTTPClient"]
+            dependencies: ["CircuitBreaker", "LoggerAPI", "AsyncHTTPClient"]
         ),
         .testTarget(
             name: "SwiftyRequestTests",
