@@ -22,6 +22,13 @@ import NIO
 import NIOHTTP1
 import NIOSSL
 
+/// The default EventLoopGroup used by all RestRequest instances: a `MultiThreadedEventLoopGroup`
+/// with one thread per available processor.
+fileprivate let globalELG = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+
+// An object to represent the parameters of a request that can be mutated prior to
+// a request being issued. This acts as an adapter between SwiftyRequest's API and
+// async-http-client's (immutable) `Request` type, and can vend new `Request`s.
 fileprivate class MutableRequest {
     /// Request HTTP method
     var method: NIOHTTP1.HTTPMethod
@@ -99,11 +106,8 @@ public class RestRequest {
         try? session.syncShutdown()
     }
 
-    /// The default EventLoopGroup used by all RestRequest instances.
-    public static let globalELG: EventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-
     /// A default `HTTPClient` instance.
-    private var session: HTTPClient
+    private(set) var session: HTTPClient
 
     // The HTTP Request
     private var mutableRequest: MutableRequest
@@ -367,7 +371,7 @@ public class RestRequest {
     }
 
     @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:timeout:eventLoopGroup:)")
-    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup = RestRequest.globalELG) {
+    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup? = nil) {
         self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
     }
 
@@ -384,8 +388,8 @@ public class RestRequest {
     ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
     ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
     ///   - timeout: An optional `HTTPClient.Configuration.Timeout` specifying how long to wait for connection or response from a remote service before timing out. Defaults to `nil`, which means no timeout.
-    ///   - eventLoopGroup: The `EventLoopGroup` that should be used for requests. Defaults to a global `MultiThreadedEventLoopGroup` with one thread per processor.
-    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup = RestRequest.globalELG) {
+    ///   - eventLoopGroup: An optional `EventLoopGroup` that should be used for requests, instead of the default `MultiThreadedEventLoopGroup` shared between all RestRequest instances.
+    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup? = nil) {
         self.mutableRequest = MutableRequest(method: method, url: url)
         self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
 
@@ -395,7 +399,7 @@ public class RestRequest {
 
     }
 
-    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup) -> HTTPClient {
+    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup?) -> HTTPClient {
         let chain: [NIOSSLCertificateSource]
         let key: NIOSSLPrivateKeySource?
         if let clientCertificate = clientCertificate {
@@ -410,7 +414,7 @@ public class RestRequest {
             certificateChain: chain, privateKey: key)
         let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration,
                                               timeout: timeout ?? HTTPClient.Configuration.Timeout())
-        return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup), configuration: config)
+        return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup ?? globalELG), configuration: config)
     }
 
     /// Convenience function to encode an `Encodable` type as the request body, using a

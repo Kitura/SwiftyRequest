@@ -1099,9 +1099,36 @@ class SwiftyRequestTests: XCTestCase {
 
     // MARK: Test configuration parameters
 
+    /// Tests that a custom EventLoopGroup can be specified and that RestRequest will use this
+    /// instead of the default group.
+    /// Because there is no way to compare an EventLoopGroup or inspect its properties to determine
+    /// whether it is the one we expected, we instead supply a custom group containing only one
+    /// thread, and then assert that multiple request handlers cannot run in parallel.
     func testEventLoopGroup() {
-        let myELG = MultiThreadedEventLoopGroup(numberOfThreads: 2)
+        let expectation = self.expectation(description: "All outstanding requests have completed")
+        let myELG = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let request = RestRequest(method: .get, url: "http://localhost:8080/", eventLoopGroup: myELG)
+        let sema = DispatchSemaphore(value: 0)
+        let requests = DispatchSemaphore(value: 0)
+        request.responseVoid { _ in
+            requests.signal()
+            request.responseVoid { _ in
+                requests.signal()
+                expectation.fulfill()
+            }
+            // Intentionally block the EventLoop thread, so that we can tell that the second
+            // request has not been processed (detecting that our single-threaded group is
+            // in use).
+            XCTAssertEqual(sema.wait(timeout: .distantFuture), .success)
+        }
+
+        // Assert that only a single request has been executed by our single-threaded ELG
+        XCTAssertEqual(requests.wait(timeout: .now() + .seconds(1)), .success, "First request should have been issued")
+        XCTAssertEqual(requests.wait(timeout: .now() + .seconds(1)), .timedOut, "Second request should not have been issued")
+
+        // Unblock the EventLoop thread, allowing the queued request to complete
+        sema.signal()
+        waitForExpectations(timeout: 1)
     }
 
     // MARK: Timeout tests
