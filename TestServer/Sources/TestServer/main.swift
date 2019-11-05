@@ -14,6 +14,7 @@
 * limitations under the License.
 */
 import Kitura
+import Socket
 import HeliumLogger
 import FileKit
 import Foundation
@@ -111,6 +112,22 @@ sslRouter.get("/ssl/jwt/user", handler: jwtAuthHandler)
 router.get("/users/:id") { (id: Int, respondWith: (User?, RequestError?) -> Void) in
     respondWith(userStore[id], nil)
 }
+
+// MARK: Timeout tests
+
+router.get("/timeout") { request, response, next in
+    guard let param = request.queryParameters["delay"], let delay = Int(param) else {
+        return try response.status(.badRequest).end()
+    }
+    DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(delay)) {
+        response.status(.OK)
+        next()
+    }
+}
+
+// A socket that listens but never accepts connections
+let sleepyServerSocket = try Socket.create(family: .inet)
+try sleepyServerSocket.listen(on: 8079, maxBacklogSize: 0, allowPortReuse: false)
 
 // MARK: Start server
 

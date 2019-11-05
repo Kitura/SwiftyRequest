@@ -1,6 +1,8 @@
 import XCTest
 import CircuitBreaker
 import NIOSSL
+import NIO
+import AsyncHTTPClient
 @testable import SwiftyRequest
 
 #if swift(>=4.1)
@@ -71,6 +73,9 @@ class SwiftyRequestTests: XCTestCase {
         ("testBasicAuthenticationFails", testBasicAuthenticationFails),
         ("testTokenAuthentication", testTokenAuthentication),
         ("testHeaders", testHeaders),
+        ("testEventLoopGroup", testEventLoopGroup),
+        ("testRequestTimeout", testRequestTimeout),
+//        ("testConnectTimeout", testConnectTimeout),
     ]
 
     // Enable logging output for tests
@@ -1092,4 +1097,103 @@ class SwiftyRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
+    // MARK: Test configuration parameters
+
+    /// Tests that a custom EventLoopGroup can be specified and that RestRequest will use this
+    /// instead of the default group.
+    /// Because there is no way to compare an EventLoopGroup or inspect its properties to determine
+    /// whether it is the one we expected, we instead supply a custom group containing only one
+    /// thread, and then assert that multiple request handlers cannot run in parallel.
+    func testEventLoopGroup() {
+        let expectation = self.expectation(description: "All outstanding requests have completed")
+        let myELG = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let request = RestRequest(method: .get, url: "http://localhost:8080/", eventLoopGroup: myELG)
+        let sema = DispatchSemaphore(value: 0)
+        let requests = DispatchSemaphore(value: 0)
+        request.responseVoid { _ in
+            requests.signal()
+            request.responseVoid { _ in
+                requests.signal()
+                expectation.fulfill()
+            }
+            // Intentionally block the EventLoop thread, so that we can tell that the second
+            // request has not been processed (detecting that our single-threaded group is
+            // in use).
+            XCTAssertEqual(sema.wait(timeout: .distantFuture), .success)
+        }
+
+        // Assert that only a single request has been executed by our single-threaded ELG
+        XCTAssertEqual(requests.wait(timeout: .now() + .seconds(1)), .success, "First request should have been issued")
+        XCTAssertEqual(requests.wait(timeout: .now() + .seconds(1)), .timedOut, "Second request should not have been issued")
+
+        // Unblock the EventLoop thread, allowing the queued request to complete
+        sema.signal()
+        waitForExpectations(timeout: 1)
+    }
+
+    // MARK: Timeout tests
+
+    /// Makes a request to a route that delays its response for longer than the configured timeout, causing a failure.
+    /// Then tests that a request with the same configuration succeeds if the route responds within the timeout.
+    func testRequestTimeout() {
+        let timeoutExpectation = self.expectation(description: "Request times out")
+        let successExpectation = self.expectation(description: "Request succeeds")
+
+        let request = RestRequest(method: .get, url: "http://localhost:8080/timeout", timeout: HTTPClient.Configuration.Timeout(connect: nil, read: .milliseconds(500)))
+
+        let delay1s = URLQueryItem(name: "delay", value: "1000")
+
+        request.responseVoid(queryItems: [delay1s]) { result in
+            switch result {
+            case .success(let response):
+                XCTFail("Request should have timed out, but status was \(response.status)")
+            case .failure(let error):
+                XCTAssertEqual(error, RestError.httpClientError(HTTPClientError.readTimeout))
+            }
+            timeoutExpectation.fulfill()
+        }
+
+        let delayNone = URLQueryItem(name: "delay", value: "100")
+
+        request.responseVoid(queryItems: [delayNone]) { result in
+            switch result {
+            case .success(let response):
+                XCTAssertEqual(response.status, .ok)
+            case .failure(let error):
+                XCTFail("Request should have succeeded, but produced: \(error)")
+            }
+            successExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 3)
+    }
+
+/**
+ * Note: Disabling this test because it seems unreliable in a CI environment
+    /// Connects to a socket that listens but never accepts a connection, and verifies that the client
+    /// times out with a failure after a specified connect timeout.
+    func testConnectTimeout() {
+        let timeoutExpectation = self.expectation(description: "Request times out")
+        let timeout: TimeAmount = .milliseconds(500)
+
+        let request = RestRequest(method: .get, url: "http://localhost:8079/", timeout: HTTPClient.Configuration.Timeout(connect: timeout, read: nil))
+
+        request.responseVoid { result in
+            switch result {
+            case .success(let response):
+                XCTFail("Connection should have timed out, but status was \(response.status)")
+            case .failure(let error):
+                XCTAssertEqual(error, RestError.otherError(NIO.ChannelError.connectTimeout(timeout)))
+                if let underlyingError = error.error, case let NIO.ChannelError.connectTimeout(timeAmount) = underlyingError {
+                    XCTAssertEqual(timeAmount, timeout, "Timeout amount was incorrect")
+                } else {
+                    XCTFail("Underlying error was not NIO.ChannelError.connectTimeout, it was: \(error.error ?? error)")
+                }
+            }
+            timeoutExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 3)
+    }
+*/
 }
