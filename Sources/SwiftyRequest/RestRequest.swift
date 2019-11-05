@@ -107,7 +107,7 @@ public class RestRequest {
     }
 
     /// A default `HTTPClient` instance.
-    private(set) var session: HTTPClient
+    private var session: HTTPClient
 
     // The HTTP Request
     private var mutableRequest: MutableRequest
