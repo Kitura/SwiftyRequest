@@ -389,9 +389,9 @@ public class RestRequest {
     ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
     ///   - timeout: An optional `HTTPClient.Configuration.Timeout` specifying how long to wait for connection or response from a remote service before timing out. Defaults to `nil`, which means no timeout.
     ///   - eventLoopGroup: An optional `EventLoopGroup` that should be used for requests, instead of the default `MultiThreadedEventLoopGroup` shared between all RestRequest instances.
-    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup? = nil) {
+    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup? = nil, clientConfiguration: HTTPClient.Configuration = HTTPClient.Configuration()) {
         self.mutableRequest = MutableRequest(method: method, url: url)
-        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
+        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup, configuration: clientConfiguration)
 
         // Set initial headers
         self.acceptType = "application/json"
@@ -399,7 +399,8 @@ public class RestRequest {
 
     }
 
-    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup?) -> HTTPClient {
+    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup?, configuration: HTTPClient.Configuration) -> HTTPClient {
+        var _configuration = configuration
         let chain: [NIOSSLCertificateSource]
         let key: NIOSSLPrivateKeySource?
         if let clientCertificate = clientCertificate {
@@ -412,9 +413,12 @@ public class RestRequest {
         let tlsConfiguration = TLSConfiguration.forClient(
             certificateVerification: (insecure ? .none : .fullVerification),
             certificateChain: chain, privateKey: key)
-        let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration,
-                                              timeout: timeout ?? HTTPClient.Configuration.Timeout())
-        return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup ?? globalELG), configuration: config)
+
+        _configuration.tlsConfiguration = tlsConfiguration
+        _configuration.ignoreUncleanSSLShutdown = true
+        _configuration.timeout = timeout ?? HTTPClient.Configuration.Timeout()
+
+        return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup ?? globalELG), configuration: _configuration)
     }
 
     /// Convenience function to encode an `Encodable` type as the request body, using a
