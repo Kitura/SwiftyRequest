@@ -414,8 +414,7 @@ public class RestRequest {
             certificateVerification: (insecure ? .none : .fullVerification),
             certificateChain: chain, privateKey: key)
 
-        _configuration.tlsConfiguration = tlsConfiguration
-        _configuration.ignoreUncleanSSLShutdown = true
+        _configuration.tlsConfiguration = tlsConfiguration        
         _configuration.timeout = timeout ?? HTTPClient.Configuration.Timeout()
 
         return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup ?? globalELG), configuration: _configuration)
