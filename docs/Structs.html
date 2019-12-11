@@ -14,6 +14,7 @@
   </head>
   <body>
 
+    <a name="//apple_ref/swift/Section/Structures" class="dashAnchor"></a>
 
     <a title="Structures  Reference"></a>
 
@@ -22,7 +23,7 @@
         <a class="header-link" href="index.html">
           SwiftyRequest Docs
         </a>
-         (100% documented)
+         (91% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -67,19 +68,7 @@
             <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/Credentials.html">Credentials</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Enums/HTTPMethod.html">HTTPMethod</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/JSON.html">JSON</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/RestError.html">RestError</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/Result.html">Result</a>
               </li>
             </ul>
           </li>
@@ -87,33 +76,7 @@
             <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/Bool.html">Bool</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions/Dictionary.html">Dictionary</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/Double.html">Double</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/Int.html">Int</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/String.html">String</a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
-            <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Protocols/JSONDecodable.html">JSONDecodable</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Protocols/JSONEncodable.html">JSONEncodable</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Protocols/JSONPathType.html">JSONPathType</a>
               </li>
             </ul>
           </li>
@@ -124,16 +87,19 @@
                 <a class="nav-group-task-link" href="Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/CertificateError.html">CertificateError</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/CircuitParameters.html">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/ClientCertificate.html">ClientCertificate</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/JSONWrapper.html">JSONWrapper</a>
+                <a class="nav-group-task-link" href="Structs/Credentials.html">Credentials</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/JSONWrapper/Error.html">– Error</a>
+                <a class="nav-group-task-link" href="Structs/RestError.html">RestError</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/RestResponse.html">RestResponse</a>
@@ -155,20 +121,13 @@
         <section class="section">
           <div class="section-content">
             <div class="task-group">
-              <div class="task-name-container">
-                <a name="/JSON"></a>
-                <a name="//apple_ref/swift/Section/JSON" class="dashAnchor"></a>
-                <a href="#/JSON">
-                  <h3 class="section-name">JSON</h3>
-                </a>
-              </div>
               <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest11JSONWrapperV"></a>
-                    <a name="//apple_ref/swift/Struct/JSONWrapper" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest11JSONWrapperV">JSONWrapper</a>
+                    <a name="/s:13SwiftyRequest17CircuitParametersV"></a>
+                    <a name="//apple_ref/swift/Struct/CircuitParameters" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -176,15 +135,111 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Object encapsulating a JSON object</p>
+                        <p>Encapsulates properties needed to initialize a <code>CircuitBreaker</code> object within the <code><a href="Classes/RestRequest.html">RestRequest</a></code> initializer.
+<code>A</code> is the type of the fallback&rsquo;s parameter.  See the CircuitBreaker documentation for a full explanation
+of these parameters.</p>
 
-                        <a href="Structs/JSONWrapper.html" class="slightly-smaller">See more</a>
+                        <a href="Structs/CircuitParameters.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">JSONWrapper</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">CircuitParameters</span><span class="o">&lt;</span><span class="kt">A</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest16CertificateErrorV"></a>
+                    <a name="//apple_ref/swift/Struct/CertificateError" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest16CertificateErrorV">CertificateError</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Represents an error while reading the data for a certificate or private key.</p>
+
+                        <a href="Structs/CertificateError.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">CertificateError</span> <span class="p">:</span> <span class="kt">Error</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span><span class="p">,</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest17ClientCertificateV"></a>
+                    <a name="//apple_ref/swift/Struct/ClientCertificate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest17ClientCertificateV">ClientCertificate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Represents a client certificate that should be provided as part of a RestRequest.
+The certificate and its corresponding private key will be read from PEM formatted data.
+If the private key is encrypted with a passphrase, the passphrase should also be supplied.</p>
+
+                        <a href="Structs/ClientCertificate.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ClientCertificate</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftyRequest11CredentialsV"></a>
+                    <a name="//apple_ref/swift/Struct/Credentials" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest11CredentialsV">Credentials</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Struct used to specify the type of authentication being used.</p>
+
+                        <a href="Structs/Credentials.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Credentials</span></code></pre>
 
                         </div>
                       </div>
@@ -230,9 +285,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest17CircuitParametersV"></a>
-                    <a name="//apple_ref/swift/Struct/CircuitParameters" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest17CircuitParametersV">CircuitParameters</a>
+                    <a name="/s:13SwiftyRequest9RestErrorV"></a>
+                    <a name="//apple_ref/swift/Struct/RestError" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest9RestErrorV">RestError</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -240,22 +295,25 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Encapsulates properties needed to initialize a <code>CircuitBreaker</code> object within the <code><a href="Classes/RestRequest.html">RestRequest</a></code> initializer.
-<code>A</code> is the type of the fallback&rsquo;s parameter.</p>
+                        <p>Enum describing error types that can occur during a rest request and response.</p>
 
-                        <a href="Structs/CircuitParameters.html" class="slightly-smaller">See more</a>
+                        <a href="Structs/RestError.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">CircuitParameters</span><span class="o">&lt;</span><span class="kt">A</span><span class="o">&gt;</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">RestError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
@@ -285,34 +343,6 @@ with <code>T</code> being the type of response we expect to receive.</p>
                     </section>
                   </div>
                 </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:13SwiftyRequest17ClientCertificateV"></a>
-                    <a name="//apple_ref/swift/Struct/ClientCertificate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest17ClientCertificateV">ClientCertificate</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Represents a reference to a client certificate.</p>
-
-                        <a href="Structs/ClientCertificate.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ClientCertificate</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
               </ul>
             </div>
           </div>
@@ -321,8 +351,8 @@ with <code>T</code> being the type of response we expect to receive.</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-02-06)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-09-27)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016,2017
+ * Copyright IBM Corporation 2016-2019
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,46 +17,104 @@
 import Foundation
 import CircuitBreaker
 import LoggerAPI
+import AsyncHTTPClient
+import NIO
+import NIOHTTP1
+import NIOSSL
 
-#if swift(>=4.1)
-  #if canImport(FoundationNetworking)
-    import FoundationNetworking
-  #endif
-#endif
+/// The default EventLoopGroup used by all RestRequest instances: a `MultiThreadedEventLoopGroup`
+/// with one thread per available processor.
+fileprivate let globalELG = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+
+// An object to represent the parameters of a request that can be mutated prior to
+// a request being issued. This acts as an adapter between SwiftyRequest's API and
+// async-http-client's (immutable) `Request` type, and can vend new `Request`s.
+fileprivate class MutableRequest {
+    /// Request HTTP method
+    var method: NIOHTTP1.HTTPMethod
+    /// Remote URL. May contain templated parameters
+    var urlString: String
+    /// Request custom HTTP Headers, defaults to no headers.
+    var headers: HTTPHeaders
+    /// Request body, defaults to no body.
+    var body: HTTPClient.Body?
+    /// Query items that will be added to the request URL.
+    var queryItems: [URLQueryItem]?
+
+    init(method: HTTPMethod = .get, url: String) {
+        self.method = method.httpClientMethod
+        self.urlString = url
+        self.headers = HTTPHeaders()
+        self.body = nil
+    }
+
+    /// Creates an (immutable) HTTPClient.Request using this wrapper's current values.
+    /// Can optionally perform substitutions on a templated URL.
+    func makeRequest(substitutions: [String: String]? = nil) throws -> HTTPClient.Request {
+        // Perform substitutions on templated URL, if necessary.
+        var url = try performSubstitutions(params: substitutions)
+        if let queryItems = self.queryItems {
+            url = try resolveQueryItems(url: url, queryItems: queryItems)
+        }
+        return try HTTPClient.Request(url: url, method: method, headers: headers, body: body)
+    }
+
+    // Replace queryitems in URL with new queryItems
+    private func resolveQueryItems(url: URL, queryItems: [URLQueryItem]) throws -> URL {
+        if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            urlComponents.queryItems = queryItems
+            // Must encode "+" to %2B (URLComponents does not do this)
+            urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+            guard let url = urlComponents.url else {
+                throw RestError.invalidURL(urlComponents.description)
+            }
+            return url
+        } else {
+            throw RestError.invalidURL(url.description)
+        }
+    }
+
+    /// Method to perform substitution on `String` URL if it contains templated placeholders
+    ///
+    /// - Parameter params: optional dictionary of parameters to substitute in
+    /// - Returns: returns a `URL` if template substitution was successful, or if the `url` is not templated.
+    /// - throws: `RestError.invalidSubstitution` if parameters were provided and the resulting URL was not valid,
+    /// - throws: `HTTPClientError.invalidURL` if no parameters were provided and the `urlString` is not a valid URL.
+    private func performSubstitutions(params: [String: String]?) throws -> URL {
+        guard let params = params, urlString.contains("{") else {
+            // No parameters provided, or no parameters required - create a plain URL
+            guard let simpleURL = URL(string: self.urlString) else {
+                throw RestError.invalidURL(urlString)
+            }
+            return simpleURL
+        }
+        // Replace templated elements with provided values
+        let expandedUrlString = urlString.expandString(params: params)
+        // Confirm that the resulting URL is valid
+        guard let expandedURL = URL(string: expandedUrlString) else {
+            throw RestError.invalidSubstitution
+        }
+        return expandedURL
+    }
+
+}
 
 /// Object containing everything needed to build and execute HTTP requests.
-public class RestRequest: NSObject  {
+public class RestRequest {
 
     deinit {
-        #if swift(>=4.1)
-        if session != URLSession.shared {
-            session.finishTasksAndInvalidate()
-        }
-        #else
-        session.finishTasksAndInvalidate()
-        #endif
+        try? session.syncShutdown()
     }
-    
-    // Check if there exists a self-signed certificate and whether it's a secure connection
-    private let isSecure: Bool
-    private let isSelfSigned: Bool
-    
-    // The client certificate for 2-way SSL
-    private let clientCertificate: ClientCertificate?
 
-    /// The `URLSession` instance that will be used to send the requests. Defaults to `URLSession.shared`.
-    #if swift(>=4.1)
-    public var session: URLSession = URLSession.shared
-    #else
-    public var session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
-    #endif
+    /// A default `HTTPClient` instance.
+    private var session: HTTPClient
 
     // The HTTP Request
-    private var request: URLRequest
+    private var mutableRequest: MutableRequest
 
     /// The currently configured `CircuitBreaker` instance for this `RestRequest`. In order to create a
     /// `CircuitBreaker` you should set the `circuitParameters` property.
-    public var circuitBreaker: CircuitBreaker<(Data?, HTTPURLResponse?, Error?) -> Void, String>?
+    internal(set) public var circuitBreaker: CircuitBreaker<(HTTPClient.Request, (Result<HTTPClient.Response, RestError>) -> Void), String>?
 
     /// Parameters for a `CircuitBreaker` instance.
     /// When these parameters are set, a new `circuitBreaker` instance is created.
@@ -67,45 +125,56 @@ public class RestRequest: NSObject  {
     ///                                           maxFailures: 2,
     ///                                           fallback: breakFallback)
     ///
-    /// let request = RestRequest(method: .get, url: "http://myApiCall/hello")
-    /// request.credentials = .apiKey,
+    /// let request = RestRequest(method: .GET, url: "http://myApiCall/hello")
     /// request.circuitParameters = circuitParameters
     /// ```
     public var circuitParameters: CircuitParameters<String>? = nil {
         didSet {
             if let params = circuitParameters {
-                circuitBreaker = CircuitBreaker(name: params.name,
-                                                timeout: params.timeout,
-                                                resetTimeout: params.resetTimeout,
-                                                maxFailures: params.maxFailures,
-                                                rollingWindow: params.rollingWindow,
-                                                bulkhead: params.bulkhead,
-                                                // We capture a weak reference to self to prevent a retain cycle from `handleInvocation` -> RestRequest` -> `circuitBreaker` -> `handleInvocation`. To do this we have explicitly declared the handleInvocation function as a closure.
-                                                command: { [weak self] invocation in self?.handleInvocation(invocation: invocation) },
-                                                fallback: params.fallback)
+                circuitBreaker = CircuitBreaker(
+                    name: params.name,
+                    timeout: params.timeout,
+                    resetTimeout: params.resetTimeout,
+                    maxFailures: params.maxFailures,
+                    rollingWindow: params.rollingWindow,
+                    bulkhead: params.bulkhead,
+                    // We capture a weak reference to self to prevent a retain cycle from `handleInvocation` -> RestRequest` -> `circuitBreaker` -> `handleInvocation`. To do this we have explicitly declared the handleInvocation function as a closure.
+                    command: { [weak self] invocation in
+                        let request = invocation.commandArgs.0
+                        self?.session.execute(request: request).whenComplete { result in
+                            let callback = invocation.commandArgs.1
+                            switch result {
+                            case .failure(let error as HTTPClientError):
+                                invocation.notifyFailure(error: BreakerError(reason: error.localizedDescription))
+                                callback(Result<HTTPClient.Response, RestError>.failure(.httpClientError(error)))
+                            case .failure(let error):
+                                invocation.notifyFailure(error: BreakerError(reason: error.localizedDescription))
+                                callback(Result<HTTPClient.Response, RestError>.failure(.otherError(error)))
+                            case .success(let success):
+                                invocation.notifySuccess()
+                                callback(Result<HTTPClient.Response, RestError>.success(success))
+                            }
+                        }
+                    },
+                    fallback: params.fallback)
             }
         }
     }
 
     // MARK: HTTP Request Parameters
-    /// URL `String` used to store a url containing replaceable template values.
-    private var urlTemplate: String?
-
-    /// The string representation of the HTTP request url.
-    private var url: String
 
     /// The HTTP method specified in the request, defaults to GET.
     ///
     /// ### Usage Example: ###
     /// ```swift
-    /// request.method = .put
+    /// request.method = .PUT
     /// ```
     public var method: HTTPMethod {
         get {
-            return HTTPMethod(fromRawValue: request.httpMethod ?? "unknown")
+            return HTTPMethod(mutableRequest.method)
         }
         set {
-            request.httpMethod = newValue.rawValue
+            mutableRequest.method = newValue.httpClientMethod
         }
     }
 
@@ -117,50 +186,41 @@ public class RestRequest: NSObject  {
     /// authenticate with are passed in.
     ///
     /// ```swift
-    /// let request = RestRequest(url: apiURL)
-    /// request.credentials = .apiKey
+    /// let request = RestRequest(url: "http://localhost:8080")
+    /// request.credentials = .basicAuthentication(username: "Hello", password: "World")
     /// ```
     public var credentials: Credentials? {
         didSet {
             // set the request's authentication credentials
             if let credentials = credentials {
-                switch credentials {
-                case .apiKey: break
-                case .bearerAuthentication(let token):
-                    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-                case .basicAuthentication(let username, let password):
-                    let authData = (username + ":" + password).data(using: .utf8)!
-                    let authString = authData.base64EncodedString()
-                    request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
-                }
+                mutableRequest.headers.replaceOrAdd(name: "Authorization", value: credentials.authheader)
             } else {
-                request.setValue(nil, forHTTPHeaderField: "Authorization")
+                mutableRequest.headers.remove(name: "Authorization")
             }
         }
     }
 
     /// The HTTP header fields which form the header section of the request message.
     ///
-    /// Header fields are colon-separated key-value pairs in string format.  Existing header fields which are not one of the
-    /// four`RestRequest` supported headers ("Authorization", "Accept", "Content-Type" and "User-Agent") will be cleared
-    /// (set to nil) then the passed in HTTP parameters will be set (or replaced).
+    /// The header fields set using this parameter will be added to the existing headers.
     ///
     /// ### Usage Example: ###
     ///
     /// ```swift
-    /// request.headerParameters = ["Cookie" : "v1"]
+    /// request.headerParameters = ["Cookie": "v1"]
     /// ```
     public var headerParameters: [String: String] {
         get {
-            return request.allHTTPHeaderFields ?? [:]
+            var dict: [String: String] = [:]
+            for (name, value) in mutableRequest.headers {
+                assert(dict[name] == nil, "Header '\(name)' was already set")
+                dict[name] = value
+            }
+            return dict
         }
         set {
-            // Remove any header fields external to the RestRequest supported headers
-            let s: Set<String> = ["Authorization", "Accept", "Content-Type", "User-Agent"]
-            _ = request.allHTTPHeaderFields?.map { key, value in if !s.contains(key) { request.setValue(nil, forHTTPHeaderField: key) } }
-            // Add new header parameters
-            for (key, value) in newValue {
-                request.setValue(value, forHTTPHeaderField: key)
+            for (name, value) in newValue {
+                mutableRequest.headers.replaceOrAdd(name: name, value: value)
             }
         }
     }
@@ -174,10 +234,14 @@ public class RestRequest: NSObject  {
     /// ```
     public var acceptType: String? {
         get {
-            return request.value(forHTTPHeaderField: "Accept")
+            return mutableRequest.headers["Accept"].first
         }
         set {
-            request.setValue(newValue, forHTTPHeaderField: "Accept")
+            if let value = newValue {
+                mutableRequest.headers.replaceOrAdd(name: "Accept", value: value)
+            } else {
+                mutableRequest.headers.remove(name: "Accept")
+            }
         }
     }
 
@@ -190,10 +254,14 @@ public class RestRequest: NSObject  {
     /// ```
     public var contentType: String? {
         get {
-            return request.value(forHTTPHeaderField: "Content-Type")
+            return mutableRequest.headers["Content-Type"].first
         }
         set {
-            request.setValue(newValue, forHTTPHeaderField: "Content-Type")
+            if let value = newValue {
+                mutableRequest.headers.replaceOrAdd(name: "Content-Type", value: value)
+            } else {
+                mutableRequest.headers.remove(name: "Content-Type")
+            }
         }
     }
 
@@ -207,13 +275,20 @@ public class RestRequest: NSObject  {
     /// ```
     public var productInfo: String? {
         get {
-            return request.value(forHTTPHeaderField: "User-Agent")
+            return mutableRequest.headers["User-Agent"].first
         }
         set {
-            request.setValue(newValue?.generateUserAgent(), forHTTPHeaderField: "User-Agent")
+            if let value = newValue {
+                mutableRequest.headers.replaceOrAdd(name: "User-Agent", value: value.generateUserAgent())
+            } else {
+                mutableRequest.headers.remove(name: "User-Agent")
+            }
         }
     }
 
+    // Storage for message body
+    private var _messageBody: Data?
+    
     /// The HTTP message body, i.e. the body of the request.
     ///
     /// ### Usage Example: ###
@@ -222,10 +297,57 @@ public class RestRequest: NSObject  {
     /// ``
     public var messageBody: Data? {
         get {
-            return request.httpBody
+            return _messageBody
         }
         set {
-            request.httpBody = newValue
+            _messageBody = newValue
+            if let data = newValue {
+                mutableRequest.body = .data(data)
+            } else {
+                mutableRequest.body = nil
+            }
+        }
+    }
+
+    /// The HTTP message body, i.e. the body of the request, as a JSON dictionary.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// let dict: [String:Any] = ["key": "value"]
+    /// request.messageBodyDictionary = dict
+    /// ``
+    public var messageBodyDictionary: [String: Any]? {
+        get {
+            guard let data = _messageBody else { return nil }
+            return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        }
+        set {
+            if let data = try? JSONSerialization.data(withJSONObject: newValue as Any) {
+                messageBody = data
+            } else {
+                messageBody = nil
+            }
+        }
+    }
+
+    /// The HTTP message body, i.e. the body of the request, as a JSON array.
+    ///
+    /// ### Usage Example: ###
+    /// ```swift
+    /// let json: [Any] = ["value1", "value2"]
+    /// request.messageBodyArray = json
+    /// ``
+    public var messageBodyArray: [Any]? {
+        get {
+            guard let data = _messageBody else { return nil }
+            return try? JSONSerialization.jsonObject(with: data) as? [Any]
+        }
+        set {
+            if let data = try? JSONSerialization.data(withJSONObject: newValue as Any) {
+                messageBody = data
+            } else {
+                messageBody = nil
+            }
         }
     }
 
@@ -241,111 +363,101 @@ public class RestRequest: NSObject  {
     /// ```
     public var queryItems: [URLQueryItem]?  {
         set {
-            // Replace queryitems on request.url with new queryItems
-            if let currentURL = request.url, var urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
-                urlComponents.queryItems = newValue
-                // Must encode "+" to %2B (URLComponents does not do this)
-                urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
-                request.url = urlComponents.url
-            }
+            mutableRequest.queryItems = newValue
         }
         get {
-            if let currentURL = request.url, let urlComponents = URLComponents(url: currentURL, resolvingAgainstBaseURL: false) {
-                return urlComponents.queryItems
-            }
-            return nil
+            return mutableRequest.queryItems
         }
+    }
+
+    @available(*, deprecated, renamed: "init(method:url:insecure:clientCertificate:timeout:eventLoopGroup:)")
+    public convenience init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup? = nil) {
+        self.init(method: method, url: url, insecure: containsSelfSignedCert ?? false, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
     }
 
     /// Initialize a `RestRequest` instance.
     ///
     /// ### Usage Example: ###
     /// ```swift
-    /// let request = RestRequest(method: .get, url: "http://myApiCall/hello")
+    /// let request = RestRequest(method: .GET, url: "http://myApiCall/hello")
     /// ```
     ///
     /// - Parameters:
     ///   - method: The method specified in the request, defaults to GET.
     ///   - url: URL string to use for the network request.
-    ///   - containsSelfSignedCert: Pass `True` to use self signed certificates.
-    ///   - clientCertificate: Pass in `ClientCertificate` with the certificate name and path to use client certificates for 2-way SSL.
-    public init(method: HTTPMethod = .get, url: String, containsSelfSignedCert: Bool? = false, clientCertificate: ClientCertificate? = nil) {
+    ///   - insecure: Pass `True` to accept invalid or self-signed certificates.
+    ///   - clientCertificate: An optional `ClientCertificate` for client authentication.
+    ///   - timeout: An optional `HTTPClient.Configuration.Timeout` specifying how long to wait for connection or response from a remote service before timing out. Defaults to `nil`, which means no timeout.
+    ///   - eventLoopGroup: An optional `EventLoopGroup` that should be used for requests, instead of the default `MultiThreadedEventLoopGroup` shared between all RestRequest instances.
+    public init(method: HTTPMethod = .get, url: String, insecure: Bool = false, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout? = nil, eventLoopGroup: EventLoopGroup? = nil) {
+        self.mutableRequest = MutableRequest(method: method, url: url)
+        self.session = RestRequest.createHTTPClient(insecure: insecure, clientCertificate: clientCertificate, timeout: timeout, eventLoopGroup: eventLoopGroup)
 
-        self.isSecure = url.hasPrefix("https")
-        self.isSelfSigned = containsSelfSignedCert ?? false
-        self.clientCertificate = clientCertificate
-
-        // Instantiate basic mutable request
-        let urlComponents = URLComponents(string: url) ?? URLComponents(string: "")!
-        let urlObject = urlComponents.url ?? URL(string: "n/a")!
-        self.request = URLRequest(url: urlObject)
-
-        // Set initial fields
-        self.url = url
-
-        super.init()
-
-        if isSecure && isSelfSigned {
-            let config = URLSessionConfiguration.default
-            config.requestCachePolicy = .reloadIgnoringLocalCacheData
-            session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
-        }
-        
-        self.method = method
+        // Set initial headers
         self.acceptType = "application/json"
         self.contentType = "application/json"
 
-        // We accept URLs with templated values which `URLComponents` does not treat as valid
-        if URLComponents(string: url) == nil {
-            self.urlTemplate = url
+    }
+
+    private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup?) -> HTTPClient {
+        let chain: [NIOSSLCertificateSource]
+        let key: NIOSSLPrivateKeySource?
+        if let clientCertificate = clientCertificate {
+            chain = [.certificate(clientCertificate.certificate)]
+            key = NIOSSLPrivateKeySource.privateKey(clientCertificate.privateKey)
+        } else {
+            chain = []
+            key = nil
         }
+        let tlsConfiguration = TLSConfiguration.forClient(
+            certificateVerification: (insecure ? .none : .fullVerification),
+            certificateChain: chain, privateKey: key)
+        let config = HTTPClient.Configuration(tlsConfiguration: tlsConfiguration,
+                                              timeout: timeout ?? HTTPClient.Configuration.Timeout())
+        return HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup ?? globalELG), configuration: config)
+    }
+
+    /// Convenience function to encode an `Encodable` type as the request body, using a
+    /// default `JSONEncoder`.
+    /// - Parameter obj: The value to encode as JSON
+    /// - throws: If the value cannot be encoded.
+    public func setBodyObject<T: Encodable>(_ obj: T) throws {
+        self.messageBody = try JSONEncoder().encode(obj)
     }
 
     // MARK: Response methods
     /// Request response method that either invokes `CircuitBreaker` or executes the HTTP request.
+    /// Note: this is equivalent to `responseVoid(templateParams:queryItems:completionHandler:)`.
     ///
-    /// - Parameter completionHandler: Callback used on completion of operation.
-    public func response(completionHandler: @escaping (Data?, HTTPURLResponse?, Error?) -> Void) {
-        if let breaker = circuitBreaker {
-            breaker.run(commandArgs: completionHandler, fallbackArgs: "Circuit is open")
-        } else {
-            let task = session.dataTask(with: request) { (data, response, error) in
-                guard error == nil, let response = response as? HTTPURLResponse else {
-                    completionHandler(nil, nil, error)
-                    return
-                }
-
-                let code = response.statusCode
-                if code >= 200 && code < 300 {
-                    completionHandler(data, response, error)
-                } else {
-                    completionHandler(data,
-                                      response,
-                                      RestError.erroredResponseStatus(code))
-                }
-            }
-            task.resume()
-        }
+    /// - Parameters:
+    ///   - templateParams: URL templating parameters used for substituion if possible.
+    ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
+    ///   - completionHandler: Callback used on completion of operation.
+    public func response(templateParams: [String: String]? = nil,
+                         queryItems: [URLQueryItem]? = nil,
+                         completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
+        responseVoid(templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
-
-    // Function to get cookies from HTTPURLResponse headers.
-    private func getCookies(from response: HTTPURLResponse?) -> [HTTPCookie]? {
-        guard let headers = response?.allHeaderFields else {
-            return nil
-        }
-        var headerFields = [String : String]()
-        for (key, value) in headers {
-            guard let key = key as? String, let value = value as? String else {
-                continue
+    
+    private func _response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
+        if let breaker = circuitBreaker {
+            breaker.run(commandArgs: (request, completionHandler), fallbackArgs: "Circuit is open")
+        } else {
+            self.session.execute(request: request).whenComplete { result in
+                switch result {
+                case .success(let response):
+                    if response.status.code >= 200 && response.status.code < 300 {
+                        return completionHandler(.success(response))
+                    } else {
+                        return completionHandler(.failure(RestError.errorStatusCode(response: response)))
+                    }
+                case .failure(let error as HTTPClientError):
+                    return completionHandler(.failure(.httpClientError(error)))
+                case .failure(let error):
+                    return completionHandler(.failure(.otherError(error)))
+                }
             }
-            headerFields[key] = value
         }
-        guard headerFields["Set-Cookie"] != nil else {
-            return nil
-        }
-        let url = response?.url
-        let dummyUrl = URL(string:"http://example.com")!
-        return HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url ?? dummyUrl)
     }
 
     /// Request response method with the expected result of a `Data` object.
@@ -356,468 +468,377 @@ public class RestRequest: NSObject  {
     ///   - completionHandler: Callback used on completion of operation.
     public func responseData(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
-                             completionHandler: @escaping (RestResponse<Data>) -> Void) {
-
-        if  let error = performSubstitutions(params: templateParams) {
-            let result = Result<Data>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
-            completionHandler(dataResponse)
-            return
-        }
+                             completionHandler: @escaping (Result<RestResponse<Data>, RestError>) -> Void) {
 
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
-            self.queryItems = queryItems
+            mutableRequest.queryItems = queryItems
         }
 
-        response { data, response, error in
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            if let error = error {
-                let result = Result<Data>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
+        _response(request: request) { result in
+            switch result {
+            case .failure(let error):
+                return completionHandler(.failure(error))
+            case .success(let response):
+                guard let body = response.body,
+                    let bodyBytes = body.getBytes(at: 0, length: body.readableBytes)
+                else {
+                    return completionHandler(.failure(RestError.noData(response: response)))
+                }
+                return completionHandler(.success(RestResponse(host: response.host,
+                                                        status: response.status,
+                                                        headers: response.headers,
+                                                        request: request,
+                                                        body: Data(bodyBytes),
+                                                        cookies: response.cookies)))
             }
-
-            guard let data = data else {
-                let result = Result<Data>.failure(RestError.noData)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-            let result = Result.success(data)
-            let cookies = self.getCookies(from: response)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-            completionHandler(dataResponse)
         }
     }
 
     /// Request response method with the expected result of the object `T` specified.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure.
-    ///   - path: Array of Json keys leading to desired JSON.
     ///   - templateParams: URL templating parameters used for substitution if possible.
     ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation.
-    public func responseObject<T: JSONDecodable>(
-        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
-        path: [JSONPathType]? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<T>) -> Void) {
-
-        if  let error = performSubstitutions(params: templateParams) {
-            let result = Result<T>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
-            completionHandler(dataResponse)
-            return
-        }
+    public func responseObject<T: Decodable>(templateParams: [String: String]? = nil,
+                                             queryItems: [URLQueryItem]? = nil,
+                                             completionHandler: @escaping (Result<RestResponse<T>, RestError>) -> Void) {
 
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
-            self.queryItems = queryItems
+            mutableRequest.queryItems = queryItems
         }
 
-        response { data, response, error in
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            if let error = error {
-                let result = Result<T>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            if let responseToError = responseToError,
-                let error = responseToError(response, data) {
-                let result = Result<T>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // ensure data is not nil
-            guard let data = data else {
-                let result = Result<T>.failure(RestError.noData)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // parse json object
-            let result: Result<T>
-            do {
-                let json = try JSONWrapper(data: data)
-                let object: T
-                if let path = path {
-                    switch path.count {
-                    case 0: object = try json.decode()
-                    case 1: object = try json.decode(at: path[0])
-                    case 2: object = try json.decode(at: path[0], path[1])
-                    case 3: object = try json.decode(at: path[0], path[1], path[2])
-                    case 4: object = try json.decode(at: path[0], path[1], path[2], path[3])
-                    case 5: object = try json.decode(at: path[0], path[1], path[2], path[3], path[4])
-                    default: throw JSONWrapper.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
-                    }
-                } else {
-                    object = try json.decode()
+        _response(request: request) { result in
+            switch result {
+            case .failure(let error):
+                return completionHandler(.failure(error))
+            case .success(let response):
+                guard let body = response.body,
+                    let bodyBytes = body.getBytes(at: 0, length: body.readableBytes)
+                else {
+                    return completionHandler(.failure(RestError.noData(response: response)))
                 }
-                result = .success(object)
-            } catch {
-                result = .failure(error)
+                do {
+                    let object = try JSONDecoder().decode(T.self, from: Data(bodyBytes))
+                    return completionHandler(.success(RestResponse(host: response.host,
+                                                            status: response.status,
+                                                            headers: response.headers,
+                                                            request: request,
+                                                            body: object,
+                                                            cookies: response.cookies)))
+                } catch {
+                    return completionHandler(.failure(RestError.decodingError(error: error, response: response)))
+                }
             }
-
-            // execute callback
-            let cookies = self.getCookies(from: response)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-            completionHandler(dataResponse)
         }
     }
 
-    /// Request response method with the expected result of the object `T` specified.
+    /// Request response method with the expected result of an array of `Any` JSON.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure.
     ///   - templateParams: URL templating parameters used for substitution if possible.
     ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation.
-    public func responseObject<T: Decodable>(
-        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<T>) -> Void) {
-
-        if  let error = performSubstitutions(params: templateParams) {
-            let result = Result<T>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
-            completionHandler(dataResponse)
-            return
-        }
-
+    public func responseArray(templateParams: [String: String]? = nil,
+                              queryItems: [URLQueryItem]? = nil,
+                              completionHandler: @escaping (Result<RestResponse<[Any]>, RestError>) -> Void) {
+        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
-            self.queryItems = queryItems
+            mutableRequest.queryItems = queryItems
         }
 
-        response { data, response, error in
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            if let error = error ?? responseToError?(response, data) {
-                let result = Result<T>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
+        _response(request: request) { result in
+            switch result {
+            case .failure(let error):
+                return completionHandler(.failure(error))
+            case .success(let response):
+                guard let body = response.body,
+                    let bodyBytes = body.getBytes(at: 0, length: body.readableBytes)
+                else {
+                    return completionHandler(.failure(RestError.noData(response: response)))
+                }
+                guard let object = (try? JSONSerialization.jsonObject(with: Data(bodyBytes))) as? [Any] else {
+                    return completionHandler(.failure(RestError.serializationError(response: response)))
+                }
+                return completionHandler(.success(RestResponse(host: response.host,
+                                                               status: response.status,
+                                                               headers: response.headers,
+                                                               request: request,
+                                                               body: object,
+                                                               cookies: response.cookies)))
             }
-
-            // ensure data is not nil
-            guard let data = data else {
-                let result = Result<T>.failure(RestError.noData)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // parse json object
-            let result: Result<T>
-            do {
-                let object = try JSONDecoder().decode(T.self, from: data)
-                result = .success(object)
-            } catch {
-                result = .failure(error)
-            }
-
-            // execute callback
-            let cookies = self.getCookies(from: response)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-            completionHandler(dataResponse)
         }
     }
-
-    /// Request response method with the expected result of an array of type `T` specified.
+    
+    /// Request response method with the expected result of a `[String: Any]` JSON dictionary.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure.
-    ///   - path: Array of JSON keys leading to desired JSON.
     ///   - templateParams: URL templating parameters used for substitution if possible.
     ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation.
-    public func responseArray<T: JSONDecodable>(
-        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
-        path: [JSONPathType]? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<[T]>) -> Void) {
-
-        if  let error = performSubstitutions(params: templateParams) {
-            let result = Result<[T]>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
-            completionHandler(dataResponse)
-            return
-        }
-
+    public func responseDictionary(templateParams: [String: String]? = nil,
+                              queryItems: [URLQueryItem]? = nil,
+                              completionHandler: @escaping (Result<RestResponse<[String: Any]>, RestError>) -> Void) {
+        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
-            self.queryItems = queryItems
+            mutableRequest.queryItems = queryItems
         }
 
-        response { data, response, error in
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            if let error = error {
-                let result = Result<[T]>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            if let responseToError = responseToError,
-                let error = responseToError(response, data) {
-                let result = Result<[T]>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // ensure data is not nil
-            guard let data = data else {
-                let result = Result<[T]>.failure(RestError.noData)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // parse json object
-            let result: Result<[T]>
-            do {
-                let json = try JSONWrapper(data: data)
-                var array: [JSONWrapper]
-                if let path = path {
-                    switch path.count {
-                    case 0: array = try json.getArray()
-                    case 1: array = try json.getArray(at: path[0])
-                    case 2: array = try json.getArray(at: path[0], path[1])
-                    case 3: array = try json.getArray(at: path[0], path[1], path[2])
-                    case 4: array = try json.getArray(at: path[0], path[1], path[2], path[3])
-                    case 5: array = try json.getArray(at: path[0], path[1], path[2], path[3], path[4])
-                    default: throw JSONWrapper.Error.keyNotFound(key: "ExhaustedVariadicParameterEncoding")
-                    }
-                } else {
-                    array = try json.getArray()
+        _response(request: request) { result in
+            switch result {
+            case .failure(let error):
+                return completionHandler(.failure(error))
+            case .success(let response):
+                guard let body = response.body,
+                    let bodyBytes = body.getBytes(at: 0, length: body.readableBytes)
+                    else {
+                        return completionHandler(.failure(RestError.noData(response: response)))
                 }
-                let objects: [T] = try array.map { json in try json.decode() }
-                result = .success(objects)
-            } catch {
-                result = .failure(error)
+                guard let object = (try? JSONSerialization.jsonObject(with: Data(bodyBytes))) as? [String: Any] else {
+                    return completionHandler(.failure(RestError.serializationError(response: response)))
+                }
+                return completionHandler(.success(RestResponse(host: response.host,
+                                                               status: response.status,
+                                                               headers: response.headers,
+                                                               request: request,
+                                                               body: object,
+                                                               cookies: response.cookies)))
             }
-
-            // execute callback
-            let cookies = self.getCookies(from: response)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-            completionHandler(dataResponse)
         }
     }
+
 
     /// Request response method with the expected result of a `String`.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure.
     ///   - templateParams: URL templating parameters used for substituion if possible.
     ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation.
-    public func responseString(
-        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<String>) -> Void) {
-
-        if  let error = performSubstitutions(params: templateParams) {
-            let result = Result<String>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
-            completionHandler(dataResponse)
-            return
-        }
-
+    public func responseString(templateParams: [String: String]? = nil,
+                               queryItems: [URLQueryItem]? = nil,
+                               completionHandler: @escaping (Result<RestResponse<String>, RestError>) -> Void) {
+        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
-            self.queryItems = queryItems
+            mutableRequest.queryItems = queryItems
         }
 
-        response { data, response, error in
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            if let error = error {
-                let result = Result<String>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
+        _response(request: request) { result in
+            switch result {
+            case .failure(let error):
+                return completionHandler(.failure(error))
+            case .success(let response):
+                guard let body = response.body,
+                    let bodyBytes = body.getBytes(at: 0, length: body.readableBytes)
+                    else {
+                        return completionHandler(.failure(RestError.noData(response: response)))
+                }
+                // Retrieve string encoding type
+                let encoding = self.getCharacterEncoding(from: response.headers["Content-Type"].first)
+                
+                guard let object = String(bytes: bodyBytes, encoding: encoding) else {
+                    return completionHandler(.failure(RestError.serializationError(response: response)))
+                }
+                return completionHandler(.success(RestResponse(host: response.host,
+                                                               status: response.status,
+                                                               headers: response.headers,
+                                                               request: request,
+                                                               body: object,
+                                                               cookies: response.cookies)))
             }
-
-            if let responseToError = responseToError,
-                let error = responseToError(response, data) {
-                let result = Result<String>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // ensure data is not nil
-            guard let data = data else {
-                let result = Result<String>.failure(RestError.noData)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // Retrieve string encoding type
-            let encoding = self.getCharacterEncoding(from: response?.allHeaderFields["Content-Type"] as? String)
-
-            // parse data as a string
-            guard let string = String(data: data, encoding: encoding) else {
-                let result = Result<String>.failure(RestError.serializationError)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: nil, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // execute callback
-            let result = Result.success(string)
-            let cookies = self.getCookies(from: response)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-            completionHandler(dataResponse)
         }
     }
 
     /// Request response method to use when there is no expected result.
     ///
     /// - Parameters:
-    ///   - responseToError: Error callback closure in case of request failure.
     ///   - templateParams: URL templating parameters used for substituion if possible.
     ///   - queryItems: Sets the query parameters for this RestRequest, overwriting any existing parameters. Defaults to `nil`, which means that this parameter will be ignored, and `RestRequest.queryItems` will be used instead. Note that if you wish to clear any existing query parameters, then you should set `request.queryItems = nil` before calling this function.
     ///   - completionHandler: Callback used on completion of operation.
-    public func responseVoid(
-        responseToError: ((HTTPURLResponse?, Data?) -> Error?)? = nil,
-        templateParams: [String: String]? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        completionHandler: @escaping (RestResponse<Void>) -> Void) {
-
-        if  let error = performSubstitutions(params: templateParams) {
-            let result = Result<Void>.failure(error)
-            let dataResponse = RestResponse(request: request, response: nil, data: nil, result: result, cookies: nil)
-            completionHandler(dataResponse)
-            return
-        }
-
+    public func responseVoid(templateParams: [String: String]? = nil,
+                             queryItems: [URLQueryItem]? = nil,
+                             completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
+        
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
-            self.queryItems = queryItems
+            mutableRequest.queryItems = queryItems
         }
 
-        response { data, response, error in
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest(substitutions: templateParams)
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            if let error = error {
-                let result = Result<Void>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
+        _response(request: request) { result in
+            switch result {
+            case .failure(let error):
+                return completionHandler(.failure(error))
+            case .success(let response):
+                return completionHandler(.success(response)) 
             }
-
-            if let responseToError = responseToError, let error = responseToError(response, data) {
-                let result = Result<Void>.failure(error)
-                let cookies = self.getCookies(from: response)
-                let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-                completionHandler(dataResponse)
-                return
-            }
-
-            // execute callback
-            let result = Result<Void>.success(())
-            let cookies = self.getCookies(from: response)
-            let dataResponse = RestResponse(request: self.request, response: response, data: data, result: result, cookies: cookies)
-            completionHandler(dataResponse)
         }
     }
 
+    class DownloadDelegate: HTTPClientResponseDelegate {
+        typealias Response = HTTPResponseHead
+        
+        var count = 0
+        let destination: URL
+        var responseHead: HTTPResponseHead?
+        var error: Error?
+        
+        init(destination: URL) {
+            self.destination = destination
+        }
+        
+        func didSendRequestHead(task: HTTPClient.Task<Response>, _ head: HTTPRequestHead) {
+            // this is executed when request is sent, called once
+            // Create a file in one doesn't exist
+            do {
+                try "".write(to: destination, atomically: true, encoding: .utf8)
+            } catch {
+                self.error = error
+            }
+        }
+        
+        func didSendRequestPart(task: HTTPClient.Task<Response>, _ part: IOData) {
+            // this is executed when request body part is sent, could be called zero or more times
+        }
+        
+        func didSendRequest(task: HTTPClient.Task<Response>) {
+            // this is executed when request is fully sent, called once
+        }
+        
+        func didReceiveHead(task: HTTPClient.Task<Response>, _ head: HTTPResponseHead) -> EventLoopFuture<Void> {
+            // this is executed when we receive HTTP Reponse head part of the request (it contains response code and headers), called once
+            self.responseHead = head
+            return task.eventLoop.makeSucceededFuture(())
+        }
+        
+        func didReceivePart(task: HTTPClient.Task<Response>, _ buffer: ByteBuffer) -> EventLoopFuture<Void> {
+            // this is executed when we receive parts of the response body, could be called zero or more times
+            do {
+                let fileHandle = try FileHandle(forUpdating: destination)
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(Data(buffer.getBytes(at: 0, length: buffer.readableBytes) ?? []))
+                fileHandle.closeFile()
+            } catch {
+                self.error = error
+            }
+            return task.eventLoop.makeSucceededFuture(())
+        }
+        
+        func didFinishRequest(task: HTTPClient.Task<HTTPResponseHead>) throws -> HTTPResponseHead {
+            // this is called when the request is fully read, called once
+            // this is where you return a result or throw any errors you require to propagate to the client
+            guard let head = responseHead else {
+                throw RestError.downloadError
+            }
+            if let error = error {
+                throw error
+            }
+            return head
+        }
+        
+        func didReceiveError(task: HTTPClient.Task<HTTPResponseHead>, _ error: Error) {
+            // this is called when we receive any network-related error, called once
+            self.error = error
+        }
+    }
+    
     /// Utility method to download a file from a remote origin.
     ///
     /// - Parameters:
     ///   - destination: URL destination to save the file to.
     ///   - completionHandler: Callback used on completion of the operation.
-    public func download(to destination: URL, completionHandler: @escaping (HTTPURLResponse?, Error?) -> Void) {
-        let task = session.downloadTask(with: request) { (source, response, error) in
-            do {
-                guard let source = source else {
-                    throw RestError.invalidFile
-                }
-                let fileManager = FileManager.default
-                try fileManager.moveItem(at: source, to: destination)
+    public func download(to destination: URL, completionHandler: @escaping (Result<HTTPResponseHead, RestError>) -> Void) {
+        let delegate = DownloadDelegate(destination: destination)
 
-                completionHandler(response as? HTTPURLResponse, error)
+        // Create an (immutable) Request from our MutableRequest
+        var request: HTTPClient.Request
+        do {
+            request = try self.mutableRequest.makeRequest()
+        } catch let error as RestError {
+            return completionHandler(.failure(error))
+        } catch {
+            return completionHandler(.failure(.otherError(error)))
+        }
 
-            } catch {
-                completionHandler(nil, RestError.fileManagerError)
+        session.execute(request: request, delegate: delegate).futureResult.whenComplete({ result in
+            switch result {
+            case .success(let response):
+                completionHandler(.success(response))
+            case .failure(let error as HTTPClientError):
+                completionHandler(.failure(.httpClientError(error)))
+            case .failure(let error):
+                completionHandler(.failure(.otherError(error)))
             }
-        }
-        task.resume()
-    }
-
-    /// Method used by `CircuitBreaker` as the contextCommand.
-    ///
-    /// - Parameter invocation: `Invocation` contains a command argument, `Void` return type, and a `String` fallback arguement.
-    private func handleInvocation(invocation: Invocation<(Data?, HTTPURLResponse?, Error?) -> Void, String>) {
-        let task = session.dataTask(with: request) { (data, response, error) in
-            if error != nil {
-                invocation.notifyFailure(error: BreakerError(reason: error?.localizedDescription))
-            } else {
-                invocation.notifySuccess()
-            }
-            let callback = invocation.commandArgs
-            callback(data, response as? HTTPURLResponse, error)
-        }
-        task.resume()
-
-    }
-
-    /// Method to perform substitution on `String` URL if it contains templated placeholders
-    ///
-    /// - Parameter params: dictionary of parameters to substitute in
-    /// - Returns: returns either a `RestError` or nil if there were no problems setting new URL on our `URLRequest` object
-    private func performSubstitutions(params: [String: String]?) -> RestError? {
-
-        guard let params = params else {
-            return nil
-        }
-
-        // Get urlTemplate if available, otherwise just use the request's url
-        let urlString = (self.urlTemplate ?? self.url).expandString(params: params)
-
-        // Confirm that the resulting URL is valid
-        guard let urlComponents = URLComponents(string: urlString) else {
-            return RestError.invalidSubstitution
-        }
-
-        // Replace the unexpanded URL with the expanded one.
-        self.request.url = urlComponents.url
-        self.url = urlString
-
-        return nil
+        })
     }
 
     /// Method to identify the charset encoding defined by the Content-Type header
@@ -842,204 +863,4 @@ public class RestRequest: NSObject  {
     }
 }
 
-/// Encapsulates properties needed to initialize a `CircuitBreaker` object within the `RestRequest` initializer.
-/// `A` is the type of the fallback's parameter.
-public struct CircuitParameters<A> {
 
-    /// The circuit name: defaults to "circuitName".
-    let name: String
-
-    /// The circuit timeout: defaults to 2000.
-    public let timeout: Int
-
-    /// The circuit timeout: defaults to 60000.
-    public let resetTimeout: Int
-
-    /// Max failures allowed: defaults to 5.
-    public let maxFailures: Int
-
-    /// Rolling Window: defaults to 10000.
-    public let rollingWindow:Int
-
-    /// Bulkhead: defaults to 0.
-    public let bulkhead: Int
-
-    /// The error fallback callback.
-    public let fallback: (BreakerError, A) -> Void
-
-    /// Initialize a `CircuitParameters` instance.
-    public init(name: String = "circuitName", timeout: Int = 2000, resetTimeout: Int = 60000, maxFailures: Int = 5, rollingWindow: Int = 10000, bulkhead: Int = 0, fallback: @escaping (BreakerError, A) -> Void) {
-        self.name = name
-        self.timeout = timeout
-        self.resetTimeout = resetTimeout
-        self.maxFailures = maxFailures
-        self.rollingWindow = rollingWindow
-        self.bulkhead = bulkhead
-        self.fallback = fallback
-    }
-}
-
-/// Contains data associated with a finished network request,
-/// with `T` being the type of response we expect to receive.
-public struct RestResponse<T> {
-
-    /// The rest request.
-    public let request: URLRequest?
-
-    /// The response to the request.
-    public let response: HTTPURLResponse?
-
-    /// The Response Data.
-    public let data: Data?
-
-    /// The Reponse Result.
-    public let result: Result<T>
-
-    /// The cookies from HTTPURLResponse
-    public let cookies: [HTTPCookie]?
-}
-
-/// Enum to differentiate a success or failure.
-public enum Result<T> {
-    /// A success of generic type `T`.
-    case success(T)
-
-    /// A failure with an `Error` object.
-    case failure(Error)
-}
-
-/// Enum used to specify the type of authentication being used.
-public enum Credentials {
-    /// An API key is being used, no additional data needed.
-    case apiKey
-
-    /// Note: The bearer token should be base64 encoded.
-    case bearerAuthentication(token: String)
-
-    /// A basic username/password authentication is being used with the values passed in.
-    case basicAuthentication(username: String, password: String)
-}
-
-/// Enum describing error types that can occur during a rest request and response.
-public enum RestError: Error, CustomStringConvertible {
-
-    /// No data was returned from the network.
-    case noData
-
-    /// Data couldn't be parsed correctly.
-    case serializationError
-
-    /// Failure to encode data into a certain format.
-    case encodingError
-
-    /// Failure in file manipulation.
-    case fileManagerError
-
-    /// The file trying to be accessed is invalid.
-    case invalidFile
-
-    /// The url substitution attempted could not be made.
-    case invalidSubstitution
-
-    /// Error response status.
-    case erroredResponseStatus(Int)
-
-    /// Error Description
-    public var description: String {
-        switch self {
-        case .noData                        : return "No Data"
-        case .serializationError            : return "Serialization Error"
-        case .encodingError                 : return "Encoding Error"
-        case .fileManagerError              : return "File Manager Error"
-        case .invalidFile                   : return "Invalid File"
-        case .invalidSubstitution           : return "Invalid Data"
-        case .erroredResponseStatus(let s)  : return "Error HTTP Response: `\(s)`"
-        }
-    }
-
-    /// Computed Property to extract the error code.
-    public var code: Int? {
-        switch self {
-        case .erroredResponseStatus(let status): return status
-        default: return nil
-        }
-    }
-}
-
-// URL Session extension
-extension RestRequest: URLSessionDelegate {
-
-    /// URL session function to allow trusting certain URLs.
-    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        let method = challenge.protectionSpace.authenticationMethod
-        let host = challenge.protectionSpace.host
-
-        guard let url = URLComponents(string: self.url), let baseHost = url.host else {
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
-        
-        let warning = "Attempting to establish a secure connection; This is only supported by macOS 10.6 or higher. Resorting to default handling."
-
-        switch (method, host) {
-        case (NSURLAuthenticationMethodClientCertificate, baseHost):
-            #if os(macOS)
-            guard let certificateName = self.clientCertificate?.name, let certificatePath = self.clientCertificate?.path else {
-                Log.warning(warning)
-                fallthrough
-            }
-            // Get the bundle path from the Certificates directory for a certificate that matches clientCertificateName's name
-            if let path = Bundle.path(forResource: certificateName, ofType: "der", inDirectory: certificatePath) {
-                // Read the certificate data from disk
-                if let key = NSData(base64Encoded: path) {
-                    // Create a secure certificate from the NSData
-                    if let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, key) {
-                        // Create a secure identity from the certificate
-                        var identity: SecIdentity? = nil
-                        let _: OSStatus = SecIdentityCreateWithCertificate(nil, certificate, &identity)
-                        guard let id = identity else {
-                            Log.warning(warning)
-                            fallthrough
-                        }
-                        completionHandler(.useCredential, URLCredential(identity: id, certificates: [certificate], persistence: .forSession))
-                    }
-                }
-            }
-            #else
-            Log.warning(warning)
-            fallthrough
-            #endif
-        case (NSURLAuthenticationMethodServerTrust, baseHost):
-            #if !os(Linux)
-            guard #available(iOS 3.0, macOS 10.6, *), let trust = challenge.protectionSpace.serverTrust else {
-                Log.warning(warning)
-                fallthrough
-            }
-
-            let credential = URLCredential(trust: trust)
-            completionHandler(.useCredential, credential)
-
-            #else
-            Log.warning(warning)
-            fallthrough
-            #endif
-        default:
-            completionHandler(.performDefaultHandling, nil)
-        }
-    }
-
-}
-
-/// Represents a reference to a client certificate.
-public struct ClientCertificate {
-    /// The name for the client certificate.
-    public let name: String
-    /// The path to the client certificate.
-    public let path: String
-
-    /// Initialize a `ClientCertificate` instance.
-    public init(name: String, path: String) {
-      self.name = name
-      self.path = path
-    }
-}

@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
           SwiftyRequest Docs
         </a>
-         (100% documented)
+         (91% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -67,19 +67,7 @@
             <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/Credentials.html">Credentials</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Enums/HTTPMethod.html">HTTPMethod</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/JSON.html">JSON</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/RestError.html">RestError</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Enums/Result.html">Result</a>
               </li>
             </ul>
           </li>
@@ -87,33 +75,7 @@
             <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/Bool.html">Bool</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions/Dictionary.html">Dictionary</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/Double.html">Double</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/Int.html">Int</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/String.html">String</a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
-            <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Protocols/JSONDecodable.html">JSONDecodable</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Protocols/JSONEncodable.html">JSONEncodable</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Protocols/JSONPathType.html">JSONPathType</a>
               </li>
             </ul>
           </li>
@@ -124,16 +86,19 @@
                 <a class="nav-group-task-link" href="Structs/BodyPart.html">BodyPart</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/CertificateError.html">CertificateError</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/CircuitParameters.html">CircuitParameters</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/ClientCertificate.html">ClientCertificate</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/JSONWrapper.html">JSONWrapper</a>
+                <a class="nav-group-task-link" href="Structs/Credentials.html">Credentials</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/JSONWrapper/Error.html">– Error</a>
+                <a class="nav-group-task-link" href="Structs/RestError.html">RestError</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/RestResponse.html">RestResponse</a>
@@ -169,9 +134,9 @@
 </p>
 <h1 id='swiftyrequest' class='heading'>SwiftyRequest</h1>
 
-<p><code>SwiftyRequest</code> is an HTTP networking library built for Swift.</p>
+<p><code>SwiftyRequest</code> is an HTTP client built for Swift.</p>
 
-<p><code>SwiftyRequest</code> uses <code>URLSession</code> for the underlying transport. <code>URLSession</code> on Linux is not yet completely implemented so you may find that this library is less reliable on Linux than Darwin (reference issues <a href="https://github.com/IBM-Swift/SwiftyRequest/issues/24">#24</a> and <a href="https://github.com/IBM-Swift/SwiftyRequest/issues/25">#25</a>, the second of these references a <a href="https://github.com/apple/swift-corelibs-foundation/pull/1629">Foundation PR</a>).</p>
+<p>The latest release of SwiftyRequest is built upon the Swift-NIO based <a href="https://github.com/swift-server/async-http-client"><code>async-http-client</code></a>.</p>
 <h2 id='contents' class='heading'>Contents</h2>
 
 <ul>
@@ -180,19 +145,24 @@
 <li><a href="#usage">Usage</a></li>
 <li><a href="#circuitbreaker-integration">CircuitBreaker Integration</a></li>
 <li><a href="#response-methods">Response Methods</a></li>
+<li><a href="#migration-from-v2-to-v3">Migrating from SwiftyRequest v2 to v3</a></li>
 </ul>
 <h2 id='features' class='heading'>Features</h2>
 
 <ul>
 <li>Several response methods (e.g. Data, Object, Array, String, etc.) to eliminate boilerplate code in your application.</li>
+<li>Direct retrieval of <code>Codable</code> types.</li>
 <li>JSON encoding and decoding.</li>
 <li>Integration with the <a href="https://github.com/IBM-Swift/CircuitBreaker">CircuitBreaker</a> library.</li>
 <li>Authentication tokens.</li>
+<li>Client Certificate support (2-way SSL).</li>
 <li>Multipart form data.</li>
 </ul>
 <h2 id='swift-version' class='heading'>Swift version</h2>
 
-<p>This repository supports Swift 4.0.3 and later.</p>
+<p>The latest version of SwiftyRequest requires Swift 5 or later.</p>
+
+<p>Swift 4 support is available in the 2.x release of SwiftyRequest.</p>
 <h2 id='installation' class='heading'>Installation</h2>
 
 <p>To leverage the <code>SwiftyRequest</code> package in your Swift application, you should specify a dependency for it in your <code>Package.swift</code> file:</p>
@@ -208,13 +178,13 @@
 <h2 id='usage' class='heading'>Usage</h2>
 <h3 id='make-requests' class='heading'>Make Requests</h3>
 
-<p>To make outbound HTTP calls using <code>SwiftyRequest</code>, create a <code><a href="Classes/RestRequest.html">RestRequest</a></code> instance. The <code>method</code> parameter is optional (it defaults to <code>GET</code>), the <code>url</code> parameter is required.</p>
+<p>To make outbound HTTP calls using <code>SwiftyRequest</code>, create a <code><a href="Classes/RestRequest.html">RestRequest</a></code> instance. The <code>method</code> parameter is optional (it defaults to <code>.get</code>), the <code>url</code> parameter is required.</p>
 
 <p>Example usage of <code><a href="Classes/RestRequest.html">RestRequest</a></code>:</p>
 <pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">SwiftyRequest</span>
 
 <span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="s">"http://myApiCall/hello"</span><span class="p">)</span>
-<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span>
+<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="nf">basicAuthentication</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="s">"John"</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="s">"12345"</span><span class="p">)</span>
 </code></pre>
 
 <p>You can customize the following parameters in the HTTP request:</p>
@@ -227,15 +197,15 @@
 <li><code>productInfo</code> : The HTTP <code>User-Agent</code> header.</li>
 <li><code>circuitParameters</code> : A <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object which includes a reference to a fallback function that will be invoked when the circuit is failing fast (see <a href="#circuitbreaker-integration">CircuitBreaker Integration</a>).</li>
 <li><code>contentType</code> : The HTTP <code>Content-Type header</code>, defaults to <code>application/json</code>.</li>
-<li><code>method</code> : The HTTP method specified in the request, defaults to <code>.get</code>.</li>
+<li><code>method</code> : The HTTP method specified in the request, defaults to <code>.GET</code>.</li>
+<li><code>queryItems</code>: Any query parameters to be appended to the URL.</li>
 </ul>
 <h3 id='invoke-response' class='heading'>Invoke Response</h3>
 
-<p>In this example, <code>responseToError</code> is simply an error handling function.
-The <code>response</code> object we get back is of type <code><a href="Structs/RestResponse.html">RestResponse&lt;String&gt;</a></code> so we can perform a switch on the <code>response.result</code> to determine if the network call was successful.</p>
-<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="nf">responseString</span><span class="p">(</span><span class="nv">responseToError</span><span class="p">:</span> <span class="n">responseToError</span><span class="p">)</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
-    <span class="k">switch</span> <span class="n">response</span><span class="o">.</span><span class="n">result</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">result</span><span class="p">):</span>
+<p>The <code>result</code> object we get back is of type <code>Result&lt;RestResponse&lt;String&gt;, Error&gt;</code> so we can perform a switch to determine if the network call was successful:</p>
+<pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">responseString</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">response</span><span class="p">):</span>
         <span class="nf">print</span><span class="p">(</span><span class="s">"Success"</span><span class="p">)</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
         <span class="nf">print</span><span class="p">(</span><span class="s">"Failure"</span><span class="p">)</span>
@@ -244,31 +214,31 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
 </code></pre>
 <h3 id='invoke-response-with-template-parameters' class='heading'>Invoke Response with Template Parameters</h3>
 
-<p>In this example, we invoke a response method with two template parameters to be used to replace the <code>{state}</code> and <code>{city}</code> values in the <code>url</code>. This allows us to create multiple response invocations with the same <code><a href="Classes/RestRequest.html">RestRequest</a></code> object, but possibly using different url values.</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/{state}/{city}.json"</span><span class="p">)</span>
-<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span>
+<p>URLs can be templated with the <code>{keyName}</code> syntax, allowing a single <code><a href="Classes/RestRequest.html">RestRequest</a></code> instance to be reused with different parameters.</p>
 
-<span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="s">"state"</span><span class="p">:</span> <span class="s">"TX"</span><span class="p">,</span> <span class="s">"city"</span><span class="p">:</span> <span class="s">"Austin"</span><span class="p">])</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+<p>In this example, we invoke a response method with two template parameters to be used to replace the <code>{state}</code> and <code>{city}</code> values in the URL:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/{state}/{city}.json"</span><span class="p">)</span>
+
+<span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="s">"state"</span><span class="p">:</span> <span class="s">"TX"</span><span class="p">,</span> <span class="s">"city"</span><span class="p">:</span> <span class="s">"Austin"</span><span class="p">])</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
     <span class="c1">// Handle response</span>
 <span class="p">}</span>
 </code></pre>
 <h3 id='invoke-response-with-query-parameters' class='heading'>Invoke Response with Query Parameters</h3>
 
-<p>In this example, we invoke a response method with a query parameter to be appended onto the <code>url</code> behind the scenes so that the <code><a href="Classes/RestRequest.html">RestRequest</a></code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>.  If there are query items already specified in the request URL they will be replaced.</p>
+<p>In this example, we invoke a response method with a query parameter to be appended onto the <code>url</code> behind the scenes so that the <code><a href="Classes/RestRequest.html">RestRequest</a></code> gets executed with the following url: <code>http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json?hour=9</code>.  Any query items already specified in the request URL will be replaced:</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"http://api.weather.com/api/123456/conditions/q/CA/San_Francisco.json"</span><span class="p">)</span>
-<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span>
 
-<span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"hour"</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="s">"9"</span><span class="p">)])</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+<span class="n">request</span><span class="o">.</span><span class="nf">responseData</span><span class="p">(</span><span class="nv">queryItems</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"hour"</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="s">"9"</span><span class="p">)])</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
     <span class="c1">// Handle response</span>
 <span class="p">}</span>
 </code></pre>
 <h2 id='circuitbreaker-integration' class='heading'>CircuitBreaker Integration</h2>
 
-<p><code>SwiftyRequest</code> now has additional built-in functionality for leveraging the <a href="https://github.com/IBM-Swift/CircuitBreaker">CircuitBreaker</a> library to increase your application&rsquo;s stability. To make use of this functionality, you just need to provide a <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object to the <code><a href="Classes/RestRequest.html">RestRequest</a></code> initializer. A <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object will include a reference to a fallback function that will be invoked when the circuit is failing fast.</p>
+<p><code>SwiftyRequest</code> has built-in functionality for leveraging the <a href="https://github.com/IBM-Swift/CircuitBreaker">CircuitBreaker</a> library to increase your application&rsquo;s stability. To make use of this functionality, assign a <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object to the <code>circuitParameters</code> property. This object will include a reference to a fallback function that will be invoked when the circuit is failing fast.</p>
 <h3 id='fallback' class='heading'>Fallback</h3>
 
 <p>Here is an example of a fallback closure:</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">fallback</span> <span class="o">=</span> <span class="p">{</span> <span class="p">(</span><span class="nv">error</span><span class="p">:</span> <span class="kt">BreakerError</span><span class="p">,</span> <span class="nv">msg</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">in</span>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">breakerFallback</span> <span class="o">=</span> <span class="p">{</span> <span class="p">(</span><span class="nv">error</span><span class="p">:</span> <span class="kt">BreakerError</span><span class="p">,</span> <span class="nv">msg</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">in</span>
     <span class="nf">print</span><span class="p">(</span><span class="s">"Fallback closure invoked... circuit must be open."</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre>
@@ -277,26 +247,65 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
 <p>We initialize the <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object and create a <code><a href="Classes/RestRequest.html">RestRequest</a></code> instance. The only required value you need to set for <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> is the <code>fallback</code> (everything else has default values).</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">circuitParameters</span> <span class="o">=</span> <span class="kt">CircuitParameters</span><span class="p">(</span><span class="nv">timeout</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
                                           <span class="nv">maxFailures</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-                                          <span class="nv">fallback</span><span class="p">:</span> <span class="n">breakFallback</span><span class="p">)</span>
+                                          <span class="nv">fallback</span><span class="p">:</span> <span class="n">breakerFallback</span><span class="p">)</span>
 
-<span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="s">"http://myApiCall/hello"</span><span class="p">)</span>
-<span class="n">request</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="o">.</span><span class="n">apiKey</span><span class="p">,</span>
+<span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="kt">GET</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="s">"http://myApiCall/hello"</span><span class="p">)</span>
 <span class="n">request</span><span class="o">.</span><span class="n">circuitParameters</span> <span class="o">=</span> <span class="n">circuitParameters</span>
 </code></pre>
 
 <p>At this point, you can use any of the response methods mentioned in the section below.</p>
 <h2 id='response-methods' class='heading'>Response Methods</h2>
 
-<p>There are various response methods you can use based on the result type you want, here they are:</p>
+<p><code><a href="Classes/RestRequest.html">RestRequest</a></code> provides a number of <code>response</code> functions that call back with a <code>Result</code> containing either a response or an error.</p>
+
+<p>To invoke the request and receive a response, you can use the <code>response</code> function. The completion handler will be called back with a result of type <code>Result&lt;HTTPClient.Response, Error&gt;</code>.</p>
+
+<p>RestRequest provides additional convenience methods you can use based on the type of the response body you expect:</p>
 
 <ul>
-<li><code>responseData</code> returns a <code>Data</code> object.</li>
-<li><code>responseObject&lt;T: Codable&gt;</code> returns a Codable object of type <code>T</code>.</li>
-<li><code>responseObject&lt;T: JSONDecodable&gt;</code> returns an object of type <code>T</code>.</li>
-<li><code>responseArray&lt;T: JSONDecodable&gt;</code> returns an array of type <code>T</code>.</li>
-<li><code>responseString</code> returns a <code>String</code>.</li>
-<li><code>responseVoid</code> returns <code>Void</code>.</li>
+<li><code>responseData</code> requires that the response contains a body, and calls back with a <code>Result&lt;RestResponse&lt;Data&gt;, Error&gt;</code>.</li>
+<li><code>responseObject&lt;T: Decodable&gt;</code> decodes the response body to the specified type, and calls back with a <code>Result&lt;RestResponse&lt;T&gt;, Error&gt;</code>.</li>
+<li><code>responseString</code> decodes the response body to a String, and calls back with a <code>Result&lt;RestResponse&lt;String&gt;, Error&gt;</code>.</li>
+<li><code>responseDictionary</code> decodes the response body as JSON, and calls back with a <code>Result&lt;RestResponse&lt;[String: Any]&gt;, Error&gt;</code>.</li>
+<li><code>responseArray</code> decodes the response body as a a JSON array, and calls back with a <code>Result&lt;RestResponse&lt;[Any]&gt;, Error&gt;</code>.</li>
+<li><code>responseVoid</code> does not expect a response body, and calls back with a <code>Result&lt;HTTPClient.Response, Error&gt;</code>.</li>
 </ul>
+<h3 id='example-of-handling-a-response' class='heading'>Example of handling a response</h3>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">RestRequest</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="s">"http://localhost:8080/users/{userid}"</span><span class="p">)</span>
+
+<span class="n">request</span><span class="o">.</span><span class="nf">responseObject</span><span class="p">(</span><span class="nv">templateParams</span><span class="p">:</span> <span class="p">[</span><span class="s">"userid"</span><span class="p">:</span> <span class="s">"1"</span><span class="p">])</span> <span class="p">{</span> <span class="p">(</span><span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">RestResponse</span><span class="o">&lt;</span><span class="kt">User</span><span class="o">&gt;</span><span class="p">,</span> <span class="kt">RestError</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">in</span>
+    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">response</span><span class="p">):</span>
+        <span class="k">let</span> <span class="nv">user</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">body</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Successfully retrieved user </span><span class="se">\(</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">response</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">response</span> <span class="p">{</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Request failed with status: </span><span class="se">\(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">responseData</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">responseData</span> <span class="p">{</span>
+            <span class="c1">// Handle error response body</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='migration-from-v2-to-v3' class='heading'>Migration from v2 to v3</h2>
+
+<p>There are a number of changes to the API in SwiftyRequest v3 compared to the v2 release:</p>
+
+<ul>
+<li>The <code><a href="Classes/RestRequest.html">RestRequest</a></code> initializer parameter  <code>containsSelfSignedCert</code> has been renamed <code>insecure</code> to better reflect its purpose (turning off SSL certificate verification).  The old name has been deprecated and may be removed in a future release.</li>
+<li>The <code>completionHandler</code> callback of <code>responseData</code> (et al) has changed from <code>(RestResponse&lt;Data&gt;) -&gt; Void</code> to <code>(Result&lt;RestResponse&lt;Data&gt;, RestError&gt;) -&gt; Void</code>.<br></li>
+<li>The <code>JSONDecodable</code> and <code>JSONEncodable</code> types have been removed in favour of using <code>Codable</code> directly.  The <code>responseObject</code> function allows you to receive a Codable object in a response.</li>
+<li>Convenience functions for handling raw JSON have been added.  <code>responseDictionary</code> and <code>responseArray</code> alow retrieval of JSON as <code>[String: Any]</code> and <code>[Any]</code> respectively, and sending of raw JSON can be performed by setting the <code>request.messageBodyDictionary</code> or <code>request.messageBodyArray</code> properties.</li>
+<li>the <code><a href="Structs/RestError.html">RestError</a></code> type is now returned explicitly in the <code>.failure</code> case.  If the error pertains to a response with a non-success status code, you can access the response with <code>error.response</code>.  If the response also contained body data, it can be retrieved via <code>error.responseData</code>.</li>
+</ul>
+<h2 id='client-certificate-support-2-way-ssl' class='heading'>Client Certificate support (2-way SSL)</h2>
+
+<p>Specify a <code><a href="Structs/ClientCertificate.html">ClientCertificate</a></code> when creating a <code><a href="Classes/RestRequest.html">RestRequest</a></code> to enable a client certificate to be presented upon a secure request (2-way SSL).</p>
+
+<p>The certificate may be provided in PEM format - either from a file, a string or Data, and an optional passphrase.  The PEM data should contain the certificate and its corresponding private key.  If the private key is encrypted, the corresponding passphrase should be specified when constructing the ClientCertificate.</p>
+
+<p>If you need to handle certificates in other formats, you may create a ClientCertificate directly from a <code>NIOSSLCertificate</code> and <code>NIOSSLPrivateKey</code>.  For more information on these types, see the documentation for the <a href="https://github.com/swift-server/async-http-client"><code>async-http-client</code> project</a>.</p>
 <h2 id='api-documentation' class='heading'>API documentation</h2>
 
 <p>For more information visit our <a href="http://ibm-swift.github.io/SwiftyRequest/">API reference</a>.</p>
@@ -314,8 +323,8 @@ The <code>response</code> object we get back is of type <code><a href="Structs/R
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-02-06)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-09-27)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
