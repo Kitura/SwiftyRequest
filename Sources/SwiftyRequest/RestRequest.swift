@@ -103,7 +103,11 @@ fileprivate class MutableRequest {
 public class RestRequest {
 
     deinit {
-        try? session.syncShutdown()
+        if MultiThreadedEventLoopGroup.currentEventLoop != nil {
+            session.shutdown(){ _ in }
+        } else {
+            try? session.syncShutdown()
+        }
     }
 
     /// A default `HTTPClient` instance.
@@ -288,7 +292,7 @@ public class RestRequest {
 
     // Storage for message body
     private var _messageBody: Data?
-    
+
     /// The HTTP message body, i.e. the body of the request.
     ///
     /// ### Usage Example: ###
@@ -438,7 +442,7 @@ public class RestRequest {
                          completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
         responseVoid(templateParams: templateParams, queryItems: queryItems, completionHandler: completionHandler)
     }
-    
+
     private func _response(request: HTTPClient.Request, completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
         if let breaker = circuitBreaker {
             breaker.run(commandArgs: (request, completionHandler), fallbackArgs: "Circuit is open")
@@ -566,7 +570,7 @@ public class RestRequest {
     public func responseArray(templateParams: [String: String]? = nil,
                               queryItems: [URLQueryItem]? = nil,
                               completionHandler: @escaping (Result<RestResponse<[Any]>, RestError>) -> Void) {
-        
+
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
@@ -605,7 +609,7 @@ public class RestRequest {
             }
         }
     }
-    
+
     /// Request response method with the expected result of a `[String: Any]` JSON dictionary.
     ///
     /// - Parameters:
@@ -615,7 +619,7 @@ public class RestRequest {
     public func responseDictionary(templateParams: [String: String]? = nil,
                               queryItems: [URLQueryItem]? = nil,
                               completionHandler: @escaping (Result<RestResponse<[String: Any]>, RestError>) -> Void) {
-        
+
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
@@ -665,7 +669,7 @@ public class RestRequest {
     public func responseString(templateParams: [String: String]? = nil,
                                queryItems: [URLQueryItem]? = nil,
                                completionHandler: @escaping (Result<RestResponse<String>, RestError>) -> Void) {
-        
+
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
@@ -694,7 +698,7 @@ public class RestRequest {
                 }
                 // Retrieve string encoding type
                 let encoding = self.getCharacterEncoding(from: response.headers["Content-Type"].first)
-                
+
                 guard let object = String(bytes: bodyBytes, encoding: encoding) else {
                     return completionHandler(.failure(RestError.serializationError(response: response)))
                 }
@@ -717,7 +721,7 @@ public class RestRequest {
     public func responseVoid(templateParams: [String: String]? = nil,
                              queryItems: [URLQueryItem]? = nil,
                              completionHandler: @escaping (Result<HTTPClient.Response, RestError>) -> Void) {
-        
+
         // Replace any existing query items with those provided in the queryItems
         // parameter, if any were given.
         if let queryItems = queryItems {
@@ -739,23 +743,23 @@ public class RestRequest {
             case .failure(let error):
                 return completionHandler(.failure(error))
             case .success(let response):
-                return completionHandler(.success(response)) 
+                return completionHandler(.success(response))
             }
         }
     }
 
     class DownloadDelegate: HTTPClientResponseDelegate {
         typealias Response = HTTPResponseHead
-        
+
         var count = 0
         let destination: URL
         var responseHead: HTTPResponseHead?
         var error: Error?
-        
+
         init(destination: URL) {
             self.destination = destination
         }
-        
+
         func didSendRequestHead(task: HTTPClient.Task<Response>, _ head: HTTPRequestHead) {
             // this is executed when request is sent, called once
             // Create a file in one doesn't exist
@@ -765,21 +769,21 @@ public class RestRequest {
                 self.error = error
             }
         }
-        
+
         func didSendRequestPart(task: HTTPClient.Task<Response>, _ part: IOData) {
             // this is executed when request body part is sent, could be called zero or more times
         }
-        
+
         func didSendRequest(task: HTTPClient.Task<Response>) {
             // this is executed when request is fully sent, called once
         }
-        
+
         func didReceiveHead(task: HTTPClient.Task<Response>, _ head: HTTPResponseHead) -> EventLoopFuture<Void> {
             // this is executed when we receive HTTP Reponse head part of the request (it contains response code and headers), called once
             self.responseHead = head
             return task.eventLoop.makeSucceededFuture(())
         }
-        
+
         func didReceivePart(task: HTTPClient.Task<Response>, _ buffer: ByteBuffer) -> EventLoopFuture<Void> {
             // this is executed when we receive parts of the response body, could be called zero or more times
             do {
@@ -792,7 +796,7 @@ public class RestRequest {
             }
             return task.eventLoop.makeSucceededFuture(())
         }
-        
+
         func didFinishRequest(task: HTTPClient.Task<HTTPResponseHead>) throws -> HTTPResponseHead {
             // this is called when the request is fully read, called once
             // this is where you return a result or throw any errors you require to propagate to the client
@@ -804,13 +808,13 @@ public class RestRequest {
             }
             return head
         }
-        
+
         func didReceiveError(task: HTTPClient.Task<HTTPResponseHead>, _ error: Error) {
             // this is called when we receive any network-related error, called once
             self.error = error
         }
     }
-    
+
     /// Utility method to download a file from a remote origin.
     ///
     /// - Parameters:
