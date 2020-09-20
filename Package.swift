@@ -1,7 +1,7 @@
 // swift-tools-version:5.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 /*
- * Copyright IBM Corporation 2017-2019
+ * Copyright IBM Corporation and the authors of the Kitura project 2017-2020
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/CircuitBreaker.git", from: "5.0.0"),
-        .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", from: "1.8.0"),
+        .package(url: "https://github.com/Kitura/CircuitBreaker.git", from: "5.0.0"),
+        .package(url: "https://github.com/Kitura/LoggerAPI.git", from: "1.8.0"),
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.0.0"),
     ],
     targets: [
