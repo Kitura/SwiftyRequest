@@ -531,7 +531,7 @@ class SwiftyRequestTests: XCTestCase {
     func testFileDownload() {
         let expectation = self.expectation(description: "download file SwiftyRequest test")
 
-        let url = "https://raw.githubusercontent.com/IBM-Swift/SwiftyRequest/c7cfc669a5872831e816d9f9c6fec06bc638222b/Tests/SwiftyRequestTests/test_file.json"
+        let url = "https://raw.githubusercontent.com/Kitura/SwiftyRequest/c7cfc669a5872831e816d9f9c6fec06bc638222b/Tests/SwiftyRequestTests/test_file.json"
 
         let request = RestRequest(url: url)
 

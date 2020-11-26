@@ -27,8 +27,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/CircuitBreaker.git", from: "5.0.0"),
-        .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", from: "1.8.0"),
+        .package(url: "https://github.com/Kitura/CircuitBreaker.git", from: "5.0.0"),
+        .package(url: "https://github.com/Kitura/LoggerAPI.git", from: "1.8.0"),
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
     ],
     targets: [
