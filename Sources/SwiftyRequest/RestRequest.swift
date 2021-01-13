@@ -103,11 +103,14 @@ fileprivate class MutableRequest {
 public class RestRequest {
 
     deinit {
+        /*
         if MultiThreadedEventLoopGroup.currentEventLoop != nil {
             session.shutdown(){ _ in }
         } else {
             try? session.syncShutdown()
         }
+        */
+        try? session.syncShutdown()
     }
 
     /// A default `HTTPClient` instance.

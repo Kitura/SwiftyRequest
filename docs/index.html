@@ -20,7 +20,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          SwiftyRequest Docs
+          SwiftyRequest 2.2.1 Docs
         </a>
          (91% documented)
       </p>
@@ -32,7 +32,7 @@
       </p>
     
         <p class="header-col header-col--secondary">
-          <a class="header-link" href="https://github.com/IBM-Swift/SwiftyRequest">
+          <a class="header-link" href="https://github.com/Kitura/SwiftyRequest">
             <img class="header-icon" src="img/gh.png"/>
             View on GitHub
           </a>
@@ -110,20 +110,20 @@
       <article class="main-content">
 
         <section class="section">
-          <div class="section-content">
+          <div class="section-content top-matter">
             
             <p align="center">
     <a href="http://kitura.io/">
-        <img src="https://raw.githubusercontent.com/IBM-Swift/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
+        <img src="https://raw.githubusercontent.com/Kitura/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://ibm-swift.github.io/SwiftyRequest/index.html">
+    <a href="https://kitura.github.io/SwiftyRequest/index.html">
     <img src="https://img.shields.io/badge/apidoc-SwiftyRequest-1FBCE4.svg?style=flat" alt="APIDoc">
     </a>
-    <a href="https://travis-ci.org/IBM-Swift/SwiftyRequest">
-    <img src="https://travis-ci.org/IBM-Swift/SwiftyRequest.svg?branch=master" alt="Build Status - Master">
+    <a href="https://travis-ci.org/Kitura/SwiftyRequest">
+    <img src="https://travis-ci.org/Kitura/SwiftyRequest.svg?branch=master" alt="Build Status - Master">
     </a>
     <img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
     <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
@@ -153,7 +153,7 @@
 <li>Several response methods (e.g. Data, Object, Array, String, etc.) to eliminate boilerplate code in your application.</li>
 <li>Direct retrieval of <code>Codable</code> types.</li>
 <li>JSON encoding and decoding.</li>
-<li>Integration with the <a href="https://github.com/IBM-Swift/CircuitBreaker">CircuitBreaker</a> library.</li>
+<li>Integration with the <a href="https://github.com/Kitura/CircuitBreaker">CircuitBreaker</a> library.</li>
 <li>Authentication tokens.</li>
 <li>Client Certificate support (2-way SSL).</li>
 <li>Multipart form data.</li>
@@ -168,8 +168,8 @@
 <p>To leverage the <code>SwiftyRequest</code> package in your Swift application, you should specify a dependency for it in your <code>Package.swift</code> file:</p>
 <h3 id='add-dependencies' class='heading'>Add dependencies</h3>
 
-<p>Add <code>SwiftyRequest</code> to the dependencies within your application&rsquo;s <code>Package.swift</code> file. Substitute <code>&quot;x.x.x&quot;</code> with the latest <code>SwiftyRequest</code> <a href="https://github.com/IBM-Swift/SwiftyRequest/releases">release</a>.</p>
-<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/IBM-Swift/SwiftyRequest.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"x.x.x"</span><span class="p">)</span>
+<p>Add <code>SwiftyRequest</code> to the dependencies within your application&rsquo;s <code>Package.swift</code> file. Substitute <code>&quot;x.x.x&quot;</code> with the latest <code>SwiftyRequest</code> <a href="https://github.com/Kitura/SwiftyRequest/releases">release</a>.</p>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/Kitura/SwiftyRequest.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"x.x.x"</span><span class="p">)</span>
 </code></pre>
 
 <p>Add <code>SwiftyRequest</code> to your target&rsquo;s dependencies:</p>
@@ -234,7 +234,7 @@
 </code></pre>
 <h2 id='circuitbreaker-integration' class='heading'>CircuitBreaker Integration</h2>
 
-<p><code>SwiftyRequest</code> has built-in functionality for leveraging the <a href="https://github.com/IBM-Swift/CircuitBreaker">CircuitBreaker</a> library to increase your application&rsquo;s stability. To make use of this functionality, assign a <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object to the <code>circuitParameters</code> property. This object will include a reference to a fallback function that will be invoked when the circuit is failing fast.</p>
+<p><code>SwiftyRequest</code> has built-in functionality for leveraging the <a href="https://github.com/Kitura/CircuitBreaker">CircuitBreaker</a> library to increase your application&rsquo;s stability. To make use of this functionality, assign a <code><a href="Structs/CircuitParameters.html">CircuitParameters</a></code> object to the <code>circuitParameters</code> property. This object will include a reference to a fallback function that will be invoked when the circuit is failing fast.</p>
 <h3 id='fallback' class='heading'>Fallback</h3>
 
 <p>Here is an example of a fallback closure:</p>
@@ -308,13 +308,13 @@
 <p>If you need to handle certificates in other formats, you may create a ClientCertificate directly from a <code>NIOSSLCertificate</code> and <code>NIOSSLPrivateKey</code>.  For more information on these types, see the documentation for the <a href="https://github.com/swift-server/async-http-client"><code>async-http-client</code> project</a>.</p>
 <h2 id='api-documentation' class='heading'>API documentation</h2>
 
-<p>For more information visit our <a href="http://ibm-swift.github.io/SwiftyRequest/">API reference</a>.</p>
+<p>For more information visit our <a href="http://kitura.github.io/SwiftyRequest/">API reference</a>.</p>
 <h2 id='community' class='heading'>Community</h2>
 
 <p>We love to talk server-side Swift, and Kitura. Join our <a href="http://swift-at-ibm-slack.mybluemix.net/">Slack</a> to meet the team!</p>
 <h2 id='license' class='heading'>License</h2>
 
-<p>This library is licensed under Apache 2.0. Full license text is available in <a href="https://github.com/IBM-Swift/SwiftyRequest/blob/master/LICENSE">LICENSE</a>.</p>
+<p>This library is licensed under Apache 2.0. Full license text is available in <a href="https://github.com/Kitura/SwiftyRequest/blob/master/LICENSE">LICENSE</a>.</p>
 
           </div>
         </section>
@@ -323,8 +323,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-09-27)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2020 <a class="link" href="https://github.com/Kitura/SwiftyRequest" target="_blank" rel="external">IBM &amp; Kitura Project Contributors</a>. All rights reserved. (Last updated: 2020-11-25)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

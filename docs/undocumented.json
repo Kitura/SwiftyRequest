@@ -1,82 +1,82 @@
 {
   "warnings": [
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/ClientCertificate.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/ClientCertificate.swift",
       "line": 45,
       "symbol": "ClientCertificate.certificate",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/ClientCertificate.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/ClientCertificate.swift",
       "line": 46,
       "symbol": "ClientCertificate.privateKey",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 99,
       "symbol": "HTTPMethod.acl",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 100,
       "symbol": "HTTPMethod.bind",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 101,
       "symbol": "HTTPMethod.unbind",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 102,
       "symbol": "HTTPMethod.rebind",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 103,
       "symbol": "HTTPMethod.link",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 104,
       "symbol": "HTTPMethod.unlink",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 105,
       "symbol": "HTTPMethod.source",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/HTTPMethod.swift",
       "line": 106,
       "symbol": "HTTPMethod.mkCalendar",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/travis/build/IBM-Swift/SwiftyRequest/Sources/SwiftyRequest/RestRequest.swift",
-      "line": 369,
-      "symbol": "RestRequest.init(method:url:containsSelfSignedCert:clientCertificate:)",
+      "file": "/Users/dannys/projects/kitura/SwiftyRequest/Sources/SwiftyRequest/RestRequest.swift",
+      "line": 374,
+      "symbol": "RestRequest.init(method:url:containsSelfSignedCert:clientCertificate:timeout:eventLoopGroup:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     }
   ],
-  "source_directory": "/Users/travis/build/IBM-Swift/SwiftyRequest"
+  "source_directory": "/Users/dannys/projects/kitura/SwiftyRequest"
 }

@@ -1,15 +1,15 @@
 <p align="center">
     <a href="http://kitura.io/">
-        <img src="https://raw.githubusercontent.com/IBM-Swift/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
+        <img src="https://raw.githubusercontent.com/Kitura/Kitura/master/Sources/Kitura/resources/kitura-bird.svg?sanitize=true" height="100" alt="Kitura">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://ibm-swift.github.io/SwiftyRequest/index.html">
+    <a href="https://kitura.github.io/SwiftyRequest/index.html">
     <img src="https://img.shields.io/badge/apidoc-SwiftyRequest-1FBCE4.svg?style=flat" alt="APIDoc">
     </a>
-    <a href="https://travis-ci.org/IBM-Swift/SwiftyRequest">
-    <img src="https://travis-ci.org/IBM-Swift/SwiftyRequest.svg?branch=master" alt="Build Status - Master">
+    <a href="https://travis-ci.org/Kitura/SwiftyRequest">
+    <img src="https://travis-ci.org/Kitura/SwiftyRequest.svg?branch=master" alt="Build Status - Master">
     </a>
     <img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
     <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
@@ -37,7 +37,7 @@ The latest release of SwiftyRequest is built upon the Swift-NIO based [`async-ht
 - Several response methods (e.g. Data, Object, Array, String, etc.) to eliminate boilerplate code in your application.
 - Direct retrieval of `Codable` types.
 - JSON encoding and decoding.
-- Integration with the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library.
+- Integration with the [CircuitBreaker](https://github.com/Kitura/CircuitBreaker) library.
 - Authentication tokens.
 - Client Certificate support (2-way SSL).
 - Multipart form data.
@@ -53,10 +53,10 @@ To leverage the `SwiftyRequest` package in your Swift application, you should sp
 
 ### Add dependencies
 
-Add `SwiftyRequest` to the dependencies within your application's `Package.swift` file. Substitute `"x.x.x"` with the latest `SwiftyRequest` [release](https://github.com/IBM-Swift/SwiftyRequest/releases).
+Add `SwiftyRequest` to the dependencies within your application's `Package.swift` file. Substitute `"x.x.x"` with the latest `SwiftyRequest` [release](https://github.com/Kitura/SwiftyRequest/releases).
 
 ```swift
-.package(url: "https://github.com/IBM-Swift/SwiftyRequest.git", from: "x.x.x")
+.package(url: "https://github.com/Kitura/SwiftyRequest.git", from: "x.x.x")
 ```
 Add `SwiftyRequest` to your target's dependencies:
 
@@ -132,7 +132,7 @@ request.responseData(queryItems: [URLQueryItem(name: "hour", value: "9")]) { res
 
 ## CircuitBreaker Integration
 
-`SwiftyRequest` has built-in functionality for leveraging the [CircuitBreaker](https://github.com/IBM-Swift/CircuitBreaker) library to increase your application's stability. To make use of this functionality, assign a `CircuitParameters` object to the `circuitParameters` property. This object will include a reference to a fallback function that will be invoked when the circuit is failing fast.
+`SwiftyRequest` has built-in functionality for leveraging the [CircuitBreaker](https://github.com/Kitura/CircuitBreaker) library to increase your application's stability. To make use of this functionality, assign a `CircuitParameters` object to the `circuitParameters` property. This object will include a reference to a fallback function that will be invoked when the circuit is failing fast.
 
 ### Fallback
 Here is an example of a fallback closure:
@@ -213,7 +213,7 @@ If you need to handle certificates in other formats, you may create a ClientCert
 
 ## API documentation
 
-For more information visit our [API reference](http://ibm-swift.github.io/SwiftyRequest/).
+For more information visit our [API reference](http://kitura.github.io/SwiftyRequest/).
 
 ## Community
 
@@ -221,4 +221,4 @@ We love to talk server-side Swift, and Kitura. Join our [Slack](http://swift-at-
 
 ## License
 
-This library is licensed under Apache 2.0. Full license text is available in [LICENSE](https://github.com/IBM-Swift/SwiftyRequest/blob/master/LICENSE).
+This library is licensed under Apache 2.0. Full license text is available in [LICENSE](https://github.com/Kitura/SwiftyRequest/blob/master/LICENSE).

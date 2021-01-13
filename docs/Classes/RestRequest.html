@@ -21,7 +21,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          SwiftyRequest Docs
+          SwiftyRequest 2.2.1 Docs
         </a>
          (91% documented)
       </p>
@@ -33,7 +33,7 @@
       </p>
     
         <p class="header-col header-col--secondary">
-          <a class="header-link" href="https://github.com/IBM-Swift/SwiftyRequest">
+          <a class="header-link" href="https://github.com/Kitura/SwiftyRequest">
             <img class="header-icon" src="../img/gh.png"/>
             View on GitHub
           </a>
@@ -111,10 +111,11 @@
       <article class="main-content">
 
         <section class="section">
-          <div class="section-content">
+          <div class="section-content top-matter">
             <h1>RestRequest</h1>
               <div class="declaration">
                 <div class="language">
+                  
                   <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">RestRequest</span></code></pre>
 
                 </div>
@@ -149,7 +150,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">internal(set)</span> <span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitBreaker</span><span class="p">:</span> <span class="kt">CircuitBreaker</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">HTTPClient</span><span class="o">.</span><span class="kt">Request</span><span class="p">,</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="kt">HTTPClient</span><span class="o">.</span><span class="kt">Response</span><span class="p">,</span> <span class="kt"><a href="../Structs/RestError.html">RestError</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">),</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">internal(set)</span> <span class="kd">public</span> <span class="k">var</span> <span class="nv">circuitBreaker</span><span class="p">:</span> <span class="kt">CircuitBreaker</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">HTTPClient</span><span class="o">.</span><span class="kt">Request</span><span class="p">,</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="kt">HTTPClient</span><span class="o">.</span><span class="kt">Response</span><span class="p">,</span> <span class="kt"><a href="../Structs/RestError.html">RestError</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">),</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
 
                         </div>
                       </div>
@@ -198,9 +199,11 @@ When these parameters are set, a new <code><a href="../Classes/RestRequest.html#
               <div class="task-name-container">
                 <a name="/HTTP%20Request%20Parameters"></a>
                 <a name="//apple_ref/swift/Section/HTTP Request Parameters" class="dashAnchor"></a>
-                <a href="#/HTTP%20Request%20Parameters">
-                  <h3 class="section-name">HTTP Request Parameters</h3>
-                </a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/HTTP%20Request%20Parameters"></a>
+                  <h3 class="section-name"><p>HTTP Request Parameters</p>
+</h3>
+                </div>
               </div>
               <ul class="item-container">
                 <li class="item">
@@ -314,7 +317,7 @@ authenticate with are passed in.</p>
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>The HTTP <code>Accept</code> header, i.e. the media type that is acceptable for the response, it defaults to
-<q>application/json</q>.</p>
+&ldquo;application/json&rdquo;.</p>
 <h3 id='usage-example' class='heading'>Usage Example:</h3>
 <pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">acceptType</span> <span class="o">=</span> <span class="s">"text/html"</span>
 </code></pre>
@@ -345,7 +348,7 @@ authenticate with are passed in.</p>
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>HTTP <code>Content-Type</code> header, i.e. the media type of the body of the request, it defaults to
-<q>application/json</q>.</p>
+&ldquo;application/json&rdquo;.</p>
 <h3 id='usage-example' class='heading'>Usage Example:</h3>
 <pre class="highlight swift"><code><span class="n">request</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="s">"application/x-www-form-urlencoded"</span>
 </code></pre>
@@ -526,9 +529,9 @@ will be replaced.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C6method3url22containsSelfSignedCert17clientCertificateAcA10HTTPMethodO_SSSbSgAA06ClientK0VSgtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(method:url:containsSelfSignedCert:clientCertificate:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6method3url22containsSelfSignedCert17clientCertificateAcA10HTTPMethodO_SSSbSgAA06ClientK0VSgtcfc">init(method:url:containsSelfSignedCert:clientCertificate:)</a>
+                    <a name="/s:13SwiftyRequest04RestB0C6method3url22containsSelfSignedCert17clientCertificate7timeout14eventLoopGroupAcA10HTTPMethodO_SSSbSgAA06ClientK0VSg15AsyncHTTPClient0S0C13ConfigurationV7TimeoutVSg3NIO05EventnO0_pSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(method:url:containsSelfSignedCert:clientCertificate:timeout:eventLoopGroup:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6method3url22containsSelfSignedCert17clientCertificate7timeout14eventLoopGroupAcA10HTTPMethodO_SSSbSgAA06ClientK0VSg15AsyncHTTPClient0S0C13ConfigurationV7TimeoutVSg3NIO05EventnO0_pSgtcfc">init(method:<wbr>url:<wbr>containsSelfSignedCert:<wbr>clientCertificate:<wbr>timeout:<wbr>eventLoopGroup:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -543,7 +546,7 @@ will be replaced.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">containsSelfSignedCert</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">?</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">clientCertificate</span><span class="p">:</span> <span class="kt"><a href="../Structs/ClientCertificate.html">ClientCertificate</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">containsSelfSignedCert</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">?</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">clientCertificate</span><span class="p">:</span> <span class="kt"><a href="../Structs/ClientCertificate.html">ClientCertificate</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">timeout</span><span class="p">:</span> <span class="kt">HTTPClient</span><span class="o">.</span><span class="kt">Configuration</span><span class="o">.</span><span class="kt">Timeout</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">eventLoopGroup</span><span class="p">:</span> <span class="kt">EventLoopGroup</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -553,9 +556,9 @@ will be replaced.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:13SwiftyRequest04RestB0C6method3url8insecure17clientCertificateAcA10HTTPMethodO_SSSbAA06ClientH0VSgtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(method:url:insecure:clientCertificate:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6method3url8insecure17clientCertificateAcA10HTTPMethodO_SSSbAA06ClientH0VSgtcfc">init(method:url:insecure:clientCertificate:)</a>
+                    <a name="/s:13SwiftyRequest04RestB0C6method3url8insecure17clientCertificate7timeout14eventLoopGroupAcA10HTTPMethodO_SSSbAA06ClientH0VSg15AsyncHTTPClient0P0C13ConfigurationV7TimeoutVSg3NIO05EventkL0_pSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(method:url:insecure:clientCertificate:timeout:eventLoopGroup:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C6method3url8insecure17clientCertificate7timeout14eventLoopGroupAcA10HTTPMethodO_SSSbAA06ClientH0VSg15AsyncHTTPClient0P0C13ConfigurationV7TimeoutVSg3NIO05EventkL0_pSgtcfc">init(method:<wbr>url:<wbr>insecure:<wbr>clientCertificate:<wbr>timeout:<wbr>eventLoopGroup:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -573,7 +576,7 @@ will be replaced.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">insecure</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">clientCertificate</span><span class="p">:</span> <span class="kt"><a href="../Structs/ClientCertificate.html">ClientCertificate</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Enums/HTTPMethod.html">HTTPMethod</a></span> <span class="o">=</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">insecure</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">clientCertificate</span><span class="p">:</span> <span class="kt"><a href="../Structs/ClientCertificate.html">ClientCertificate</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">timeout</span><span class="p">:</span> <span class="kt">HTTPClient</span><span class="o">.</span><span class="kt">Configuration</span><span class="o">.</span><span class="kt">Timeout</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">eventLoopGroup</span><span class="p">:</span> <span class="kt">EventLoopGroup</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -629,6 +632,30 @@ will be replaced.</p>
                                 </div>
                               </td>
                             </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>timeout</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An optional <code>HTTPClient.Configuration.Timeout</code> specifying how long to wait for connection or response from a remote service before timing out. Defaults to <code>nil</code>, which means no timeout.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>eventLoopGroup</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An optional <code>EventLoopGroup</code> that should be used for requests, instead of the default <code>MultiThreadedEventLoopGroup</code> shared between all RestRequest instances.</p>
+                                </div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
                       </div>
@@ -640,7 +667,7 @@ will be replaced.</p>
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C13setBodyObjectyyxKSERzlF"></a>
                     <a name="//apple_ref/swift/Method/setBodyObject(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C13setBodyObjectyyxKSERzlF">setBodyObject(_:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C13setBodyObjectyyxKSERzlF">setBodyObject(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -693,9 +720,11 @@ default <code>JSONEncoder</code>.</p>
               <div class="task-name-container">
                 <a name="/Response%20methods"></a>
                 <a name="//apple_ref/swift/Section/Response methods" class="dashAnchor"></a>
-                <a href="#/Response%20methods">
-                  <h3 class="section-name">Response methods</h3>
-                </a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Response%20methods"></a>
+                  <h3 class="section-name"><p>Response methods</p>
+</h3>
+                </div>
               </div>
               <ul class="item-container">
                 <li class="item">
@@ -703,7 +732,7 @@ default <code>JSONEncoder</code>.</p>
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C8response14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOy15AsyncHTTPClient0P0C8ResponseVAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/response(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C8response14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOy15AsyncHTTPClient0P0C8ResponseVAA0C5ErrorVGctF">response(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C8response14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOy15AsyncHTTPClient0P0C8ResponseVAA0C5ErrorVGctF">response(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -776,7 +805,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C12responseData14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVyAJ0E0VGAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/responseData(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C12responseData14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVyAJ0E0VGAA0C5ErrorVGctF">responseData(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C12responseData14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVyAJ0E0VGAA0C5ErrorVGctF">responseData(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -848,7 +877,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C14responseObject14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVyxGAA0C5ErrorVGctSeRzlF"></a>
                     <a name="//apple_ref/swift/Method/responseObject(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseObject14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVyxGAA0C5ErrorVGctSeRzlF">responseObject(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseObject14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVyxGAA0C5ErrorVGctSeRzlF">responseObject(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -920,7 +949,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C13responseArray14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySayypGGAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/responseArray(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C13responseArray14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySayypGGAA0C5ErrorVGctF">responseArray(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C13responseArray14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySayypGGAA0C5ErrorVGctF">responseArray(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -992,7 +1021,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C18responseDictionary14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySDySSypGGAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/responseDictionary(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C18responseDictionary14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySDySSypGGAA0C5ErrorVGctF">responseDictionary(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C18responseDictionary14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySDySSypGGAA0C5ErrorVGctF">responseDictionary(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1064,7 +1093,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C14responseString14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySSGAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/responseString(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseString14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySSGAA0C5ErrorVGctF">responseString(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C14responseString14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOyAA0C8ResponseVySSGAA0C5ErrorVGctF">responseString(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1136,7 +1165,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C12responseVoid14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOy15AsyncHTTPClient0Q0C8ResponseVAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/responseVoid(templateParams:queryItems:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C12responseVoid14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOy15AsyncHTTPClient0Q0C8ResponseVAA0C5ErrorVGctF">responseVoid(templateParams:queryItems:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C12responseVoid14templateParams10queryItems17completionHandlerySDyS2SGSg_Say10Foundation12URLQueryItemVGSgys6ResultOy15AsyncHTTPClient0Q0C8ResponseVAA0C5ErrorVGctF">responseVoid(templateParams:<wbr>queryItems:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1208,7 +1237,7 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
                     <code>
                     <a name="/s:13SwiftyRequest04RestB0C8download2to17completionHandlery10Foundation3URLV_ys6ResultOy8NIOHTTP116HTTPResponseHeadVAA0C5ErrorVGctF"></a>
                     <a name="//apple_ref/swift/Method/download(to:completionHandler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:13SwiftyRequest04RestB0C8download2to17completionHandlery10Foundation3URLV_ys6ResultOy8NIOHTTP116HTTPResponseHeadVAA0C5ErrorVGctF">download(to:completionHandler:)</a>
+                    <a class="token" href="#/s:13SwiftyRequest04RestB0C8download2to17completionHandlery10Foundation3URLV_ys6ResultOy8NIOHTTP116HTTPResponseHeadVAA0C5ErrorVGctF">download(to:<wbr>completionHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1269,8 +1298,8 @@ Note: this is equivalent to <code><a href="../Classes/RestRequest.html#/s:13Swif
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://github.com/IBM-Swift/SwiftyRequest" target="_blank" rel="external">IBM</a>. All rights reserved. (Last updated: 2019-09-27)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2020 <a class="link" href="https://github.com/Kitura/SwiftyRequest" target="_blank" rel="external">IBM &amp; Kitura Project Contributors</a>. All rights reserved. (Last updated: 2020-11-25)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
