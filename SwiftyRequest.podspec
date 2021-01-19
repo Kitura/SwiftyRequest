@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name        = "SwiftyRequest"
-  s.version     = "2.2.1"
+  s.version     = "3.0.0"
   s.summary     = "SwiftyRequest is an HTTP networking library built for Swift."
   s.homepage    = "https://github.com/Kitura/SwiftyRequest"
   s.license     = { :type => "Apache License, Version 2.0" }
@@ -13,4 +13,5 @@ Pod::Spec.new do |s|
   s.source_files = "Sources/**/*.swift"
   s.dependency 'LoggerAPI', '~> 1.7'
   s.dependency 'IBMSwiftCircuitBreaker', '~> 5.0'
+  s.dependency 'AsyncHttpClient', '~> 1.0'
 end
