@@ -38,10 +38,12 @@ func generateJWTHandler(user: JWTUser?, respondWith: (AccessToken?, RequestError
         else {
             return respondWith(nil, .internalServerError)
     }
+    print("JWT AccessToken: \(signedJWT)")
     respondWith(AccessToken(accessToken: signedJWT), nil)
 }
 
 func jwtAuthHandler(typeSafeJWT: MyJWTAuth<ClaimsStandardJWT>, respondWith: (JWTUser?, RequestError?) -> Void) {
+    print("JWT Auth: \(typeSafeJWT.jwt.claims.sub ?? "(nil)")")
     guard let userName = typeSafeJWT.jwt.claims.sub else {
         return respondWith(nil, .internalServerError)
     }
