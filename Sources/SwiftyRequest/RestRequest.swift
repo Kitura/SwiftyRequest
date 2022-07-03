@@ -400,7 +400,6 @@ public class RestRequest {
         // Set initial headers
         self.acceptType = "application/json"
         self.contentType = "application/json"
-
     }
 
     private static func createHTTPClient(insecure: Bool, clientCertificate: ClientCertificate? = nil, timeout: HTTPClient.Configuration.Timeout?, eventLoopGroup: EventLoopGroup?) -> HTTPClient {
@@ -448,17 +447,19 @@ public class RestRequest {
             breaker.run(commandArgs: (request, completionHandler), fallbackArgs: "Circuit is open")
         } else {
             self.session.execute(request: request).whenComplete { result in
-                switch result {
-                case .success(let response):
-                    if response.status.code >= 200 && response.status.code < 300 {
-                        return completionHandler(.success(response))
-                    } else {
-                        return completionHandler(.failure(RestError.errorStatusCode(response: response)))
+                self.session.shutdown { _ in
+                    switch result {
+                    case .success(let response):
+                        if response.status.code >= 200 && response.status.code < 300 {
+                            return completionHandler(.success(response))
+                        } else {
+                            return completionHandler(.failure(RestError.errorStatusCode(response: response)))
+                        }
+                    case .failure(let error as HTTPClientError):
+                        return completionHandler(.failure(.httpClientError(error)))
+                    case .failure(let error):
+                        return completionHandler(.failure(.otherError(error)))
                     }
-                case .failure(let error as HTTPClientError):
-                    return completionHandler(.failure(.httpClientError(error)))
-                case .failure(let error):
-                    return completionHandler(.failure(.otherError(error)))
                 }
             }
         }
@@ -549,11 +550,11 @@ public class RestRequest {
                 do {
                     let object = try JSONDecoder().decode(T.self, from: Data(bodyBytes))
                     return completionHandler(.success(RestResponse(host: response.host,
-                                                            status: response.status,
-                                                            headers: response.headers,
-                                                            request: request,
-                                                            body: object,
-                                                            cookies: response.cookies)))
+                                                                   status: response.status,
+                                                                   headers: response.headers,
+                                                                   request: request,
+                                                                   body: object,
+                                                                   cookies: response.cookies)))
                 } catch {
                     return completionHandler(.failure(RestError.decodingError(error: error, response: response)))
                 }
