@@ -28,7 +28,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/Kitura/CircuitBreaker.git", from: "5.0.200"),
-        .package(url: "https://github.com/Kitura/LoggerAPI.git", from: "1.9.200"),
+        .package(url: "https://github.com/Kitura/LoggerAPI.git", from: "2.0.0"),
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0")
     ],
     targets: [
