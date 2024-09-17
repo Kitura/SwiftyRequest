@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 /*
  * Copyright IBM Corporation 2017-2019
@@ -27,15 +27,14 @@ let package = Package(
         )
     ],
     dependencies: [
-        // .package(url: "https://github.com/Kitura/CircuitBreaker.git", from: "5.0.200"),
-        .package(path: "/Users/lahariganti/Desktop/localgit/CircuitBreaker"),
+        .package(url: "https://github.com/StyleShoots/CircuitBreaker", branch: "master"),
         .package(url: "https://github.com/Kitura/LoggerAPI.git", from: "2.0.0"),
-        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0")
+        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.22.1")
     ],
     targets: [
         .target(
             name: "SwiftyRequest",
-            dependencies: ["CircuitBreaker", "LoggerAPI", "AsyncHTTPClient"]
+            dependencies: ["CircuitBreaker", "LoggerAPI", .product(name: "AsyncHTTPClient", package: "async-http-client")]
         ),
         .testTarget(
             name: "SwiftyRequestTests",
